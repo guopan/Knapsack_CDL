@@ -2,16 +2,9 @@
 #define WIND_DISPLAY_H
 #include <QDebug>
 #include <QWidget>
-#include "direction_needle.h"
-#include "speed_bar.h"
-#include "heights_label.h"
+#include "rt_display.h"
+#include "rt_title.h"
 #include "global_defines.h"
-#include <QRect>
-#include <QPen>
-#include <QPainter>
-#include <QPen>
-#include <QLabel>
-#include <QGridLayout>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
@@ -20,18 +13,7 @@ class wind_display : public QWidget
     Q_OBJECT
 public:
     explicit wind_display(QWidget *parent = 0);
-    QLabel *DetectedAttitude;
-    QLabel *HorizontalDirection;
-    QLabel *HorizontalVelocity;
-    QLabel *VerticalVelocity;
-
-    heights_label *my_height [nLayers];
-    direction_needle *my_needle[nLayers];
-    speed_bar *my_bar[nLayers];
-    QGridLayout *Glayout;
-    QVBoxLayout *Vlayout;
-    QHBoxLayout *Hlayout;
-
+    ~wind_display();
 public slots:
     void setHSpeed(const double *sp);
     void setHDirection(const double *dir);
@@ -45,6 +27,11 @@ signals:
     void Heights_changed();
 
 private:
+    rt_display *my_display [nLayers];
+    rt_title *my_title;
+
+    QVBoxLayout *Vlayout;
+    QHBoxLayout *Hlayout;
     double HSpeed[nLayers];
     double H_direction[nLayers];
     double VSpeed[nLayers];
@@ -52,7 +39,6 @@ private:
     double Height_low;
     double Heithe_high;
 
-    int n;
 };
 
 #endif // WIND_DISPLAY_H

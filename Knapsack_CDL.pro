@@ -31,10 +31,9 @@ SOURCES += \
     motor.cpp \
     motorthread.cpp \
     adq214.cpp \
-    direction_needle.cpp \
-    heights_label.cpp \
-    speed_bar.cpp \
-    wind_display.cpp
+    wind_display.cpp \
+    rt_display.cpp \
+    rt_title.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,11 +42,10 @@ HEADERS += \
     motor.h \
     motorthread.h \
     adq214.h \
-    direction_needle.h \
-    heights_label.h \
-    speed_bar.h \
     wind_display.h \
-    global_defines.h
+    global_defines.h \
+    rt_display.h \
+    rt_title.h
 
 FORMS += \
         mainwindow.ui

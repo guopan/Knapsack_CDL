@@ -8,9 +8,6 @@
 #include "adq214.h"
 
 #include <QDebug>
-#include "heights_label.h"
-#include "direction_needle.h"
-#include "speed_bar.h"
 #include "wind_display.h"
 #include <QLabel>
 #include <QTimer>

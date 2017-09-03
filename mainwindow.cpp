@@ -44,13 +44,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //显示部分
     H_low = 100;
-    H_high = 900;
+    H_high = 1000;
     for(int i=0;i<nLayers;i++)
     {
         H_speed[i] = 0;
         H_direction[i] = 0;
         V_speed[i] = 0;
-        Height_values[i] = H_low + i*100;
+        Height_values[i] = H_high - i*100;
     }
 
     DisplaySpeed = new wind_display(this);
@@ -67,9 +67,12 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete DisplaySpeed;
+    delete mainToolBar;
+    timer->stop();
+    timer->deleteLater();
+    toolBarControlTimer->stop();
+    toolBarControlTimer->deleteLater();
 }
-
-
 
 //void MainWindow::on_readCompassButton_clicked()  //(辅助按钮，可不执行)
 //{
@@ -83,7 +86,6 @@ void MainWindow::on_startButton_clicked()
     Motor.prepare();            //电机上电并设置速度，加速度参数
 
 }
-
 
 void MainWindow::showCompassAngle(const double &s)
 {
@@ -190,7 +192,6 @@ void MainWindow::checkMotor()
         }
     }
 }
-
 
 void MainWindow::changeData()
 {
