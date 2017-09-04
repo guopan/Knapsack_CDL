@@ -15,14 +15,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    mainToolBar = new UserToolBar();
-    mainToolBar->setIconSize(QSize(48, 48));
-    mainToolBar->quitAction->setIcon(QIcon(":/images/Standby.png"));
-//    quitAction = mainToolBar->addAction(),QString::fromLocal8Bit("ÍË³ö"));
-    connect(mainToolBar->quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
-    addToolBar(mainToolBar);
-    isToolBarShowed = false;
-    showToolBar(isToolBarShowed);
+    userToolBar = new UserToolBar();
+    connect(userToolBar->quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
+    addToolBar(Qt::TopToolBarArea, userToolBar);
+    adminToolBar = new AdminToolBar();
+    addToolBar(Qt::TopToolBarArea, adminToolBar);
+    isUserToolBarShowed = false;
+    isAdminToolBarShowed = false;
+    showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
     toolBarControlTimer = new QTimer(this);
     toolBarControlTimer->setSingleShot(true);
     toolBarControlTimer->setInterval(10000);
@@ -31,7 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mouseEventClassifyTimer->setSingleShot(true);
     mouseEventClassifyTimer->setInterval(25);
     connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
-
+    doubleAltKeyPressedClassifyTimer = new QTimer(this);
+    doubleAltKeyPressedClassifyTimer->setSingleShot(true);
 //    timeOclock = new QTimer(this);
 
     connect(&Compass, &compass::compassAngle, this, &MainWindow::showCompassAngle);
@@ -71,7 +72,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete DisplaySpeed;
-    delete mainToolBar;
+    delete userToolBar;
+    delete adminToolBar;
     timer->stop();
     timer->deleteLater();
     toolBarControlTimer->stop();
@@ -241,44 +243,70 @@ void MainWindow::startActionTriggered()
 void MainWindow::toolBarControlTimerOutFcn()
 {
     qDebug() << "1111111111111";
-    isToolBarShowed = false;
-    showToolBar(isToolBarShowed);
+    isUserToolBarShowed = false;
+    showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
 }
 
 void MainWindow::mouseEventClassifyTimerOutFcn()
 {
-    if (isToolBarShowed) {
-        isToolBarShowed = false;
-        showToolBar(isToolBarShowed);
+    if (isUserToolBarShowed) {
+        isUserToolBarShowed = false;
+        showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
         toolBarControlTimer->stop();
     }
 }
 
-void MainWindow::showToolBar(bool isToolBarShowed)
+void MainWindow::showToolBar(bool isUserToolBarShowed, bool isAdminToolBarShowed)
 {
-    mainToolBar->setVisible(isToolBarShowed);
+    userToolBar->setVisible(isUserToolBarShowed);
+    adminToolBar->setVisible(isAdminToolBarShowed);
 }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    mouseEventClassifyTimer->stop();
-    if (event->button() == Qt::LeftButton) {
-        if (isToolBarShowed) {
-            isToolBarShowed = false;
-            showToolBar(isToolBarShowed);
-            toolBarControlTimer->stop();
-        }
-        else {
-            isToolBarShowed = true;
-            showToolBar(isToolBarShowed);
-            toolBarControlTimer->stop();
-            toolBarControlTimer->start(3000);
+    if (!isAdminToolBarShowed) {
+        mouseEventClassifyTimer->stop();
+        if (event->button() == Qt::LeftButton) {
+            if (isUserToolBarShowed) {
+                isUserToolBarShowed = false;
+                showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
+                toolBarControlTimer->stop();
+            }
+            else {
+                isUserToolBarShowed = true;
+                showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
+                toolBarControlTimer->stop();
+                toolBarControlTimer->start(3000);
+            }
         }
     }
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton)
-        mouseEventClassifyTimer->start(200);
+    if (!isAdminToolBarShowed) {
+        if (event->button() == Qt::LeftButton)
+            mouseEventClassifyTimer->start(200);
+    }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Alt) {
+        if (doubleAltKeyPressedClassifyTimer->isActive()) {
+            if (isAdminToolBarShowed) {
+                isAdminToolBarShowed = false;
+                isUserToolBarShowed = false;
+                showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
+            }
+            else {
+                isAdminToolBarShowed = true;
+                isUserToolBarShowed = true;
+                showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
+            }
+        }
+        else {
+            doubleAltKeyPressedClassifyTimer->start(500);
+        }
+    }
 }

@@ -16,7 +16,9 @@
 #include <QToolBar>
 #include <QAction>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <usertoolbar.h>
+#include <admintoolbar.h>
 
 namespace Ui {
 class MainWindow;
@@ -69,11 +71,6 @@ private:
     bool moveNorth, checkReady;
     double headAngle, motorPX0;
     QTimer *timeOclock;
-    QTimer *toolBarControlTimer;
-    QTimer *mouseEventClassifyTimer;
-
-//    motorthread Motorthread;
-//    compassThread CompassThread;
 
     ADQ214 adq;
     int perTime;     //每次转动的角度，先假设为每60°采一组数
@@ -83,12 +80,18 @@ private:
     wind_display *DisplaySpeed;
     QGridLayout *Glayout;
 
-    UserToolBar *mainToolBar;
-    bool isToolBarShowed;
-    void showToolBar(bool isToolBarShowed);
+    QTimer *toolBarControlTimer;
+    QTimer *mouseEventClassifyTimer;
+    QTimer *doubleAltKeyPressedClassifyTimer;
+    UserToolBar *userToolBar;
+    AdminToolBar *adminToolBar;
+    bool isUserToolBarShowed;
+    bool isAdminToolBarShowed;
+    void showToolBar(bool isUserToolBarShowed, bool isAdminToolBarShowed);
 
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // MAINWINDOW_H

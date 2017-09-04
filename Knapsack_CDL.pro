@@ -34,7 +34,8 @@ SOURCES += \
     wind_display.cpp \
     rt_display.cpp \
     rt_title.cpp \
-    usertoolbar.cpp
+    usertoolbar.cpp \
+    admintoolbar.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     global_defines.h \
     rt_display.h \
     rt_title.h \
-    usertoolbar.h
+    usertoolbar.h \
+    admintoolbar.h
 
 FORMS += \
         mainwindow.ui
