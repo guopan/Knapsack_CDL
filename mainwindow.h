@@ -52,6 +52,7 @@ private slots:
     void quitActionTriggered();
 
     void toolBarControlTimerOutFcn();
+    void mouseEventClassifyTimerOutFcn();
 private:
     Ui::MainWindow *ui;
     compass Compass;
@@ -67,6 +68,7 @@ private:
     double headAngle, motorPX0;
     QTimer *timeOclock;
     QTimer *toolBarControlTimer;
+    QTimer *mouseEventClassifyTimer;
 
 //    motorthread Motorthread;
 //    compassThread CompassThread;

@@ -26,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBarControlTimer->setSingleShot(true);
     toolBarControlTimer->setInterval(10000);
     connect(toolBarControlTimer, SIGNAL(timeout()), this, SLOT(toolBarControlTimerOutFcn()));
+    mouseEventClassifyTimer = new QTimer(this);
+    mouseEventClassifyTimer->setSingleShot(true);
+    mouseEventClassifyTimer->setInterval(25);
+    connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
 
 //    timeOclock = new QTimer(this);
 
@@ -233,6 +237,15 @@ void MainWindow::toolBarControlTimerOutFcn()
     showToolBar(isToolBarShowed);
 }
 
+void MainWindow::mouseEventClassifyTimerOutFcn()
+{
+    if (isToolBarShowed) {
+        isToolBarShowed = false;
+        showToolBar(isToolBarShowed);
+        toolBarControlTimer->stop();
+    }
+}
+
 void MainWindow::showToolBar(bool isToolBarShowed)
 {
     mainToolBar->setVisible(isToolBarShowed);
@@ -240,6 +253,7 @@ void MainWindow::showToolBar(bool isToolBarShowed)
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
+    mouseEventClassifyTimer->stop();
     if (event->button() == Qt::LeftButton) {
         if (isToolBarShowed) {
             isToolBarShowed = false;
@@ -257,11 +271,6 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton) {
-        if (isToolBarShowed) {
-            isToolBarShowed = false;
-            showToolBar(isToolBarShowed);
-            toolBarControlTimer->stop();
-        }
-    }
+    if (event->button() == Qt::LeftButton)
+        mouseEventClassifyTimer->start(200);
 }
