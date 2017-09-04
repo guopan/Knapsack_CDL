@@ -15,10 +15,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    mainToolBar = new QToolBar(this);
+    mainToolBar = new UserToolBar();
     mainToolBar->setIconSize(QSize(48, 48));
-    quitAction = mainToolBar->addAction(QIcon(":/images/Standby.png"),QString::fromLocal8Bit("退出"));
-    connect(quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
+    mainToolBar->quitAction->setIcon(QIcon(":/images/Standby.png"));
+//    quitAction = mainToolBar->addAction(),QString::fromLocal8Bit("退出"));
+    connect(mainToolBar->quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
     addToolBar(mainToolBar);
     isToolBarShowed = false;
     showToolBar(isToolBarShowed);
@@ -64,7 +65,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(changeData()));
-    timer->start(1000);
 }
 
 MainWindow::~MainWindow()
@@ -76,6 +76,8 @@ MainWindow::~MainWindow()
     timer->deleteLater();
     toolBarControlTimer->stop();
     toolBarControlTimer->deleteLater();
+    mouseEventClassifyTimer->stop();
+    mouseEventClassifyTimer->deleteLater();
 }
 
 //void MainWindow::on_readCompassButton_clicked()  //(辅助按钮，可不执行)
@@ -228,6 +230,12 @@ void MainWindow::changeData()
 void MainWindow::quitActionTriggered()
 {
     this->close();
+}
+
+void MainWindow::startActionTriggered()
+{
+    qDebug() << "Start Action Triggered!!!";
+    timer->start(1000);
 }
 
 void MainWindow::toolBarControlTimerOutFcn()

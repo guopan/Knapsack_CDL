@@ -33,7 +33,8 @@ SOURCES += \
     adq214.cpp \
     wind_display.cpp \
     rt_display.cpp \
-    rt_title.cpp
+    rt_title.cpp \
+    usertoolbar.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -45,7 +46,8 @@ HEADERS += \
     wind_display.h \
     global_defines.h \
     rt_display.h \
-    rt_title.h
+    rt_title.h \
+    usertoolbar.h
 
 FORMS += \
         mainwindow.ui

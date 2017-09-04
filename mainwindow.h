@@ -16,6 +16,7 @@
 #include <QToolBar>
 #include <QAction>
 #include <QMouseEvent>
+#include <usertoolbar.h>
 
 namespace Ui {
 class MainWindow;
@@ -50,6 +51,7 @@ private slots:
 
     void changeData();
     void quitActionTriggered();
+    void startActionTriggered();
 
     void toolBarControlTimerOutFcn();
     void mouseEventClassifyTimerOutFcn();
@@ -81,8 +83,7 @@ private:
     wind_display *DisplaySpeed;
     QGridLayout *Glayout;
 
-    QToolBar *mainToolBar;
-    QAction *quitAction;
+    UserToolBar *mainToolBar;
     bool isToolBarShowed;
     void showToolBar(bool isToolBarShowed);
 
