@@ -31,7 +31,6 @@ private:
     rt_title *my_title;
 
     QVBoxLayout *Vlayout;
-    QHBoxLayout *Hlayout;
     double HSpeed[nLayers];
     double H_direction[nLayers];
     double VSpeed[nLayers];

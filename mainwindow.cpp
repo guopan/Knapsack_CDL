@@ -33,18 +33,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
     doubleAltKeyPressedClassifyTimer = new QTimer(this);
     doubleAltKeyPressedClassifyTimer->setSingleShot(true);
-//    timeOclock = new QTimer(this);
+    timeOclock = new QTimer(this);
 
     connect(&Compass, &compass::compassAngle, this, &MainWindow::showCompassAngle);
     connect(&Motor, &motor::motorPrepareOk, this, &MainWindow::readyToMove);
     connect(&Motor, &motor::beginMove, this, &MainWindow::timeStart);
-//    connect(timeOclock,SIGNAL(timeout()),this, SLOT(checkMove()));
+    connect(timeOclock,SIGNAL(timeout()),this, SLOT(checkMove()));
     connect(&Motor, &motor::moveReady,this, &MainWindow::getPosition);
     connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
     connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
 
-    //    Compass.read();             // 读取一次罗盘数据确定罗盘连接状况
-    //    checkMotor();               // 检查电机连接
+    Compass.read();             // 读取一次罗盘数据确定罗盘连接状况
+    checkMotor();               // 检查电机连接
     perTime = 60;
 //    adq.connectADQDevice();     // 连接采集卡
 
@@ -65,17 +65,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->gridLayout->addWidget(DisplaySpeed);
 
     QTimer *timer = new QTimer(this);
+    timer->start(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(changeData()));
 }
 
 MainWindow::~MainWindow()
 {
+
     delete ui;
     delete DisplaySpeed;
     delete userToolBar;
     delete adminToolBar;
-    timer->stop();
-    timer->deleteLater();
     toolBarControlTimer->stop();
     toolBarControlTimer->deleteLater();
     mouseEventClassifyTimer->stop();

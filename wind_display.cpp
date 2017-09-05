@@ -23,7 +23,6 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
 
 wind_display::~wind_display()
 {
-    delete Hlayout;
     delete Vlayout;
     delete my_title;
     for (int i = 0; i < nLayers; ++i)
