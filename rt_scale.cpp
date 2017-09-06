@@ -9,6 +9,7 @@ rt_scale::rt_scale(QWidget *parent) : QWidget(parent)
 {
     margin = 10;
     Max_Scale = 10;     // 水平风速，满刻度 10m/s
+    H_speed_scale = 1;
 }
 
 void rt_scale::paintEvent(QPaintEvent *event)
@@ -65,7 +66,7 @@ void rt_scale::paintEvent(QPaintEvent *event)
     painter.setFont(font);
 
     // 计算参数
-    int bar_width = w * 200 / baseSize-1400;
+    int bar_width = w * 200 / baseSize-1480;
 
     // 绘制矩形背景
     painter.translate(1100, 0);    // 平移坐标系原点，右移到...
@@ -140,4 +141,11 @@ void rt_scale::paintEvent(QPaintEvent *event)
 void rt_scale::setHSizeHint(int hhh)
 {
     HSizeHint = hhh;
+}
+
+void rt_scale::setH_speed_scale(int scale)
+{
+    H_speed_scale = scale;
+    Max_Scale = 10 * H_speed_scale;
+    update();
 }

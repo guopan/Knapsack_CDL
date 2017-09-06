@@ -8,6 +8,8 @@ rt_display::rt_display(QWidget *parent) : QWidget(parent)
     H_speed = 0;
     H_direction = 0;
     V_speed = 0;
+    H_speed_scale = 1;
+    HSizeHint = 0;
     H = 0;
     connect(this, SIGNAL(data_changed()), this, SLOT(update()));
 }
@@ -161,14 +163,14 @@ void rt_display::paintEvent(QPaintEvent *event)
 
 
     painter.translate(400, 0);    // 平移坐标系原点，右移到风速条起始点
-    // 绘制矩形条
+    // 绘制水平风速矩形条
     painter.save();
     painter.setPen(Qt::NoPen);
     painter.setBrush(Color_HSpeed);
-    painter.drawRect(0, -80, H_speed*60, 160);
+    painter.drawRect(0, -80, H_speed/H_speed_scale*(w*200/baseSize-1480)/10, 160);
     painter.restore();
 
-    //     绘制垂直风速三角形
+    // 绘制垂直风速三角形
     QPoint VS_Triangle_P[3] = {         // 垂直方向指针位置 - 向上三角形
         QPoint(0, -80),
         QPoint(80, 80),
@@ -182,7 +184,7 @@ void rt_display::paintEvent(QPaintEvent *event)
     };
 
     painter.save();
-    painter.translate(H_speed*60, 0);
+    painter.translate(H_speed/H_speed_scale*(w*200/baseSize-1480)/10, 0);
     painter.setPen(Qt::NoPen);
 
     if(V_speed>=0)
@@ -234,13 +236,22 @@ void rt_display::setHeight(const int h)
 }
 
 // 设置水平风速值
-void rt_display::setHSpeed(const double sp)
+void rt_display::setHSpeed(const double sp, const int scale)
 {
+    bool need2update = false;
     if(H_speed != sp)
     {
         H_speed = sp;
-        emit data_changed();
+        need2update = true;
     }
+    if(H_speed_scale != scale)
+    {
+        H_speed_scale = scale;
+        need2update = true;
+    }
+    if(need2update)
+        emit data_changed();
+//    qDebug()<<"sp = "<<H_speed<<"   SCALE= "<<H_speed_scale;
 }
 
 // 设置水平风向，0~360度

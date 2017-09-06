@@ -11,7 +11,7 @@ public:
     explicit rt_display(QWidget *parent = nullptr);
 public:
     void setHeight(const int h);
-    void setHSpeed(const double sp);
+    void setHSpeed(const double sp, const int scale);
     void setVSpeed(const double sp);
     void setHdirection(const double dir);
     void setHSizeHint(int hhh);
@@ -27,6 +27,7 @@ private:
     double H_direction;
     double H;
     int HSizeHint;      // Widget¸ß¶È
+    int H_speed_scale;
 
 protected:
     void paintEvent(QPaintEvent *event) override;

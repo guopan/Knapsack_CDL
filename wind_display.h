@@ -41,6 +41,7 @@ private:
     double Heights[nLayers];
     double Height_low;
     double Heithe_high;
+    int HSpeedScale;
 
 //    void resizeEvent(QResizeEvent * event);
 

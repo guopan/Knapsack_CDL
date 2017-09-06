@@ -11,6 +11,7 @@ public:
     explicit rt_scale(QWidget *parent = nullptr);
 public:
     void setHSizeHint(int hhh);
+    void setH_speed_scale(int scale);
 signals:
 
 public slots:
@@ -19,6 +20,7 @@ private:
     int margin;
     int Max_Scale;
     int HSizeHint;      // Widget¸ß¶È
+    int H_speed_scale;
 protected:
     void paintEvent(QPaintEvent *event) override;
 };

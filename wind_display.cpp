@@ -1,5 +1,6 @@
 #include "wind_display.h"
 #include <QWidget>
+#include <QtMath>
 
 wind_display::wind_display(QWidget *parent) : QWidget(parent)
 {
@@ -13,7 +14,7 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
         // 设置100~1000米的10个标签
         my_display[i] = new rt_display;
         my_display[i]->setHeight(0);
-        my_display[i]->setHSpeed(0);
+        my_display[i]->setHSpeed(0,1);
         my_display[i]->setHdirection(0);
         my_display[i]->setVSpeed(0);
         Vlayout->addWidget(my_display[i]);
@@ -23,6 +24,7 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
     Vlayout->setStretch(nLayers+1, 1);
 
     setLayout(Vlayout);    //整体布局
+    HSpeedScale = 1;
 }
 
 wind_display::~wind_display()
@@ -37,12 +39,30 @@ wind_display::~wind_display()
 
 void wind_display::setHSpeed(const double *sp)
 {
+
+    int MaxHSpeed = 0;
+    for(int i=0;i<nLayers;i++)
+        if(MaxHSpeed < *(sp+i))
+            MaxHSpeed = *(sp+i);
+    int New_HSpeedScale;
+    if(MaxHSpeed<=10)
+        New_HSpeedScale = 1;
+    else
+        New_HSpeedScale = qCeil((qreal)(MaxHSpeed) / 10);
+
     for(int i=0;i<nLayers;i++)
         if(HSpeed[i] != *(sp+i))
         {
             HSpeed[i] = *(sp+i);
-            my_display[i]->setHSpeed(HSpeed[i]);
+            my_display[i]->setHSpeed(HSpeed[i], New_HSpeedScale);
         }
+//    qDebug()<<"ssssssp = "<<MaxHSpeed<<"   SSSSSSSCALE= "<<New_HSpeedScale;
+    if(New_HSpeedScale != HSpeedScale)
+    {
+        HSpeedScale = New_HSpeedScale;
+        my_scale->setH_speed_scale(HSpeedScale);
+    }
+//    qDebug()<<"=============";
 }
 
 void wind_display::setHDirection(const double *dir)

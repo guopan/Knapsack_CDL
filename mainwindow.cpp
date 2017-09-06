@@ -210,9 +210,9 @@ void MainWindow::changeData()
     for (int i = 0; i < nLayers; ++i)
     {
         // 水平风速
-        H_speed[i] += (1.3 - H_speed[i]*0.01*i);
-        if(H_speed[i]>10)
-            H_speed[i] -= 7.3;
+        H_speed[i] += (1.9 - H_speed[i]*0.02*i);
+        if(H_speed[i]>20)
+            H_speed[i] -= 19.8;
 
         // 水平风向
         H_direction[i] += 100.3 + H_direction[i]*0.02*i;
@@ -227,10 +227,10 @@ void MainWindow::changeData()
             V_speed[i] += 5.5;
         V_speed[i] -= 3;
 
+    }
         DisplaySpeed->setHSpeed(H_speed);
         DisplaySpeed->setHDirection(H_direction);
         DisplaySpeed->setVSpeed(V_speed);
-    }
 }
 
 void MainWindow::quitActionTriggered()
@@ -316,24 +316,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 }
 
 void MainWindow::resizeEvent(QResizeEvent * event)
-//?void wind_display::On_resize()
 {
     QMainWindow::resizeEvent(event);
-//    int sum = my_title->height();
-//    sum += my_scale->height();
-
-//    qDebug()<<"minih ==== "<<my_scale->height();
-//    qDebug()<<"minih ==== "<<my_title->height();
-//    for(int i=0;i<nLayers;i++)
-//    {
-//        sum += my_display[i]->height();
-//        qDebug()<<"minih ==== "<<my_display[i]->height();
-//    }
-//    int hhh = height();
-
-//    qDebug()<<"Total_H ==== "<<hhh;
-//    qDebug()<<"SUM ==== "<<sum;
-//    qDebug()<<"Total - SUM ==== "<<(hhh-sum);
-//    qDebug()<<"Total - SUM ==== ";
     emit size_changed();
 }
