@@ -4,9 +4,11 @@
 #include <QWidget>
 #include "rt_display.h"
 #include "rt_title.h"
+#include "rt_scale.h"
 #include "global_defines.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QResizeEvent>
 
 class wind_display : public QWidget
 {
@@ -19,6 +21,7 @@ public slots:
     void setHDirection(const double *dir);
     void setVSpeed(const double *sp);
     void setHeights(const double *h);
+    void setSubSize();
 
 signals:
     void HSpeed_changed();
@@ -29,6 +32,7 @@ signals:
 private:
     rt_display *my_display [nLayers];
     rt_title *my_title;
+    rt_scale *my_scale;
 
     QVBoxLayout *Vlayout;
     double HSpeed[nLayers];
@@ -37,6 +41,8 @@ private:
     double Heights[nLayers];
     double Height_low;
     double Heithe_high;
+
+//    void resizeEvent(QResizeEvent * event);
 
 };
 

@@ -63,7 +63,11 @@ MainWindow::MainWindow(QWidget *parent) :
     DisplaySpeed->setHeights(Height_values);
 
     ui->gridLayout->addWidget(DisplaySpeed);
+//    connect(&Motor, &motor::moveReady,this, &MainWindow::getPosition);
+//    connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
+//    connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
 
+    connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
     QTimer *timer = new QTimer(this);
     timer->start(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(changeData()));
@@ -309,4 +313,27 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             doubleAltKeyPressedClassifyTimer->start(500);
         }
     }
+}
+
+void MainWindow::resizeEvent(QResizeEvent * event)
+//?void wind_display::On_resize()
+{
+    QMainWindow::resizeEvent(event);
+//    int sum = my_title->height();
+//    sum += my_scale->height();
+
+//    qDebug()<<"minih ==== "<<my_scale->height();
+//    qDebug()<<"minih ==== "<<my_title->height();
+//    for(int i=0;i<nLayers;i++)
+//    {
+//        sum += my_display[i]->height();
+//        qDebug()<<"minih ==== "<<my_display[i]->height();
+//    }
+//    int hhh = height();
+
+//    qDebug()<<"Total_H ==== "<<hhh;
+//    qDebug()<<"SUM ==== "<<sum;
+//    qDebug()<<"Total - SUM ==== "<<(hhh-sum);
+//    qDebug()<<"Total - SUM ==== ";
+    emit size_changed();
 }

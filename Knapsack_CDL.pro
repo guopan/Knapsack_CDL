@@ -35,7 +35,8 @@ SOURCES += \
     rt_display.cpp \
     rt_title.cpp \
     usertoolbar.cpp \
-    admintoolbar.cpp
+    admintoolbar.cpp \
+    rt_scale.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -49,7 +50,8 @@ HEADERS += \
     rt_display.h \
     rt_title.h \
     usertoolbar.h \
-    admintoolbar.h
+    admintoolbar.h \
+    rt_scale.h
 
 FORMS += \
         mainwindow.ui

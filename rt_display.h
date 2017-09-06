@@ -14,6 +14,7 @@ public:
     void setHSpeed(const double sp);
     void setVSpeed(const double sp);
     void setHdirection(const double dir);
+    void setHSizeHint(int hhh);
 signals:
     void data_changed();
 
@@ -25,6 +26,7 @@ private:
     double V_speed;
     double H_direction;
     double H;
+    int HSizeHint;      // Widget¸ß¶È
 
 protected:
     void paintEvent(QPaintEvent *event) override;

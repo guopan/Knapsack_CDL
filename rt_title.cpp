@@ -12,7 +12,6 @@ rt_title::rt_title(QWidget *parent) : QWidget(parent)
 
 void rt_title::paintEvent(QPaintEvent *event)
 {
-
     Q_UNUSED(event);
 
     // 方向指针位置 - 多边形
@@ -36,9 +35,8 @@ void rt_title::paintEvent(QPaintEvent *event)
     // 确定缩放尺度
     int w = width();
     int h = height();
-
-    //    w = qFloor(float(w)/11)*11; // 消除各个行宽的微小差别
-    h = qRound(float(h)/4)*4;   // 消除各个行高的微小差别
+    if(qAbs(h-HSizeHint)<3)
+        h = HSizeHint;         // 消除各个行高的微小差别
     int baseSize = qMin(w/11, h);
 
     QPainter painter(this);
@@ -164,4 +162,10 @@ void rt_title::paintEvent(QPaintEvent *event)
     painter.setPen(Qt::black);
     painter.drawText(rectF, Qt::AlignCenter, str);
 
+}
+
+// 设置控件高度的参考值
+void rt_title::setHSizeHint(int hhh)
+{
+    HSizeHint = hhh;
 }

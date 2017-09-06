@@ -1,14 +1,14 @@
-#ifndef RT_TITLE_H
-#define RT_TITLE_H
+#ifndef RT_SCALE_H
+#define RT_SCALE_H
 
 #include <QWidget>
 #include <QRectF>
 #include <QDebug>
-class rt_title : public QWidget
+class rt_scale : public QWidget
 {
     Q_OBJECT
 public:
-    explicit rt_title(QWidget *parent = nullptr);
+    explicit rt_scale(QWidget *parent = nullptr);
 public:
     void setHSizeHint(int hhh);
 signals:
@@ -17,9 +17,10 @@ public slots:
 
 private:
     int margin;
+    int Max_Scale;
     int HSizeHint;      // Widget¸ß¶È
 protected:
     void paintEvent(QPaintEvent *event) override;
 };
 
-#endif // RT_TITLE_H
+#endif // RT_SCALE_H

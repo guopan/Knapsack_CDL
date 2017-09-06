@@ -42,12 +42,11 @@ void rt_display::paintEvent(QPaintEvent *event)
     QColor MarklineColor(0, 127, 127, 150);
     QColor NeedleColor(255, 255, 255, 255);
 
-
     // 确定缩放尺度
     int w = width();
     int h = height();
-    //    w = qFloor(float(w)/11)*11; // 消除各个行宽的微小差别
-    h = qRound(float(h)/4)*4;   // 消除各个行高的微小差别
+    if(qAbs(h-HSizeHint)<3)
+        h = HSizeHint;         // 消除各个行高的微小差别
     int baseSize = qMin(w/11, h);
 
     QPainter painter(this);
@@ -262,5 +261,11 @@ void rt_display::setVSpeed(const double sp)
         V_speed = sp;
         emit data_changed();
     }
+}
+
+// 设置控件高度的参考值
+void rt_display::setHSizeHint(int hhh)
+{
+    HSizeHint = hhh;
 }
 

@@ -5,6 +5,7 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
 {
     Vlayout = new QVBoxLayout;
     my_title = new rt_title;
+    my_scale = new rt_scale;
     Vlayout->addWidget(my_title);
     Vlayout->setStretch(0, 1);
     for (int i = 0; i < nLayers; ++i)
@@ -18,6 +19,9 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
         Vlayout->addWidget(my_display[i]);
         Vlayout->setStretch(i+1, 1);
     }
+    Vlayout->addWidget(my_scale);
+    Vlayout->setStretch(nLayers+1, 1);
+
     setLayout(Vlayout);    //整体布局
 }
 
@@ -69,4 +73,17 @@ void wind_display::setHeights(const double *h)
             Heights[i] = *(h+i);
             my_display[i]->setHeight(Heights[i]);
         }
+}
+
+void wind_display::setSubSize()
+{
+    int h = height();
+    h = int((h-99)/(nLayers+2));
+
+    my_title->setHSizeHint(h);
+    for(int i=0;i<nLayers;i++)
+    {
+        my_display[i]->setHSizeHint(h);
+    }
+    my_scale->setHSizeHint(h);
 }
