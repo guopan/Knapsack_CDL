@@ -2,9 +2,11 @@
 
 UserToolBar::UserToolBar()
 {
-    quitAction = this->addAction(QString::fromLocal8Bit("退出"));
     startAction = this->addAction(QString::fromLocal8Bit("开始"));
+    quitAction = this->addAction(QString::fromLocal8Bit("退出"));
+
     setIconSize(QSize(48, 48));
+    startAction->setIcon(QIcon(":/images/Start.png"));
     quitAction->setIcon(QIcon(":/images/Standby.png"));
     setMovable(false);
 }

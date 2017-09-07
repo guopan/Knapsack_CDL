@@ -35,6 +35,7 @@ wind_display::~wind_display()
     {
         delete my_display[i];
     }
+    delete my_scale;
 }
 
 void wind_display::setHSpeed(const double *sp)

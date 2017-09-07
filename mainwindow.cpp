@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     isUserToolBarShowed = false;
     isAdminToolBarShowed = false;
     showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
+
     toolBarControlTimer = new QTimer(this);
     toolBarControlTimer->setSingleShot(true);
     toolBarControlTimer->setInterval(10000);
