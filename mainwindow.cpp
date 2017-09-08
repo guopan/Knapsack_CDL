@@ -305,6 +305,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
             }
             else {
+                toolBarControlTimer->stop();
                 isAdminToolBarShowed = true;
                 isUserToolBarShowed = true;
                 showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
