@@ -47,6 +47,7 @@ public:
     double Height_values[10];
 signals:
     void data_changed();
+    void size_changed();
 private slots:
 
 //    void on_readCompassButton_clicked();
@@ -105,6 +106,7 @@ private:
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void resizeEvent(QResizeEvent * event);
 };
 
 #endif // MAINWINDOW_H
