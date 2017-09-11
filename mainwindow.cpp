@@ -15,6 +15,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QDir dirs;
+    QString path = dirs.currentPath()+"/"+"214settings.ini";				//??????????????????
+    qDebug() << "initial path = " << path;
+    m_setfile.test_create_file(path);									//??settings.ini????????????
+    m_setfile.readFrom_file(path);										//??settings.ini??
+    mysetting = m_setfile.get_setting();								//mysetting????????
+
     userToolBar = new UserToolBar();
     connect(userToolBar->quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
     addToolBar(Qt::TopToolBarArea, userToolBar);
@@ -23,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     isUserToolBarShowed = false;
     isAdminToolBarShowed = false;
     showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
+    connect(adminToolBar,SIGNAL(actionTriggered(QAction*)),this, SLOT(action_set_triggered()));
 
     toolBarControlTimer = new QTimer(this);
     toolBarControlTimer->setSingleShot(true);
@@ -85,6 +94,21 @@ MainWindow::~MainWindow()
     toolBarControlTimer->deleteLater();
     mouseEventClassifyTimer->stop();
     mouseEventClassifyTimer->deleteLater();
+}
+
+void MainWindow::action_set_triggered()
+{
+    qDebug() << " open setting ";
+    ParaSetDlg = new paraDialog(this);
+    ParaSetDlg->init_setting(mysetting,stopped);					//mysetting???????psetting
+    ParaSetDlg->initial_para();										//???????????????
+    ParaSetDlg->on_checkBox_autocreate_datafile_clicked();			//????????
+    if (ParaSetDlg->exec() == QDialog::Accepted)					// ?????
+    {
+        mysetting =	ParaSetDlg->get_settings();						//mysetting????????
+
+    }
+    delete ParaSetDlg;
 }
 
 //void MainWindow::on_readCompassButton_clicked()  //(辅助按钮，可不执行)

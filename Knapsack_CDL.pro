@@ -36,7 +36,9 @@ SOURCES += \
     rt_title.cpp \
     usertoolbar.cpp \
     admintoolbar.cpp \
-    rt_scale.cpp
+    rt_scale.cpp \
+    paradialog.cpp \
+    settingfile.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -51,10 +53,14 @@ HEADERS += \
     rt_title.h \
     usertoolbar.h \
     admintoolbar.h \
-    rt_scale.h
+    rt_scale.h \
+    paradialog.h \
+    settingfile.h \
+    acqsettings.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    paradialog.ui
 win32: LIBS += -L$$quote(C:/Program Files/SP Devices/ADQAPI/) -lADQAPI
 INCLUDEPATH += $$quote(C:/Program Files/SP Devices/ADQAPI/)
 

@@ -6,6 +6,9 @@
 #include "motor.h"
 #include "motorthread.h"
 #include "adq214.h"
+#include "acqsettings.h"
+#include "settingfile.h"
+#include <paradialog.h>
 
 #include <QDebug>
 #include "wind_display.h"
@@ -19,6 +22,7 @@
 #include <QKeyEvent>
 #include <usertoolbar.h>
 #include <admintoolbar.h>
+
 
 namespace Ui {
 class MainWindow;
@@ -43,7 +47,6 @@ public:
     double Height_values[10];
 signals:
     void data_changed();
-    void size_changed();
 private slots:
 
 //    void on_readCompassButton_clicked();
@@ -58,6 +61,9 @@ private slots:
 
     void toolBarControlTimerOutFcn();
     void mouseEventClassifyTimerOutFcn();
+
+    void action_set_triggered();					//…Ë÷√
+
 private:
     Ui::MainWindow *ui;
     compass Compass;
@@ -89,11 +95,16 @@ private:
     bool isUserToolBarShowed;
     bool isAdminToolBarShowed;
     void showToolBar(bool isUserToolBarShowed, bool isAdminToolBarShowed);
+    paraDialog *ParaSetDlg;
+    ACQSETTING mysetting;
+    settingfile m_setfile;
+    bool stopped;									//Õ£÷π≤…ºØ
+
+
 
     void mouseDoubleClickEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
-    void resizeEvent(QResizeEvent * event);
 };
 
 #endif // MAINWINDOW_H
