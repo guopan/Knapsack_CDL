@@ -37,10 +37,10 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBarControlTimer->setSingleShot(true);
     toolBarControlTimer->setInterval(10000);
     connect(toolBarControlTimer, SIGNAL(timeout()), this, SLOT(toolBarControlTimerOutFcn()));
-    mouseEventClassifyTimer = new QTimer(this);
-    mouseEventClassifyTimer->setSingleShot(true);
-    mouseEventClassifyTimer->setInterval(25);
-    connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
+//    mouseEventClassifyTimer = new QTimer(this);
+//    mouseEventClassifyTimer->setSingleShot(true);
+//    mouseEventClassifyTimer->setInterval(25);
+//    connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
     doubleAltKeyPressedClassifyTimer = new QTimer(this);
     doubleAltKeyPressedClassifyTimer->setSingleShot(true);
     timeOclock = new QTimer(this);
@@ -92,8 +92,6 @@ MainWindow::~MainWindow()
     delete adminToolBar;
     toolBarControlTimer->stop();
     toolBarControlTimer->deleteLater();
-    mouseEventClassifyTimer->stop();
-    mouseEventClassifyTimer->deleteLater();
 }
 
 void MainWindow::action_set_triggered()
@@ -111,11 +109,6 @@ void MainWindow::action_set_triggered()
     delete ParaSetDlg;
 }
 
-//void MainWindow::on_readCompassButton_clicked()  //(辅助按钮，可不执行)
-//{
-//    Compass.read();           //读取罗盘数据
-//}
-
 void MainWindow::on_startButton_clicked()
 {
     Compass.read();
@@ -126,7 +119,6 @@ void MainWindow::on_startButton_clicked()
 
 void MainWindow::showCompassAngle(const double &s)
 {
-    //    ui->compassText->setText(QString::number(s,'f2',2));
     headAngle=s;           // 记录罗盘数值
 }
 
@@ -271,18 +263,8 @@ void MainWindow::startActionTriggered()
 
 void MainWindow::toolBarControlTimerOutFcn()
 {
-    qDebug() << "1111111111111";
     isUserToolBarShowed = false;
     showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
-}
-
-void MainWindow::mouseEventClassifyTimerOutFcn()
-{
-    if (isUserToolBarShowed) {
-        isUserToolBarShowed = false;
-        showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
-        toolBarControlTimer->stop();
-    }
 }
 
 void MainWindow::showToolBar(bool isUserToolBarShowed, bool isAdminToolBarShowed)
@@ -291,11 +273,10 @@ void MainWindow::showToolBar(bool isUserToolBarShowed, bool isAdminToolBarShowed
     adminToolBar->setVisible(isAdminToolBarShowed);
 }
 
-void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
+void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     if (!isAdminToolBarShowed) {
-        mouseEventClassifyTimer->stop();
-        if (event->button() == Qt::LeftButton) {
+        if (event->button() == Qt::RightButton){
             if (isUserToolBarShowed) {
                 isUserToolBarShowed = false;
                 showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
@@ -308,14 +289,11 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
                 toolBarControlTimer->start(3000);
             }
         }
-    }
-}
-
-void MainWindow::mousePressEvent(QMouseEvent *event)
-{
-    if (!isAdminToolBarShowed) {
-        if (event->button() == Qt::LeftButton)
-            mouseEventClassifyTimer->start(200);
+        else if(event->button() == Qt::LeftButton) {
+            isUserToolBarShowed = false;
+            showToolBar(isUserToolBarShowed, isAdminToolBarShowed);
+            toolBarControlTimer->stop();
+        }
     }
 }
 

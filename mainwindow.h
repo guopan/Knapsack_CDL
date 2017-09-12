@@ -45,13 +45,12 @@ public:
     double H_direction[10];
     double V_speed[10];
     double Height_values[10];
+
 signals:
     void data_changed();
     void size_changed();
+
 private slots:
-
-//    void on_readCompassButton_clicked();
-
     void on_startButton_clicked();
 
     void checkMove();
@@ -61,7 +60,6 @@ private slots:
     void startActionTriggered();
 
     void toolBarControlTimerOutFcn();
-    void mouseEventClassifyTimerOutFcn();
 
     void action_set_triggered();					//…Ë÷√
 
@@ -89,24 +87,22 @@ private:
     QGridLayout *Glayout;
 
     QTimer *toolBarControlTimer;
-    QTimer *mouseEventClassifyTimer;
     QTimer *doubleAltKeyPressedClassifyTimer;
     UserToolBar *userToolBar;
     AdminToolBar *adminToolBar;
     bool isUserToolBarShowed;
     bool isAdminToolBarShowed;
     void showToolBar(bool isUserToolBarShowed, bool isAdminToolBarShowed);
+
+    void mousePressEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+
+    void resizeEvent(QResizeEvent * event);
+
     paraDialog *ParaSetDlg;
     ACQSETTING mysetting;
     settingfile m_setfile;
     bool stopped;									//Õ£÷π≤…ºØ
-
-
-
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void resizeEvent(QResizeEvent * event);
 };
 
 #endif // MAINWINDOW_H
