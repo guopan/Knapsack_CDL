@@ -7,10 +7,10 @@
 #include <QDialog>
 #include <QMessageBox>
 
-const int FACTOR  = 150;								//é‡‡æ ·ç‚¹è®¡ç®—å…¬å¼ç³»æ•°
-const int SIZE_OF_FILE_HEADER = 6;						//å•ä¸ªå•æ–‡ä»¶å¤´çš„å¤§å°
-const int DATA_MEMORY = 64*1000*1000;					//é‡‡é›†å¡å†…å­˜ç©ºé—´ï¼ˆç‚¹ï¼‰
-const int UPLOAD_SPEED = 20;							//ä¸Šä¼ é€Ÿåº¦MB/s
+const int FACTOR  = 150;								//²ÉÑùµã¼ÆËã¹«Ê½ÏµÊı
+const int SIZE_OF_FILE_HEADER = 6;						//µ¥¸öµ¥ÎÄ¼şÍ·µÄ´óĞ¡
+const int DATA_MEMORY = 64*1000*1000;					//²É¼¯¿¨ÄÚ´æ¿Õ¼ä£¨µã£©
+const int UPLOAD_SPEED = 20;							//ÉÏ´«ËÙ¶ÈMB/s
 
 namespace Ui {
 class paraDialog;
@@ -32,12 +32,12 @@ public slots:
      void on_checkBox_autocreate_datafile_clicked();
 
 private slots:
-    //æ¿€å…‰å‚æ•°
+    //¼¤¹â²ÎÊı
     void set_laserRPF();
     void set_laserPulseWidth();
     void set_laserWaveLength();
     void set_AOM_Freq();
-    //æ‰«æå‚æ•°
+    //É¨Ãè²ÎÊı
     void set_elevationAngle();
     void set_start_azAngle();
     void set_step_azAngle();
@@ -50,12 +50,12 @@ private slots:
     void set_motorSP();
     void set_time_direct_interval();
     void set_time_circle_interval();
-    //é‡‡æ ·è®¾ç½®
+    //²ÉÑùÉèÖÃ
     void set_sampleFreq();
     void set_detRange();
     void set_plsAccNum();
     void set_filesize();
-    //æ–‡ä»¶å­˜å‚¨
+    //ÎÄ¼ş´æ´¢
 
 
     void on_pushButton_pathModify_clicked();
@@ -76,21 +76,21 @@ private:
     ACQSETTING psetting;
     ACQSETTING defaulsetting;
     settingfile dlg_setfile;
-    QString profile_path;                      //é…ç½®æ–‡ä»¶è·¯å¾„
+    QString profile_path;                      //ÅäÖÃÎÄ¼şÂ·¾¶
 
-    double direct_size;		                   //å•æ–¹å‘ä¸Šçš„æ•°æ®é‡
-    int sampleNum;			                   //å•ä¸ªè„‰å†²çš„é‡‡æ ·ç‚¹æ•°
-    bool nocollecting;		                   //æ˜¯å¦æ­£åœ¨é‡‡é›†æ•°æ®
-    int pagePerPls;			                   //å•ä¸ªè„‰å†²çš„pageæ•°
+    double direct_size;		                   //µ¥·½ÏòÉÏµÄÊı¾İÁ¿
+    int sampleNum;			                   //µ¥¸öÂö³åµÄ²ÉÑùµãÊı
+    bool nocollecting;		                   //ÊÇ·ñÕıÔÚ²É¼¯Êı¾İ
+    int pagePerPls;			                   //µ¥¸öÂö³åµÄpageÊı
     QString lenStr;
 
-    void set_dect_time();				         //è®¡ç®—é¢„ä¼°æ¢æµ‹æ—¶é—´
-    void filesize_over();				         //åˆ¤æ–­å•æ–‡ä»¶é‡è¶…è¿‡é‡‡é›†å¡å†…å­˜
+    void set_dect_time();				         //¼ÆËãÔ¤¹ÀÌ½²âÊ±¼ä
+    void filesize_over();				         //ÅĞ¶Ïµ¥ÎÄ¼şÁ¿³¬¹ı²É¼¯¿¨ÄÚ´æ
     void show_DatafilePath(QString str);
-    quint64 getDiskFreeSpace(QString driver);	 //è·å–è·¯å¾„ä¸‹çš„ç¡¬ç›˜å‰©ä½™ç©ºé—´å¤§å°
+    quint64 getDiskFreeSpace(QString driver);	 //»ñÈ¡Â·¾¶ÏÂµÄÓ²ÅÌÊ£Óà¿Õ¼ä´óĞ¡
 
     void update_show();
-    void show_detect_mode();    //å‚è€ƒä¿¡æ¯â€”â€”æ¢æµ‹æ–¹å¼
+    void show_detect_mode();    //²Î¿¼ĞÅÏ¢¡ª¡ªÌ½²â·½Ê½
 
 };
 

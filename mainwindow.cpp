@@ -85,7 +85,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-
     delete ui;
     delete DisplaySpeed;
     delete userToolBar;
@@ -104,7 +103,6 @@ void MainWindow::action_set_triggered()
     if (ParaSetDlg->exec() == QDialog::Accepted)					// ?????
     {
         mysetting =	ParaSetDlg->get_settings();						//mysetting????????
-
     }
     delete ParaSetDlg;
 }

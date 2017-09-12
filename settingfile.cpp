@@ -10,43 +10,43 @@ void settingfile::init_fsetting(const ACQSETTING &setting)
     fsetting = setting;
 }
 
-void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      //å†™å…¥æ–‡ä»¶
+void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      //Ğ´ÈëÎÄ¼ş
 {
     fsetting = setting;
     QString path_a = a;
 
     QSettings settings(path_a,QSettings::IniFormat);
     settings.beginGroup("Laser_parameters");
-    settings.setValue("laserRPF",fsetting.laserRPF);					//æ¿€å…‰é‡é¢‘
-    settings.setValue("laserPulseWidth",fsetting.laserPulseWidth);		//æ¿€å…‰è„‰å®½
-    settings.setValue("laserWaveLength",fsetting.laserWaveLength);		//æ¿€å…‰æ³¢é•¿
-    settings.setValue("AOM_Freq",fsetting.AOM_Freq);					//AOMç§»é¢‘é‡
+    settings.setValue("laserRPF",fsetting.laserRPF);					//¼¤¹âÖØÆµ
+    settings.setValue("laserPulseWidth",fsetting.laserPulseWidth);		//¼¤¹âÂö¿í
+    settings.setValue("laserWaveLength",fsetting.laserWaveLength);		//¼¤¹â²¨³¤
+    settings.setValue("AOM_Freq",fsetting.AOM_Freq);					//AOMÒÆÆµÁ¿
     settings.endGroup();
 
     settings.beginGroup("Scan_parameters");
-    settings.setValue("elevationAngle",fsetting.elevationAngle);		//ä¿¯ä»°è§’
-    settings.setValue("start_azAngle",fsetting.start_azAngle);			//èµ·å§‹è§’
-    settings.setValue("step_azAngle",fsetting.step_azAngle);			//æ­¥è¿›è§’
-    settings.setValue("angleNum",fsetting.angleNum);					//æ–¹å‘æ•°
-    settings.setValue("circleNum",fsetting.circleNum);					//åœ†å‘¨æ•°
-    settings.setValue("anglekey",fsetting.anglekey);					//æ–¹å‘æ•°
-    settings.setValue("circlekey",fsetting.circlekey);					//åœ†å‘¨æ•°
-    settings.setValue("continusdete",fsetting.continusdete);            //è¿ç»­æ¢æµ‹
-    settings.setValue("SP",fsetting.SP);								//ç”µæœºé€Ÿåº¦
-    settings.setValue("direct_intervalTime",fsetting.direct_intervalTime);//æ–¹å‘é—´é—´éš”
-    settings.setValue("time_circle_interval",fsetting.time_circle_interval);//åœ†å‘¨é—´é—´éš”
+    settings.setValue("elevationAngle",fsetting.elevationAngle);		//¸©Ñö½Ç
+    settings.setValue("start_azAngle",fsetting.start_azAngle);			//ÆğÊ¼½Ç
+    settings.setValue("step_azAngle",fsetting.step_azAngle);			//²½½ø½Ç
+    settings.setValue("angleNum",fsetting.angleNum);					//·½ÏòÊı
+    settings.setValue("circleNum",fsetting.circleNum);					//Ô²ÖÜÊı
+    settings.setValue("anglekey",fsetting.anglekey);					//·½ÏòÊı
+    settings.setValue("circlekey",fsetting.circlekey);					//Ô²ÖÜÊı
+    settings.setValue("continusdete",fsetting.continusdete);            //Á¬ĞøÌ½²â
+    settings.setValue("SP",fsetting.SP);								//µç»úËÙ¶È
+    settings.setValue("direct_intervalTime",fsetting.direct_intervalTime);//·½Ïò¼ä¼ä¸ô
+    settings.setValue("time_circle_interval",fsetting.time_circle_interval);//Ô²ÖÜ¼ä¼ä¸ô
     settings.endGroup();
 
     settings.beginGroup("Sample_parameters");
-    settings.setValue("sampleFreq",fsetting.sampleFreq);				//é‡‡æ ·é¢‘ç‡
-    settings.setValue("detRange",fsetting.detRange);					//æ¢æµ‹è·ç¦»
-    settings.setValue("sampleNum",fsetting.sampleNum);                  //é‡‡æ ·ç‚¹æ•°
-    settings.setValue("plsAccNum",fsetting.plsAccNum);					//è„‰å†²æ•°
+    settings.setValue("sampleFreq",fsetting.sampleFreq);				//²ÉÑùÆµÂÊ
+    settings.setValue("detRange",fsetting.detRange);					//Ì½²â¾àÀë
+    settings.setValue("sampleNum",fsetting.sampleNum);                  //²ÉÑùµãÊı
+    settings.setValue("plsAccNum",fsetting.plsAccNum);					//Âö³åÊı
     settings.endGroup();
 
     settings.beginGroup("File_store");
-    settings.setValue("DatafilePath",fsetting.DatafilePath);					//æ–‡ä»¶ä¿å­˜è·¯å¾„
-    settings.setValue("autocreate_datafile",fsetting.autocreate_datafile);		//è‡ªåŠ¨åˆ›å»ºæ—¥æœŸæ–‡ä»¶å¤¹
+    settings.setValue("DatafilePath",fsetting.DatafilePath);					//ÎÄ¼ş±£´æÂ·¾¶
+    settings.setValue("autocreate_datafile",fsetting.autocreate_datafile);		//×Ô¶¯´´½¨ÈÕÆÚÎÄ¼ş¼Ğ
     settings.endGroup();
 
 }
@@ -63,29 +63,29 @@ void settingfile::readFrom_file(const QString &b)
     settings.endGroup();
 
     settings.beginGroup("Scan_parameters");
-    fsetting.elevationAngle = settings.value("elevationAngle").toInt();		//ä¿¯ä»°è§’
-    fsetting.start_azAngle = settings.value("start_azAngle").toInt();		//èµ·å§‹è§’
-    fsetting.step_azAngle = settings.value("step_azAngle").toInt();			//æ­¥è¿›è§’
-    fsetting.angleNum = settings.value("angleNum").toInt();					//æ–¹å‘æ•°
-    fsetting.circleNum = settings.value("circleNum").toFloat();				//åœ†å‘¨æ•°
-    fsetting.anglekey = settings.value("anglekey").toBool();				//æ–¹å‘é”®
-    fsetting.circlekey = settings.value("circlekey").toBool();				//åœ†å‘¨é”®
-    fsetting.continusdete = settings.value("continusdete").toBool();        //è¿ç»­æ¢æµ‹
-    fsetting.SP = settings.value("SP").toInt();								//ç”µæœºé€Ÿåº¦
-    fsetting.direct_intervalTime = settings.value("direct_intervalTime").toFloat();//æ–¹å‘é—´é—´éš”
-    fsetting.time_circle_interval = settings.value("time_circle_interval").toFloat();//åœ†å‘¨é—´é—´éš”
+    fsetting.elevationAngle = settings.value("elevationAngle").toInt();		//¸©Ñö½Ç
+    fsetting.start_azAngle = settings.value("start_azAngle").toInt();		//ÆğÊ¼½Ç
+    fsetting.step_azAngle = settings.value("step_azAngle").toInt();			//²½½ø½Ç
+    fsetting.angleNum = settings.value("angleNum").toInt();					//·½ÏòÊı
+    fsetting.circleNum = settings.value("circleNum").toFloat();				//Ô²ÖÜÊı
+    fsetting.anglekey = settings.value("anglekey").toBool();				//·½Ïò¼ü
+    fsetting.circlekey = settings.value("circlekey").toBool();				//Ô²ÖÜ¼ü
+    fsetting.continusdete = settings.value("continusdete").toBool();        //Á¬ĞøÌ½²â
+    fsetting.SP = settings.value("SP").toInt();								//µç»úËÙ¶È
+    fsetting.direct_intervalTime = settings.value("direct_intervalTime").toFloat();//·½Ïò¼ä¼ä¸ô
+    fsetting.time_circle_interval = settings.value("time_circle_interval").toFloat();//Ô²ÖÜ¼ä¼ä¸ô
     settings.endGroup();
 
     settings.beginGroup("Sample_parameters");
-    fsetting.sampleFreq = settings.value("sampleFreq").toInt();				//é‡‡æ ·é¢‘ç‡
-    fsetting.detRange = settings.value("detRange").toFloat();				//æ¢æµ‹è·ç¦»
-    fsetting.sampleNum = settings.value("sampleNum").toInt();				//é‡‡æ ·ç‚¹æ•°
-    fsetting.plsAccNum = settings.value("plsAccNum").toInt();				//è„‰å†²æ•°
+    fsetting.sampleFreq = settings.value("sampleFreq").toInt();				//²ÉÑùÆµÂÊ
+    fsetting.detRange = settings.value("detRange").toFloat();				//Ì½²â¾àÀë
+    fsetting.sampleNum = settings.value("sampleNum").toInt();				//²ÉÑùµãÊı
+    fsetting.plsAccNum = settings.value("plsAccNum").toInt();				//Âö³åÊı
     settings.endGroup();
 
     settings.beginGroup("File_store");
-    fsetting.DatafilePath = settings.value("DatafilePath").toString();					//æ–‡ä»¶ä¿å­˜è·¯å¾„
-    fsetting.autocreate_datafile = settings.value("autocreate_datafile").toBool();		//è‡ªåŠ¨åˆ›å»ºæœ€å°æ–‡ä»¶å¤¹
+    fsetting.DatafilePath = settings.value("DatafilePath").toString();					//ÎÄ¼ş±£´æÂ·¾¶
+    fsetting.autocreate_datafile = settings.value("autocreate_datafile").toBool();		//×Ô¶¯´´½¨×îĞ¡ÎÄ¼ş¼Ğ
     settings.endGroup();
 }
 
@@ -102,52 +102,52 @@ void settingfile::checkValid()
 void settingfile::test_create_file(const QString &c)
 {
     QString path_c = c;
-    QString prefix_str = QDateTime::currentDateTime().toString("yyyyMMdd");				//è·å–æœ€æ–°æ—¥æœŸ
+    QString prefix_str = QDateTime::currentDateTime().toString("yyyyMMdd");				//»ñÈ¡×îĞÂÈÕÆÚ
     QFileInfo file(path_c);                                               //2?
     QSettings settings(path_c,QSettings::IniFormat);
     if(file.exists() == false)
     {
         settings.beginGroup("Laser_parameters");
-        settings.setValue("laserRPF",10000);				//æ¿€å…‰é‡é¢‘
-        settings.setValue("laserPulseWidth",500);			//æ¿€å…‰è„‰å®½
-        settings.setValue("laserWaveLength",1540);			//æ¿€å…‰æ³¢é•¿
-        settings.setValue("AOM_Freq",120);					//AOMç§»é¢‘é‡
+        settings.setValue("laserRPF",10000);				//¼¤¹âÖØÆµ
+        settings.setValue("laserPulseWidth",500);			//¼¤¹âÂö¿í
+        settings.setValue("laserWaveLength",1540);			//¼¤¹â²¨³¤
+        settings.setValue("AOM_Freq",120);					//AOMÒÆÆµÁ¿
         settings.endGroup();
 
         settings.beginGroup("Scan_parameters");
-        settings.setValue("elevationAngle",70);				//ä¿¯ä»°è§’
-        settings.setValue("start_azAngle",0);				//èµ·å§‹è§’
-        settings.setValue("step_azAngle",90);				//æ­¥è¿›è§’
-        settings.setValue("angleNum",80);					//æ–¹å‘æ•°
-        settings.setValue("circleNum",20);					//åœ†å‘¨æ•°
-        settings.setValue("anglekey",false);			    //æ–¹å‘é”®
-        settings.setValue("circlekey",false);				//åœ†å‘¨é”®
-        settings.setValue("continusdete",true);            //è¿ç»­æ¢æµ‹
-        settings.setValue("SP",90);							//ç”µæœºé€Ÿåº¦
-        settings.setValue("direct_intervalTime",0);			//æ–¹å‘é—´é—´éš”
-        settings.setValue("time_circle_interval",0);		//åœ†å‘¨é—´é—´éš”
+        settings.setValue("elevationAngle",70);				//¸©Ñö½Ç
+        settings.setValue("start_azAngle",0);				//ÆğÊ¼½Ç
+        settings.setValue("step_azAngle",90);				//²½½ø½Ç
+        settings.setValue("angleNum",80);					//·½ÏòÊı
+        settings.setValue("circleNum",20);					//Ô²ÖÜÊı
+        settings.setValue("anglekey",false);			    //·½Ïò¼ü
+        settings.setValue("circlekey",false);				//Ô²ÖÜ¼ü
+        settings.setValue("continusdete",true);            //Á¬ĞøÌ½²â
+        settings.setValue("SP",90);							//µç»úËÙ¶È
+        settings.setValue("direct_intervalTime",0);			//·½Ïò¼ä¼ä¸ô
+        settings.setValue("time_circle_interval",0);		//Ô²ÖÜ¼ä¼ä¸ô
         settings.endGroup();
 
         settings.beginGroup("Sample_parameters");
-        settings.setValue("sampleFreq",400);				//é‡‡æ ·é¢‘ç‡
-        settings.setValue("detRange",6000);					//æ¢æµ‹è·ç¦»
-        settings.setValue("sampleNum",16128);				//é‡‡æ ·ç‚¹æ•°
-        settings.setValue("plsAccNum",100);					//è„‰å†²æ•°
+        settings.setValue("sampleFreq",400);				//²ÉÑùÆµÂÊ
+        settings.setValue("detRange",6000);					//Ì½²â¾àÀë
+        settings.setValue("sampleNum",16128);				//²ÉÑùµãÊı
+        settings.setValue("plsAccNum",100);					//Âö³åÊı
         settings.endGroup();
 
         settings.beginGroup("File_store");
-//        path_c.chop(16);									//æˆªæ‰æœ«å°¾é…ç½®æ–‡ä»¶å
-//        path_c.append("/").append(prefix_str);			//è·¯å¾„æœ«å°¾åŠ ä¸Šæ—¥æœŸæ–‡ä»¶å¤¹
-        settings.setValue("DatafilePath",path_c);			//æ–‡ä»¶ä¿å­˜è·¯å¾„
-        settings.setValue("autocreate_datafile",true);		//è‡ªåŠ¨åˆ›å»ºæ—¥æœŸæ–‡ä»¶å¤¹
+//        path_c.chop(16);									//½ØµôÄ©Î²ÅäÖÃÎÄ¼şÃû
+//        path_c.append("/").append(prefix_str);			//Â·¾¶Ä©Î²¼ÓÉÏÈÕÆÚÎÄ¼ş¼Ğ
+        settings.setValue("DatafilePath",path_c);			//ÎÄ¼ş±£´æÂ·¾¶
+        settings.setValue("autocreate_datafile",true);		//×Ô¶¯´´½¨ÈÕÆÚÎÄ¼ş¼Ğ
         settings.endGroup();
     }
     else
     {
-        path_c.chop(16);									//æˆªæ‰æœ«å°¾é…ç½®æ–‡ä»¶å
-        path_c.append("/").append(prefix_str);				//è·¯å¾„æœ«å°¾åŠ ä¸Šæ—¥æœŸæ–‡ä»¶å¤¹
+        path_c.chop(16);									//½ØµôÄ©Î²ÅäÖÃÎÄ¼şÃû
+        path_c.append("/").append(prefix_str);				//Â·¾¶Ä©Î²¼ÓÉÏÈÕÆÚÎÄ¼ş¼Ğ
         settings.beginGroup("File_store");
-        settings.setValue("dataFileName_Prefix",prefix_str);//å‰ç¼€æ–‡ä»¶å
+        settings.setValue("dataFileName_Prefix",prefix_str);//Ç°×ºÎÄ¼şÃû
         settings.endGroup();
         qDebug() <<"Settings file exist";
     }
@@ -158,8 +158,8 @@ void settingfile::test_create_file(const QString &c)
     if(LogFile.exists() == false)
     {
         QString cteate_time = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss");
-        cteate_time.append(QString::fromLocal8Bit("åˆ›å»ºè®°å½•æ–‡ä»¶"));
-        LogFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);   //ä½¿ç”¨QTextStreamå‘æ–‡ä»¶è¾“å‡ºæ¢è¡Œï¼Œéœ€è¦ä½¿ç”¨QIODevice::Textæ ‡å¿—
+        cteate_time.append(QString::fromLocal8Bit("´´½¨¼ÇÂ¼ÎÄ¼ş"));
+        LogFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text);   //Ê¹ÓÃQTextStreamÏòÎÄ¼şÊä³ö»»ĞĞ£¬ĞèÒªÊ¹ÓÃQIODevice::Text±êÖ¾
         QTextStream record_str(&LogFile);
         record_str << cteate_time << endl;
         LogFile.close();
@@ -170,50 +170,50 @@ void settingfile::test_create_file(const QString &c)
 bool settingfile::isSettingsChanged(const ACQSETTING &setting)
 {
     ACQSETTING dlgsetting = setting;
-    if(fsetting.laserRPF != dlgsetting.laserRPF)					//æ¿€å…‰é‡é¢‘
+    if(fsetting.laserRPF != dlgsetting.laserRPF)					//¼¤¹âÖØÆµ
         return true;
-    if(fsetting.laserPulseWidth != dlgsetting.laserPulseWidth)		//è„‰å†²å®½åº¦
+    if(fsetting.laserPulseWidth != dlgsetting.laserPulseWidth)		//Âö³å¿í¶È
         return true;
-    if(fsetting.laserWaveLength != dlgsetting.laserWaveLength)		//æ¿€å…‰æ³¢é•¿
+    if(fsetting.laserWaveLength != dlgsetting.laserWaveLength)		//¼¤¹â²¨³¤
         return true;
-    if(fsetting.AOM_Freq != dlgsetting.AOM_Freq)					//AOMç§»é¢‘é‡
+    if(fsetting.AOM_Freq != dlgsetting.AOM_Freq)					//AOMÒÆÆµÁ¿
         return true;
 
-    if(fsetting.elevationAngle != dlgsetting.elevationAngle)		//ä¿¯ä»°è§’
+    if(fsetting.elevationAngle != dlgsetting.elevationAngle)		//¸©Ñö½Ç
         return true;
-    if(fsetting.start_azAngle != dlgsetting.start_azAngle)			//èµ·å§‹è§’
+    if(fsetting.start_azAngle != dlgsetting.start_azAngle)			//ÆğÊ¼½Ç
         return true;
-    if(fsetting.step_azAngle != dlgsetting.step_azAngle)			//æ­¥è¿›è§’
+    if(fsetting.step_azAngle != dlgsetting.step_azAngle)			//²½½ø½Ç
         return true;
-    if(fsetting.angleNum != dlgsetting.angleNum)					//æ–¹å‘æ•°
+    if(fsetting.angleNum != dlgsetting.angleNum)					//·½ÏòÊı
         return true;
-    if(fsetting.circleNum != dlgsetting.circleNum)					//åœ†å‘¨æ•°
+    if(fsetting.circleNum != dlgsetting.circleNum)					//Ô²ÖÜÊı
         return true;
     if(fsetting.anglekey != dlgsetting.anglekey)
         return true;
     if(fsetting.circlekey != dlgsetting.circlekey)
         return true;
-    if(fsetting.continusdete != dlgsetting.continusdete)            //è¿ç»­æ¢æµ‹
+    if(fsetting.continusdete != dlgsetting.continusdete)            //Á¬ĞøÌ½²â
         return true;
-    if(fsetting.SP != dlgsetting.SP)								//ç”µæœºé€Ÿåº¦
+    if(fsetting.SP != dlgsetting.SP)								//µç»úËÙ¶È
         return true;
     if(fsetting.direct_intervalTime != dlgsetting.direct_intervalTime)
         return true;
     if(fsetting.time_circle_interval != dlgsetting.time_circle_interval)
         return true;
 
-    if(fsetting.sampleFreq != dlgsetting.sampleFreq)				//é‡‡æ ·é¢‘ç‡
+    if(fsetting.sampleFreq != dlgsetting.sampleFreq)				//²ÉÑùÆµÂÊ
         return true;
-    if(fsetting.detRange != dlgsetting.detRange)					//æ¢æµ‹è·ç¦»
+    if(fsetting.detRange != dlgsetting.detRange)					//Ì½²â¾àÀë
         return true;
     if(fsetting.sampleNum != dlgsetting.sampleNum)
         return true;
     if(fsetting.plsAccNum != dlgsetting.plsAccNum)
         return true;
 
-    if(fsetting.DatafilePath != dlgsetting.DatafilePath)			  //æ–‡ä»¶ä¿å­˜è·¯å¾„
+    if(fsetting.DatafilePath != dlgsetting.DatafilePath)			  //ÎÄ¼ş±£´æÂ·¾¶
         return true;
-    if(fsetting.autocreate_datafile != dlgsetting.autocreate_datafile)//è‡ªåŠ¨åˆ›å»ºæ—¥æœŸæ–‡ä»¶å¤¹
+    if(fsetting.autocreate_datafile != dlgsetting.autocreate_datafile)//×Ô¶¯´´½¨ÈÕÆÚÎÄ¼ş¼Ğ
         return true;
 
     return false;
@@ -224,7 +224,7 @@ void settingfile::updatelogFile(const QString &addInstruct)
 {
     instruct_str = addInstruct;
     qDebug() << "instruct_str = " << instruct_str;
-    //é‡‡é›†æ–‡å­—è¯´æ˜
+    //²É¼¯ÎÄ×ÖËµÃ÷
     QFile last_LF(LF_path);
     QString last_time = QDateTime::currentDateTime().toString("yyyy/MM/dd hh:mm:ss");
     last_time.append(QString::fromLocal8Bit("start collecting"));

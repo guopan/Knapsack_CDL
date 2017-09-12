@@ -4,34 +4,34 @@
 
 typedef struct
 {
-    //æ¿€å…‰å‚æ•°
-    quint16 laserRPF;			//æ¿€å…‰é¢‘ç‡
-    quint16 laserPulseWidth;	//è„‰å†²å®½åº¦
-    quint16 laserWaveLength;	//æ¿€å…‰æ³¢é•¿
-    quint16 AOM_Freq;			//AOMç§»é¢‘é‡
+    //¼¤¹â²ÎÊı
+    quint16 laserRPF;			//¼¤¹âÆµÂÊ
+    quint16 laserPulseWidth;	//Âö³å¿í¶È
+    quint16 laserWaveLength;	//¼¤¹â²¨³¤
+    quint16 AOM_Freq;			//AOMÒÆÆµÁ¿
 
-    //æ‰«æå‚æ•°
-    quint16 elevationAngle;		//ä¿¯ä»°è§’
-    quint16 start_azAngle;		//èµ·å§‹è§’
-    quint16 step_azAngle;		//æ­¥è¿›è§’
-    quint32 angleNum;			//æ–¹å‘æ•°
-    float circleNum;			//åœ†å‘¨æ•°
-    bool anglekey;				//æ–¹å‘é”®
-    bool circlekey;				//åœ†å‘¨é”®
-    bool continusdete;          //è¿ç»­æ¢æµ‹
-    quint16 SP;					//é©±åŠ¨å™¨é€Ÿåº¦
-    float direct_intervalTime;	//æ–¹å‘é—´é—´éš”
-    float time_circle_interval;	//åœ†å‘¨é—´é—´éš”
+    //É¨Ãè²ÎÊı
+    quint16 elevationAngle;		//¸©Ñö½Ç
+    quint16 start_azAngle;		//ÆğÊ¼½Ç
+    quint16 step_azAngle;		//²½½ø½Ç
+    quint32 angleNum;			//·½ÏòÊı
+    float circleNum;			//Ô²ÖÜÊı
+    bool anglekey;				//·½Ïò¼ü
+    bool circlekey;				//Ô²ÖÜ¼ü
+    bool continusdete;          //Á¬ĞøÌ½²â
+    quint16 SP;					//Çı¶¯Æ÷ËÙ¶È
+    float direct_intervalTime;	//·½Ïò¼ä¼ä¸ô
+    float time_circle_interval;	//Ô²ÖÜ¼ä¼ä¸ô
 
-    //é‡‡æ ·å‚æ•°
-    quint16 sampleFreq;			//é‡‡æ ·é¢‘ç‡
-    float detRange;				//é‡‡æ ·è·ç¦»
-    quint32 sampleNum;			//é‡‡æ ·ç‚¹æ•°
-    quint16 plsAccNum;			//å•æ¬¡è„‰å†²æ•°
+    //²ÉÑù²ÎÊı
+    quint16 sampleFreq;			//²ÉÑùÆµÂÊ
+    float detRange;				//²ÉÑù¾àÀë
+    quint32 sampleNum;			//²ÉÑùµãÊı
+    quint16 plsAccNum;			//µ¥´ÎÂö³åÊı
 
-    //æ–‡ä»¶å­˜å‚¨
-    QString DatafilePath;		//æ•°æ®å­˜å‚¨è·¯å¾„
-    bool autocreate_datafile;	//è‡ªåŠ¨åˆ›å»ºæ—¥æœŸæ–‡ä»¶å¤¹
+    //ÎÄ¼ş´æ´¢
+    QString DatafilePath;		//Êı¾İ´æ´¢Â·¾¶
+    bool autocreate_datafile;	//×Ô¶¯´´½¨ÈÕÆÚÎÄ¼ş¼Ğ
 
 }ACQSETTING;
 

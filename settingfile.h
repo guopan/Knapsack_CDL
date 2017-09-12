@@ -15,22 +15,22 @@ class settingfile
 public:
     settingfile();
 
-    //é…ç½®æ–‡ä»¶
+    //ÅäÖÃÎÄ¼ş
     ACQSETTING get_setting(void);
     void init_fsetting(const ACQSETTING &setting);
-    void writeTo_file(const ACQSETTING &setting,const QString &a);	//å†™å…¥æ–‡ä»¶ä¸­
-    void readFrom_file(const QString &b);							//ä»æ–‡ä»¶ä¸­è¯»å–
-    void checkValid();												//æ£€æŸ¥åŠ è½½çš„é…ç½®æ–‡ä»¶æ˜¯å¦æœ‰æ•ˆ
-    void test_create_file(const QString &c);						//æ£€æŸ¥é…ç½®æ–‡ä»¶æ˜¯å¦å­˜åœ¨ï¼Œè‹¥æ— åˆ™ç”Ÿæˆ
-    bool isSettingsChanged(const ACQSETTING &setting);				//è®¾ç½®çª—å£å‚æ•°ä¿®æ”¹åï¼Œæœªä¿å­˜æ—¶æç¤ºæ˜¯å¦ä¿å­˜
+    void writeTo_file(const ACQSETTING &setting,const QString &a);	//Ğ´ÈëÎÄ¼şÖĞ
+    void readFrom_file(const QString &b);							//´ÓÎÄ¼şÖĞ¶ÁÈ¡
+    void checkValid();												//¼ì²é¼ÓÔØµÄÅäÖÃÎÄ¼şÊÇ·ñÓĞĞ§
+    void test_create_file(const QString &c);						//¼ì²éÅäÖÃÎÄ¼şÊÇ·ñ´æÔÚ£¬ÈôÎŞÔòÉú³É
+    bool isSettingsChanged(const ACQSETTING &setting);				//ÉèÖÃ´°¿Ú²ÎÊıĞŞ¸Äºó£¬Î´±£´æÊ±ÌáÊ¾ÊÇ·ñ±£´æ
 
-    //è®°å½•æ–‡ä»¶
-    void updatelogFile(const QString &addInstruct);					//è®°å½•é‡‡é›†è¿‡ç¨‹
+    //¼ÇÂ¼ÎÄ¼ş
+    void updatelogFile(const QString &addInstruct);					//¼ÇÂ¼²É¼¯¹ı³Ì
 
 private:
     ACQSETTING fsetting;
-    QString LF_path;												//è®°å½•é‡‡é›†æ–‡ä»¶çš„è·¯å¾„
-    QString instruct_str;											//æ–‡å­—è¯´æ˜
+    QString LF_path;												//¼ÇÂ¼²É¼¯ÎÄ¼şµÄÂ·¾¶
+    QString instruct_str;											//ÎÄ×ÖËµÃ÷
 };
 
 #endif // SETTINGFILE_H
