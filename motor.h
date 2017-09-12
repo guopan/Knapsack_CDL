@@ -14,11 +14,13 @@ public:
     void moveRelative(const double &a);
     void position();
     void checkMove();
+    void motorQuit();
 signals:
     void motorAngle(const double &s);
     void motorPrepareOk();
     void beginMove();
     void moveReady();
+    void motorError();
 public slots:
 private slots:
     void timeout();

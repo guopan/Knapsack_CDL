@@ -50,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&Motor, &motor::beginMove, this, &MainWindow::timeStart);
     connect(timeOclock,SIGNAL(timeout()),this, SLOT(checkMove()));
     connect(&Motor, &motor::moveReady,this, &MainWindow::getPosition);
+    connect(&Motor, &motor::motorError, this, &MainWindow::errorSolve);
     connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
     connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
 
@@ -112,7 +113,6 @@ void MainWindow::on_startButton_clicked()
     Compass.read();
     moveNorth=true;
     Motor.prepare();            //电机上电并设置速度，加速度参数
-
 }
 
 void MainWindow::showCompassAngle(const double &s)
@@ -220,6 +220,20 @@ void MainWindow::checkMotor()
     }
 }
 
+void MainWindow::errorSolve()
+{
+    timeOclock->stop();
+    if(moveNorth)
+    {
+        Compass.read();
+        Motor.prepare();
+    }
+    else
+    {
+        Motor.prepare();
+    }
+}
+
 void MainWindow::changeData()
 {
     for (int i = 0; i < nLayers; ++i)
@@ -250,6 +264,9 @@ void MainWindow::changeData()
 
 void MainWindow::quitActionTriggered()
 {
+    timeOclock->stop();
+    Motor.motorQuit();
+    Sleep(100);
     this->close();
 }
 

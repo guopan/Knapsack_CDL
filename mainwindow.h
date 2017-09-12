@@ -71,6 +71,7 @@ private:
     void timeStart();
     void getPosition();
     void checkMotor();
+    void errorSolve();
 
     motor Motor;
     void readyToMove();

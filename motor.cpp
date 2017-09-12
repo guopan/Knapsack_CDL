@@ -55,6 +55,11 @@ void motor::timeout()
     qDebug()<<"motor timeout";
 }
 
+void motor::motorQuit()
+{
+    Order_str = "MO=0;";
+    thread_port.transaction(portname,Order_str);
+}
 
 void motor::receive_response(const QString &s)
 {
@@ -86,7 +91,16 @@ void motor::receive_response(const QString &s)
             emit this->moveReady();
             qDebug()<<"moveready";
         }
-       else{qDebug()<<"moveon";}
+       else
+        {
+            if(s.left(4)=="MS;3")
+            {
+                emit this->motorError();
+                qDebug()<<"电机启动异常";
+            }
+            else
+            {qDebug()<<"moveon";}
+        }
     }
     if(s.left(2) == "PA")
     {
@@ -122,9 +136,14 @@ void motor::receive_response(const QString &s)
     }
     if(s.left(10) == "VR;Whistle")
     {
+        Order_str = ";";
+        thread_port.transaction(portname,Order_str);
+    }
+    if(s.left(1) == ";")
+    {
         Order_str = "MO=1;";
         thread_port.transaction(portname,Order_str);
-    }    
+    }
 }
 
 
