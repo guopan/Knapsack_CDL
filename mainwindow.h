@@ -80,7 +80,6 @@ private:
     QTimer *timeOclock;
 
     ADQ214 adq;
-    int perTime;     //每次转动的角度，先假设为每60°采一组数
 
     QWidget *widget;
 

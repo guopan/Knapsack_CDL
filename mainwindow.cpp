@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     userToolBar = new UserToolBar();
     connect(userToolBar->quitAction, &QAction::triggered, this, &MainWindow::quitActionTriggered);
+    connect(userToolBar->startAction, &QAction::triggered, this, &MainWindow::startActionTriggered);
 
     addToolBar(Qt::TopToolBarArea, userToolBar);
     adminToolBar = new AdminToolBar();
@@ -39,10 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBarControlTimer->setSingleShot(true);
     toolBarControlTimer->setInterval(10000);
     connect(toolBarControlTimer, SIGNAL(timeout()), this, SLOT(toolBarControlTimerOutFcn()));
-//    mouseEventClassifyTimer = new QTimer(this);
-//    mouseEventClassifyTimer->setSingleShot(true);
-//    mouseEventClassifyTimer->setInterval(25);
-//    connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
+    //    mouseEventClassifyTimer = new QTimer(this);
+    //    mouseEventClassifyTimer->setSingleShot(true);
+    //    mouseEventClassifyTimer->setInterval(25);
+    //    connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
     doubleAltKeyPressedClassifyTimer = new QTimer(this);
     doubleAltKeyPressedClassifyTimer->setSingleShot(true);
     timeOclock = new QTimer(this);
@@ -58,8 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Compass.read();             // 读取一次罗盘数据确定罗盘连接状况
     checkMotor();               // 检查电机连接
-    perTime = 60;
-//    adq.connectADQDevice();     // 连接采集卡
+    mysetting.step_azAngle = 60;
+
+    //    adq.connectADQDevice();     // 连接采集卡
 
     // 显示部分
     H_low = 100;
@@ -76,14 +78,15 @@ MainWindow::MainWindow(QWidget *parent) :
     DisplaySpeed->setHeights(Height_values);
 
     ui->gridLayout->addWidget(DisplaySpeed);
-//    connect(&Motor, &motor::moveReady,this, &MainWindow::getPosition);
-//    connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
-//    connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
+    //    connect(&Motor, &motor::moveReady,this, &MainWindow::getPosition);
+    //    connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
+    //    connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
 
     connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
-    QTimer *timer = new QTimer(this);
-    timer->start(1000);
+    timer = new QTimer(this);
+    //    timer->start(1000);
     connect(timer, SIGNAL(timeout()), this, SLOT(changeData()));
+    stopped = true;
 }
 
 MainWindow::~MainWindow()
@@ -145,21 +148,21 @@ void MainWindow::checkMotorAngle(const double &s)
         if(!checkReady)           //先确定每次转动前的初始位置
         {
             motorPX0 = s;
-            Motor.moveRelative(perTime);
-            if(motorPX0>360-perTime)
+            Motor.moveRelative(mysetting.step_azAngle);
+            if(motorPX0>360-mysetting.step_azAngle)
                 motorPX0 = motorPX0-360;
             checkReady = true;
         }
         else
         {
-            if((s-motorPX0-perTime)<=0.5&&(s-motorPX0-perTime)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
+            if((s-motorPX0-mysetting.step_azAngle)<=0.5&&(s-motorPX0-mysetting.step_azAngle)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
             {
                 adq.Start_Capture();
                 checkReady = false;
             }
             else
             {
-                Motor.moveRelative(motorPX0+perTime-s);
+                Motor.moveRelative(motorPX0+mysetting.step_azAngle-s);
             }
         }
     }
@@ -259,9 +262,9 @@ void MainWindow::changeData()
         V_speed[i] -= 3;
 
     }
-        DisplaySpeed->setHSpeed(H_speed);
-        DisplaySpeed->setHDirection(H_direction);
-        DisplaySpeed->setVSpeed(V_speed);
+    DisplaySpeed->setHSpeed(H_speed);
+    DisplaySpeed->setHDirection(H_direction);
+    DisplaySpeed->setVSpeed(V_speed);
 }
 
 void MainWindow::quitActionTriggered()
@@ -275,7 +278,16 @@ void MainWindow::quitActionTriggered()
 void MainWindow::startActionTriggered()
 {
     qDebug() << "Start Action Triggered!!!";
-    timer->start(1000);
+    if(stopped)
+    {
+        timer->start(1000);
+        stopped = false;
+    }
+    else
+    {
+        timer->stop();
+        stopped = true;
+    }
 }
 
 void MainWindow::toolBarControlTimerOutFcn()
