@@ -55,8 +55,7 @@ HEADERS += \
     admintoolbar.h \
     rt_scale.h \
     paradialog.h \
-    settingfile.h \
-    acqsettings.h
+    settingfile.h
 
 FORMS += \
         mainwindow.ui \

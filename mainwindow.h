@@ -6,7 +6,7 @@
 #include "motor.h"
 #include "motorthread.h"
 #include "adq214.h"
-#include "acqsettings.h"
+#include "global_defines.h"
 #include "settingfile.h"
 #include <paradialog.h>
 

@@ -8,7 +8,7 @@
 #include <QFile>
 #include <QTextStream>
 
-#include "acqsettings.h"
+#include "global_defines.h"
 
 class settingfile
 {

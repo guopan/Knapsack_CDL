@@ -1,6 +1,6 @@
 #ifndef PARADIALOG_H
 #define PARADIALOG_H
-#include "acqsettings.h"
+#include "global_defines.h"
 #include "settingfile.h"
 #include "qmessagebox.h"
 #include "qfiledialog.h"
