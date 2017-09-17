@@ -25,7 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mysetting = m_setfile.get_settings();								// mysetting获取文件中的参数
 
     userToolBar = new UserToolBar();
-    connect(userToolBar->quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
+    connect(userToolBar->quitAction, &QAction::triggered, this, &MainWindow::quitActionTriggered);
+
     addToolBar(Qt::TopToolBarArea, userToolBar);
     adminToolBar = new AdminToolBar();
     addToolBar(Qt::TopToolBarArea, adminToolBar);
