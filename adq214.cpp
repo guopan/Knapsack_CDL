@@ -199,9 +199,6 @@ void ADQ214::WriteSpecData2disk()                   // ½«Êý¾Ý×ª»»³É¹¦ÂÊÆ×£¬Ð´Èëµ
         return;
     int nLoops = setupadq.num_samples_collect/2048;
 
-
-    setupadq.stream_ch &= 0x07;
-
     if (psd_res != nullptr)
         delete psd_res;
     int psd_datanum = 512*nLoops;        //¹¦ÂÊÆ×³¤¶È
@@ -211,14 +208,14 @@ void ADQ214::WriteSpecData2disk()                   // ½«Êý¾Ý×ª»»³É¹¦ÂÊÆ×£¬Ð´Èëµ
     for (l=0;l<nLoops;l++)
         for (k=0,i=0; (k<512); k++,k++)
         {
-            psd_res[512*l + BitReverseIndex[k]].pos[3] = setupadq.data_stream_target[2048*l + i];
-            psd_res[512*l + BitReverseIndex[k]].pos[2] = setupadq.data_stream_target[2048*l + i+1];
-            psd_res[512*l + BitReverseIndex[k]].pos[1] = setupadq.data_stream_target[2048*l + i+4];
-            psd_res[512*l + BitReverseIndex[k]].pos[0] = setupadq.data_stream_target[2048*l + i+5];
-            psd_res[512*l + BitReverseIndex[k+1]].pos[3] = setupadq.data_stream_target[2048*l + i+2];
-            psd_res[512*l + BitReverseIndex[k+1]].pos[2] = setupadq.data_stream_target[2048*l + i+3];
-            psd_res[512*l + BitReverseIndex[k+1]].pos[1] = setupadq.data_stream_target[2048*l + i+6];
-            psd_res[512*l + BitReverseIndex[k+1]].pos[0] = setupadq.data_stream_target[2048*l + i+7];
+            psd_res[512*l + k].pos[3] = setupadq.data_stream_target[2048*l + i];
+            psd_res[512*l + k].pos[2] = setupadq.data_stream_target[2048*l + i+1];
+            psd_res[512*l + k].pos[1] = setupadq.data_stream_target[2048*l + i+4];
+            psd_res[512*l + k].pos[0] = setupadq.data_stream_target[2048*l + i+5];
+            psd_res[512*l + k+1].pos[3] = setupadq.data_stream_target[2048*l + i+2];
+            psd_res[512*l + k+1].pos[2] = setupadq.data_stream_target[2048*l + i+3];
+            psd_res[512*l + k+1].pos[1] = setupadq.data_stream_target[2048*l + i+6];
+            psd_res[512*l + k+1].pos[0] = setupadq.data_stream_target[2048*l + i+7];
 
             i = i + 8;
             qDebug()<<"Union.Spec["<<BitReverseIndex[k]<<"] = "<<psd_res[512*l + BitReverseIndex[k]].data64;
