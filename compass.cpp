@@ -75,8 +75,6 @@ double compass::toangle(const QString &c)
     return answer;
 }
 
-
-
 void compass::showResponse(const QByteArray &s)
 {
     double angle;

@@ -31,12 +31,12 @@ SOURCES += \
     motor.cpp \
     motorthread.cpp \
     adq214.cpp \
-    wind_display.cpp \
-    rt_display.cpp \
-    rt_title.cpp \
+    display\wind_display.cpp \
+    display\rt_display.cpp \
+    display\rt_title.cpp \
     usertoolbar.cpp \
     admintoolbar.cpp \
-    rt_scale.cpp \
+    display\rt_scale.cpp \
     paradialog.cpp \
     settingfile.cpp \
     dswf.cpp \
@@ -49,13 +49,13 @@ HEADERS += \
     motor.h \
     motorthread.h \
     adq214.h \
-    wind_display.h \
+    display\wind_display.h \
     global_defines.h \
-    rt_display.h \
-    rt_title.h \
+    display\rt_display.h \
+    display\rt_title.h \
     usertoolbar.h \
     admintoolbar.h \
-    rt_scale.h \
+    display\rt_scale.h \
     paradialog.h \
     settingfile.h \
     dswf.h \
@@ -67,7 +67,8 @@ FORMS += \
 win32: LIBS += -L$$quote(C:/Program Files/SP Devices/ADQAPI/) -lADQAPI
 INCLUDEPATH += \
     $$quote(C:/Program Files/SP Devices/ADQAPI/)\
- C:\eigen
+ C:\eigen\
+.\diplay\
 
 RESOURCES += \
     icons.qrc

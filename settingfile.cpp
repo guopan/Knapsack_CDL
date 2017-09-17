@@ -33,8 +33,8 @@ void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      
     settings.setValue("circlekey",fsetting.circlekey);					//圆周数
     settings.setValue("continusdete",fsetting.continusdete);            //连续探测
     settings.setValue("SP",fsetting.SP);								//电机速度
-    settings.setValue("direct_intervalTime",fsetting.direct_intervalTime);//方向间间隔
-    settings.setValue("time_circle_interval",fsetting.time_circle_interval);//圆周间间隔
+    settings.setValue("direct_intervalTime",fsetting.IntervalTime);//方向间间隔
+    settings.setValue("time_circle_interval",fsetting.GroupTime);//圆周间间隔
     settings.endGroup();
 
     settings.beginGroup("Sample_parameters");
@@ -72,8 +72,8 @@ void settingfile::readFrom_file(const QString &b)
     fsetting.circlekey = settings.value("circlekey").toBool();				//圆周键
     fsetting.continusdete = settings.value("continusdete").toBool();        //连续探测
     fsetting.SP = settings.value("SP").toInt();								//电机速度
-    fsetting.direct_intervalTime = settings.value("direct_intervalTime").toFloat();//方向间间隔
-    fsetting.time_circle_interval = settings.value("time_circle_interval").toFloat();//圆周间间隔
+    fsetting.IntervalTime = settings.value("direct_intervalTime").toFloat();//方向间间隔
+    fsetting.GroupTime = settings.value("time_circle_interval").toFloat();//圆周间间隔
     settings.endGroup();
 
     settings.beginGroup("Sample_parameters");
@@ -197,9 +197,9 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
         return true;
     if(fsetting.SP != dlgsetting.SP)								//电机速度
         return true;
-    if(fsetting.direct_intervalTime != dlgsetting.direct_intervalTime)
+    if(fsetting.IntervalTime != dlgsetting.IntervalTime)
         return true;
-    if(fsetting.time_circle_interval != dlgsetting.time_circle_interval)
+    if(fsetting.GroupTime != dlgsetting.GroupTime)
         return true;
 
     if(fsetting.sampleFreq != dlgsetting.sampleFreq)				//采样频率

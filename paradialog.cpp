@@ -42,7 +42,7 @@ void paraDialog::initial_para()
     connect(ui->lineEdit_circleNum, &QLineEdit::textChanged,this,&paraDialog::set_angleNum);					//Ô²ÖÜÊý -> ·½ÏòÊý
     connect(ui->radioButton_anglekey,&QRadioButton::clicked,this,&paraDialog::set_anglekey);					//·½Ïò¼ü
     connect(ui->radioButton_circlekey,&QRadioButton::clicked,this,&paraDialog::set_circlekey);					//Ô²ÖÜ¼ü
-    connect(ui->radioButton_continousdete,&QRadioButton::clicked,this,&paraDialog::set_continusdetekey);        //Á¬ÐøÌ½²â
+//    connect(ui->radioButton_continousdet,&QRadioButton::clicked,this,&paraDialog::set_continusdetekey);        //Á¬ÐøÌ½²â
     connect(ui->lineEdit_SP,&QLineEdit::textChanged,this,&paraDialog::set_motorSP);								//×î¸ß×ªËÙ -> Ì½²âÊ±¼ä
     connect(ui->lineEdit_direct_interval,&QLineEdit::textChanged,this,&paraDialog::set_time_direct_interval);
     connect(ui->lineEdit_circle_interval,&QLineEdit::textChanged,this,&paraDialog::set_time_circle_interval);
@@ -77,7 +77,7 @@ void paraDialog::update_show()
     ui->lineEdit_step_azAngle->setText(QString::number(psetting.step_azAngle));
     //É¨ÃèÌ½²â
     ui->groupBox_6->setEnabled(true);
-    ui->radioButton_continousdete->setChecked(psetting.continusdete);
+//    ui->radioButton_continousdet->setChecked(psetting.continusdete);
     ui->radioButton_anglekey->setChecked(psetting.anglekey);
     ui->radioButton_circlekey->setChecked(psetting.circlekey);
     if(psetting.anglekey)
@@ -95,8 +95,8 @@ void paraDialog::update_show()
     ui->lineEdit_SP->setText(QString::number(psetting.SP));
 
     //É¨Ãè²ÎÊý¡ª¡ª¶¨Ê±ÉèÖÃ
-    ui->lineEdit_direct_interval->setText(QString::number(psetting.direct_intervalTime,'f',2));
-    ui->lineEdit_circle_interval->setText(QString::number(psetting.time_circle_interval,'f',2));
+    ui->lineEdit_direct_interval->setText(QString::number(psetting.IntervalTime,'f',2));
+    ui->lineEdit_circle_interval->setText(QString::number(psetting.GroupTime,'f',2));
 
     //ÎÄ¼þ´æ´¢
 
@@ -104,7 +104,7 @@ void paraDialog::update_show()
     ui->checkBox_autocreate_datafile->setChecked(psetting.autocreate_datafile);
     //¸üÐÂÍ¨µÀÎÄ¼þÃû³Æ
 
-//ÒÔÏÂÊÇ²Î¿¼ÐÅÏ¢
+    //ÒÔÏÂÊÇ²Î¿¼ÐÅÏ¢
     //Ì½²â·½Ê½
     show_detect_mode();
 
@@ -115,7 +115,6 @@ void paraDialog::update_show()
     direct_size = SIZE_OF_FILE_HEADER + psetting.plsAccNum*psetting.sampleNum;								//µ¥Î»B
     //Ë«Í¨µÀÊý¾ÝÁ¿
     set_filesize();
-
 }
 
 //Ì½²â·½Ê½
@@ -124,28 +123,28 @@ void paraDialog::show_detect_mode()
     if(psetting.elevationAngle == 0)
     {
         if(psetting.step_azAngle == 0)
-            ui->lineEdit_detectDir->setText(QString::fromStdString("Ë®Æ½µ¥ÏòÌ½²â"));        //Horizontal single
+            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Ë®Æ½µ¥ÏòÌ½²â"));        //Horizontal single
         else
-            ui->lineEdit_detectDir->setText(QString::fromStdString("Ë®Æ½É¨ÃèÌ½²â£¬Ã¿ÖÜ·½ÏòÊý")+QString::number(360/psetting.step_azAngle));//Horizontal scanning£¬directions
+            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Ë®Æ½É¨ÃèÌ½²â£¬Ã¿ÖÜ·½ÏòÊý")+QString::number(360/psetting.step_azAngle));//Horizontal scanning£¬directions
     }
     else
         if(psetting.step_azAngle == 0)
-            ui->lineEdit_detectDir->setText(QString::fromStdString("µ¥Ïò¾¶ÏòÌ½²â"));//Single radial
+            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("µ¥Ïò¾¶ÏòÌ½²â"));//Single radial
         else
-            ui->lineEdit_detectDir->setText(QString::fromStdString("Ô²×¶É¨ÃèÌ½²â£¬Ã¿ÖÜ·½ÏòÊý")+QString::number(360/psetting.step_azAngle));
+            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Ô²×¶É¨ÃèÌ½²â£¬Ã¿ÖÜ·½ÏòÊý")+QString::number(360/psetting.step_azAngle));
 }
 
 //Ì½²âÊ±¼ä=µç»ú×ª¶¯Ê±¼ä+´¥·¢Ê±¼ä+ÉÏ´«Ê±¼ä+·½Ïò¼ä¼ä¸ôÊ±¼ä+Ô²ÖÜ¼ä¼ä¸ôÊ±¼ä
 void paraDialog::set_dect_time()
 {
     int time_need = psetting.angleNum*psetting.step_azAngle/psetting.SP +
-                    psetting.angleNum*psetting.sampleNum/(psetting.sampleFreq*1000000) +
-                    psetting.angleNum*ui->lineEdit_sglfilesize->text().toFloat()/UPLOAD_SPEED;
+            psetting.angleNum*psetting.sampleNum/(psetting.sampleFreq*1000000) +
+            psetting.angleNum*ui->lineEdit_sglfilesize->text().toFloat()/UPLOAD_SPEED;
     if(psetting.step_azAngle == 0)
-        time_need = time_need + (psetting.angleNum-1)*psetting.direct_intervalTime;
+        time_need = time_need + (psetting.angleNum-1)*psetting.IntervalTime;
     else
-        time_need = time_need + (psetting.angleNum-1)*psetting.direct_intervalTime
-                    + psetting.time_circle_interval*60*psetting.angleNum/(360/psetting.step_azAngle);
+        time_need = time_need + (psetting.angleNum-1)*psetting.IntervalTime
+                + psetting.GroupTime*60*psetting.angleNum/(360/psetting.step_azAngle);
     if(time_need < 1)
         ui->lineEdit_totalTime->setText("<1s");									//ÔÚ1sÒÔÏÂ
     else
@@ -162,21 +161,21 @@ void paraDialog::set_dect_time()
                     ui->lineEdit_totalTime->setText(QString::number(m)+"min"+QString::number(s)+"s");
             }
             else																//ÔÚ1hÒÔÉÏ
+            {
+                int h = time_need/3600;
+                int remain = time_need%3600;
+                if(remain == 0)
+                    ui->lineEdit_totalTime->setText(QString::number(h)+"h");//ÎÞ·ÖÎÞÃë
+                else
                 {
-                    int h = time_need/3600;
-                    int remain = time_need%3600;
-                    if(remain == 0)
-                        ui->lineEdit_totalTime->setText(QString::number(h)+"h");//ÎÞ·ÖÎÞÃë
+                    int m = remain/60;
+                    int s = remain%60;
+                    if(s == 0)
+                        ui->lineEdit_totalTime->setText(QString::number(h)+"h"+QString::number(m)+"m");//ÎÞÃë
                     else
-                    {
-                        int m = remain/60;
-                        int s = remain%60;
-                        if(s == 0)
-                            ui->lineEdit_totalTime->setText(QString::number(h)+"h"+QString::number(m)+"m");//ÎÞÃë
-                        else
-                            ui->lineEdit_totalTime->setText(QString::number(h)+"h"+QString::number(m)+"m"+QString::number(s)+"s");
-                    }
+                        ui->lineEdit_totalTime->setText(QString::number(h)+"h"+QString::number(m)+"m"+QString::number(s)+"s");
                 }
+            }
 }
 
 
@@ -250,7 +249,7 @@ void paraDialog::set_circleNum()													//Ô²ÖÜÊý Ó°Ïì·½ÏòÊý,psetting»ñÈ¡±à¼
         ui->lineEdit_circleNum->setText(QString::number(psetting.circleNum,'f',2));
     }
 
-//    check_update_SN();
+    //    check_update_SN();
     set_dect_time();																//Ô¤¹ÀÊ±¼ä
     //Ë«Í¨µÀÊý¾ÝÁ¿
     ui->lineEdit_totalsize->setText(QString::number(4*psetting.angleNum*direct_size/(1024*1024),'f',2));
@@ -315,13 +314,13 @@ void paraDialog::set_motorSP()														//µç»ú×ªËÙ
 
 void paraDialog::set_time_direct_interval()
 {
-    psetting.direct_intervalTime = ui->lineEdit_direct_interval->text().toFloat();
+    psetting.IntervalTime = ui->lineEdit_direct_interval->text().toFloat();
     set_dect_time();
 }
 
 void paraDialog::set_time_circle_interval()
 {
-    psetting.time_circle_interval = ui->lineEdit_circle_interval->text().toFloat();
+    psetting.GroupTime = ui->lineEdit_circle_interval->text().toFloat();
     set_dect_time();
 }
 
@@ -360,7 +359,7 @@ void paraDialog::set_plsAccNum()													//Âö³åÊýÓ°Ïìµ¥ÎÄ¼þÁ¿¡¢×ÜÊý¾ÝÁ¿£¨Ë«Í
     set_filesize();
 }
 
- //Ë«Í¨µÀÊý¾Ý´óÐ¡Á¿
+//Ë«Í¨µÀÊý¾Ý´óÐ¡Á¿
 void paraDialog::set_filesize()
 {
     filesize_over();
@@ -495,13 +494,13 @@ ACQSETTING paraDialog::get_settings()
 
 void paraDialog::on_pushButton_save_clicked()
 {
-//    if(psetting.dataFileName_Suffix.length() < lenStr.length())
-//    {
-//        QMessageBox::information(this,QString::fromLocal8Bit("ÌáÊ¾"),
-//                                 QString::fromLocal8Bit("ÇëÖØÐÂÉèÖÃÐòºÅ£¬×îÐ¡³¤¶ÈÎª") + QString::number(lenStr.length()));
-//        return;
-//    }
-    profile_path = QFileDialog::getSaveFileName(this,QString::fromStdString("±£´æ"),".","*.ini");
+    //    if(psetting.dataFileName_Suffix.length() < lenStr.length())
+    //    {
+    //        QMessageBox::information(this,QString::fromLocal8Bit("ÌáÊ¾"),
+    //                                 QString::fromLocal8Bit("ÇëÖØÐÂÉèÖÃÐòºÅ£¬×îÐ¡³¤¶ÈÎª") + QString::number(lenStr.length()));
+    //        return;
+    //    }
+    profile_path = QFileDialog::getSaveFileName(this,QString::fromLocal8Bit("±£´æ"),".","*.ini");
     if(!profile_path.isEmpty())
     {
         if(QFileInfo(profile_path).suffix().isEmpty())
@@ -537,12 +536,12 @@ void paraDialog::on_pushButton_reset_clicked()
 
 void paraDialog::on_pushButton_sure_clicked()
 {
-//    if(psetting.dataFileName_Suffix.length() < lenStr.length())
-//    {
-//        QMessageBox::information(this,QString::fromLocal8Bit("ÌáÊ¾"),
-//                                 QString::fromLocal8Bit("ÇëÖØÐÂÉèÖÃÐòºÅ£¬×îÐ¡³¤¶ÈÎª") + QString::number(lenStr.length()));
-//        return;
-//    }
+    //    if(psetting.dataFileName_Suffix.length() < lenStr.length())
+    //    {
+    //        QMessageBox::information(this,QString::fromLocal8Bit("ÌáÊ¾"),
+    //                                 QString::fromLocal8Bit("ÇëÖØÐÂÉèÖÃÐòºÅ£¬×îÐ¡³¤¶ÈÎª") + QString::number(lenStr.length()));
+    //        return;
+    //    }
 
     QString Disk_Name = psetting.DatafilePath.left(3);								//Â·¾¶¶ÔÓ¦Ó²ÅÌ·ÖÇøÃû
     quint64 freeSpace = getDiskFreeSpace(Disk_Name);								//»ñÈ¡Â·¾¶¶ÔÓ¦Ó²ÅÌ·ÖÇøµÄ¿Õ¼ä´óÐ¡MB

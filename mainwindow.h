@@ -11,7 +11,7 @@
 #include <paradialog.h>
 
 #include <QDebug>
-#include "wind_display.h"
+#include "display/wind_display.h"
 #include <QLabel>
 #include <QTimer>
 #include <QWidget>
