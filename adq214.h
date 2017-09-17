@@ -20,6 +20,7 @@ public:
     bool CaptureData2Buffer();      // 采集数据到缓存
     void WriteData2disk();          // 写入采集数据到文件
     void WriteSpecData2disk();      // 写入采集数据到文件
+    void ConvertData2Spec();        // 转换采集数据到功率谱
 
 signals:
     void collectFinish();
@@ -28,7 +29,7 @@ private:
     bool isADQ214Connected;
     void *adq_cu;
     setupADQ setupadq;
-
+    ACQSETTING mainSettings;
     FILE* outfileA = NULL;
     FILE* outfileB = NULL;
     bool success;

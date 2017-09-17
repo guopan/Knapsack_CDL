@@ -10,7 +10,6 @@ typedef struct
     int clock_source;                   // ±÷”‘¥
     int pll_divider;
     int num_samples_collect;
-    int num_sample_skip;
     int trig_mode;
 
     unsigned int buffers_filled;
@@ -20,9 +19,6 @@ typedef struct
     signed short* data_stream_target;
     quint16 spi_data_out[8];
     quint16 spi_data_in[4];
-
-//    FILE* outfileA = NULL;
-//    FILE* outfileB = NULL;
 }setupADQ;
 
 typedef struct

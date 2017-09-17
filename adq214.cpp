@@ -8,7 +8,7 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     adq_cu = CreateADQControlUnit();
     success = true;
 
-    int apirev = ADQAPI_GetRevision();     //2?  ªÒ»°API∞Ê±æ
+    int apirev = ADQAPI_GetRevision();     // ªÒ»°API∞Ê±æ
     qDebug() << IS_VALID_DLL_REVISION(apirev);
     connectADQDevice();
 
@@ -16,7 +16,7 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     num_of_failed = 0;
     num_of_ADQ214 = 0;
 
-    setupadq.num_samples_collect = 2048;  //…Ë÷√≤…—˘µ„ ˝
+    setupadq.num_samples_collect = 2048;  // …Ë÷√≤…—˘µ„ ˝
     setupadq.stream_ch = ADQ214_STREAM_ENABLED_BOTH;
     setupadq.stream_ch &= 0x7;
     setupadq.num_buffers = 64;
@@ -41,16 +41,11 @@ void ADQ214::connectADQDevice()
     {
         qDebug()<<"≤…ºØø®“—¡¨Ω”";
         isADQ214Connected = true;
-        // beginADQ();
     }
 }
 
 void ADQ214::Start_Capture()
 {
-    int num_buffers = 256;
-    int size_buffers = 1024;
-    ADQ214_SetTransferBuffers(adq_cu, adq_num, num_buffers, size_buffers);
-
     if(!Config_ADQ214())
         return;
 
@@ -58,20 +53,22 @@ void ADQ214::Start_Capture()
     memset(setupadq.data_stream_target, 0, setupadq.num_samples_collect);
 
     if(!CaptureData2Buffer())
+    {
+        qDebug() << ("Collect failed!");
+        delete setupadq.data_stream_target;
         return;
-
-    WriteData2disk();
-    WriteSpecData2disk();
-    //    Display_Data();
-
+    }
     qDebug() << ("Collect finished!");
+
+    ConvertData2Spec();
+    WriteSpecData2disk();
+
     delete setupadq.data_stream_target;
     if(success == 0)
     {
         qDebug() << "Error!";
         DeleteADQControlUnit(adq_cu);
     }
-
 }
 
 bool ADQ214::Config_ADQ214()                   // ≈‰÷√≤…ºØø®
@@ -84,19 +81,31 @@ bool ADQ214::Config_ADQ214()                   // ≈‰÷√≤…ºØø®
     }
     else
     {
-        ADQ214_SetDataFormat(adq_cu, adq_num,ADQ214_DATA_FORMAT_UNPACKED_14BIT);
+        success = ADQ214_SetDataFormat(adq_cu, adq_num,ADQ214_DATA_FORMAT_UNPACKED_16BIT);          // …Ë÷√ ˝æ›∏Ò Ω£¨≤ª÷™”–√ª”–”√
         // …Ë÷√TransferBuffer¥Û–°º∞ ˝¡ø
-        //    success = ADQ214_SetTransferBuffers(adq_cu, adq_num, setupadq.num_buffers, setupadq.size_buffers);
+        int num_buffers = 256;
+        int size_buffers = 1024;
+        success = success && ADQ214_SetTransferBuffers(adq_cu, adq_num, num_buffers, size_buffers);
+        success = success && ADQ214_SetClockSource(adq_cu, adq_num, setupadq.clock_source);          // …Ë÷√ ±÷”‘¥
+        success = success && ADQ214_SetPllFreqDivider(adq_cu, adq_num, setupadq.pll_divider);        // …Ë÷√PLL∑÷∆µ ˝
 
+        // ≈‰÷√ADQ214µƒƒ⁄≤øºƒ¥Ê∆˜
 
-        success = ADQ214_SetClockSource(adq_cu, adq_num, setupadq.clock_source);
-
-        success = success && ADQ214_SetPllFreqDivider(adq_cu, adq_num, setupadq.pll_divider);
+        // quint16 CMD = 0;
+        // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,CMD);                      //√¸¡Ó
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.Trigger_Level);  //¥•∑¢µÁ∆Ω
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.plsAccNum);      //¿€º”¬ˆ≥Â ˝
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  //æ‡¿Î√≈µ„ ˝£¨–Ë“™Œ™≈º ˝
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin);      //æ‡¿Î√≈ ˝
+        // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,write_data5);              //ƒø±Í∆µ¥¯œ¬œﬁ£¨±£¡Ù
+        // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x36,0,write_data6);              //ƒø±Í∆µ¥¯…œœﬁ£¨±£¡Ù
+        uint Total_Points_Num = mainSettings.nPointsPerBin * (mainSettings.nRangeBin+2);            // ƒ⁄≤ø–≈∫≈£¨¥¶¿Ì◊‹µ„ ˝
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x37,0,Total_Points_Num);            //µ•¬ˆ≥Â¥¶¿Ì◊‹µ„ ˝
     }
     return success;
 }
 
-bool ADQ214::CaptureData2Buffer()                   // ≤…ºØ ˝æ›µΩª∫¥Ê
+bool ADQ214::CaptureData2Buffer()         // ≤…ºØ ˝æ›µΩª∫¥Ê
 {
     success = ADQ214_DisarmTrigger(adq_cu, adq_num);
     success = success && ADQ214_SetStreamStatus(adq_cu, adq_num,setupadq.stream_ch);
@@ -107,13 +116,23 @@ bool ADQ214::CaptureData2Buffer()                   // ≤…ºØ ˝æ›µΩª∫¥Ê
 
     int nloops = 0;
 
-    ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,setupadq.spi_data_out[0]&0xFFFE);   // bit[0]÷√0
-    ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,setupadq.spi_data_out[0]|0x0001);   // bit[0]÷√1
+    ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,0xFFFE);   // bit[0]÷√0
+    ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,0x0001);   // bit[0]÷√1
 
     while (samples_to_collect > 0)
     {
         nloops ++;
         qDebug() << "Loops:" << nloops;
+        if (setupadq.trig_mode == 1)        //If trigger mode is sofware
+        {
+            ADQ214_SWTrig(adq_cu, adq_num);
+        }
+
+        //            ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,write_data0&0xFF7F);   // bit[7]÷√0
+        //            ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,write_data0|0x0080);   // bit[7]÷√1
+        ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,0xFFFE);   // bit[0]÷√0
+        ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,0x0001);   // bit[0]÷√1
+
         do
         {
             setupadq.collect_result = ADQ214_GetTransferBufferStatus(adq_cu, adq_num, &setupadq.buffers_filled);
@@ -121,6 +140,7 @@ bool ADQ214::CaptureData2Buffer()                   // ≤…ºØ ˝æ›µΩª∫¥Ê
         } while ((setupadq.buffers_filled == 0) && (setupadq.collect_result));
 
         setupadq.collect_result = ADQ214_CollectDataNextPage(adq_cu, adq_num);
+        qDebug() << "setupadq.collect_result = " << setupadq.collect_result;
 
         int samples_in_buffer = qMin(ADQ214_GetSamplesPerPage(adq_cu, adq_num), samples_to_collect);
         qDebug() << "samples_in_buffer = " << samples_in_buffer;
@@ -149,6 +169,7 @@ bool ADQ214::CaptureData2Buffer()                   // ≤…ºØ ˝æ›µΩª∫¥Ê
     }
 
     success = success && ADQ_DisarmTrigger(adq_cu, adq_num);
+
     success = success && ADQ214_SetStreamStatus(adq_cu, adq_num,0);
     return success;
 }
@@ -162,49 +183,90 @@ void ADQ214::WriteData2disk()                   // Ω´ ˝æ›÷±Ω”–¥»ÎŒƒº˛
     QFile fileA("dataA.txt");
     QFile fileB("dataB.txt");
 
-
-    QTextStream out(&fileA);
-    QTextStream out2(&fileB);
-
-    unsigned int samples_to_collect = setupadq.num_samples_collect;
-    if(fileA.open(QFile::WriteOnly)&&fileB.open(QFile::WriteOnly))
+    switch(setupadq.stream_ch)
     {
-        while (samples_to_collect > 0)
-        {
-            for (int i=0; (i<4) && (samples_to_collect>0); i++)
-            {
-                out << setupadq.data_stream_target[setupadq.num_samples_collect-samples_to_collect] << endl;
-                qDebug()<<"CHA -- "<<setupadq.num_samples_collect-samples_to_collect;
-                samples_to_collect--;
-            }
+    case ADQ214_STREAM_ENABLED_BOTH:
+    {
+        QTextStream out(&fileA);
+        QTextStream out2(&fileB);
 
-            for (int i=0; (i<4) && (samples_to_collect>0); i++)
+        unsigned int samples_to_collect = setupadq.num_samples_collect;
+        if(fileA.open(QFile::WriteOnly)&&fileB.open(QFile::WriteOnly))
+        {
+            while (samples_to_collect > 0)
             {
-                out2 << setupadq.data_stream_target[setupadq.num_samples_collect-samples_to_collect] << endl;
-                qDebug()<<"CHB -- "<<setupadq.num_samples_collect-samples_to_collect;
-                samples_to_collect--;
+                for (int i=0; (i<4) && (samples_to_collect>0); i++)
+                {
+                    out << setupadq.data_stream_target[setupadq.num_samples_collect-samples_to_collect] << endl;
+                    qDebug()<<"CHA -- "<<setupadq.num_samples_collect-samples_to_collect;
+                    samples_to_collect--;
+                }
+
+                for (int i=0; (i<4) && (samples_to_collect>0); i++)
+                {
+                    out2 << setupadq.data_stream_target[setupadq.num_samples_collect-samples_to_collect] << endl;
+                    qDebug()<<"CHB -- "<<setupadq.num_samples_collect-samples_to_collect;
+                    samples_to_collect--;
+                }
             }
         }
+        fileA.close();
+        fileB.close();
+        break;
     }
-    fileA.close();
-    fileB.close();
+    case ADQ214_STREAM_ENABLED_A:
+    {
+        if(fileA.open(QFile::WriteOnly))
+        {
+            QTextStream out(&fileA);
+            for (int i=0; i<setupadq.num_samples_collect; i++)
+            {
+                out<<setupadq.data_stream_target[i]<<endl;
+            }
+        }
+        fileA.close();
+        break;
+    }
+    case ADQ214_STREAM_ENABLED_B:
+    {
+        if(fileB.open(QFile::WriteOnly))
+        {
+            QTextStream out(&fileB);
+            for (int i=0; i<setupadq.num_samples_collect; i++)
+            {
+                out<<setupadq.data_stream_target[i]<<endl;
+            }
+        }
+        fileB.close();
+        break;
+    }
+    default:
+        break;
+    }
 }
 
-void ADQ214::WriteSpecData2disk()                   // Ω´ ˝æ›◊™ªª≥…π¶¬ ∆◊£¨–¥»ÎµΩŒƒº˛
+void ADQ214::WriteSpecData2disk()         // Ω´ ˝æ›◊™ªª≥…π¶¬ ∆◊£¨–¥»ÎµΩŒƒº˛
 {
     // Write to data to file after streaming to RAM, because ASCII output is too slow for realtime.
+    qDebug() << "Writing streamed Spectrum data in RAM to disk" ;
+    QFile Specfile("data_Spec.txt");
+    if(Specfile.open(QFile::WriteOnly))
+    {
+        QTextStream out(&Specfile);
+        for (int k=0; (k<mainSettings.nPointsPerBin*512); k++)
+            out <<psd_res[k].data64 << endl;
+    }
+    Specfile.close();
+}
 
-    if(setupadq.num_samples_collect%2048 != 0)
-        return;
-    int nLoops = setupadq.num_samples_collect/2048;
-
+void ADQ214::ConvertData2Spec()           // Ω´ ˝æ›◊™ªª≥…π¶¬ ∆◊
+{
     if (psd_res != nullptr)
         delete psd_res;
-    int psd_datanum = 512*nLoops;        //π¶¬ ∆◊≥§∂»
-    psd_res = new PSD_DATA[psd_datanum];
+    psd_res = new PSD_DATA[mainSettings.nPointsPerBin*512];
 
     int i = 0, k = 0, l = 0;
-    for (l=0;l<nLoops;l++)
+    for (l=0;l<mainSettings.nPointsPerBin;l++)
         for (k=0,i=0; (k<512); k++,k++)
         {
             psd_res[512*l + k].pos[3] = setupadq.data_stream_target[2048*l + i];
@@ -217,16 +279,5 @@ void ADQ214::WriteSpecData2disk()                   // Ω´ ˝æ›◊™ªª≥…π¶¬ ∆◊£¨–¥»Îµ
             psd_res[512*l + k+1].pos[0] = setupadq.data_stream_target[2048*l + i+7];
 
             i = i + 8;
-            qDebug()<<"Union.Spec["<<BitReverseIndex[k]<<"] = "<<psd_res[512*l + BitReverseIndex[k]].data64;
-            qDebug()<<"Union.Spec["<<BitReverseIndex[k+1]<<"] = "<<psd_res[512*l + BitReverseIndex[k+1]].data64;
         }
-    qDebug() << "Writing streamed Spectrum data in RAM to disk" ;
-    QFile Specfile("data_Spec.txt");
-    if(Specfile.open(QFile::WriteOnly))
-    {
-        QTextStream out(&Specfile);
-        for (k=0; (k<psd_datanum); k++)
-            out <<psd_res[k].data64 << endl;
-    }
-    Specfile.close();
 }
