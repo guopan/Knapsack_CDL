@@ -47,13 +47,12 @@ void ADQ214::connectADQDevice()
 
 void ADQ214::Start_Capture()
 {
-    //    int num_buffers = 8;
-    //    int size_buffers = 1024;
-    //    success = success && ADQ214_SetTransferBuffers(adq_cu, adq_num, num_buffers, size_buffers);
+    int num_buffers = 256;
+    int size_buffers = 1024;
+    ADQ214_SetTransferBuffers(adq_cu, adq_num, num_buffers, size_buffers);
 
     if(!Config_ADQ214())
         return;
-
 
     setupadq.data_stream_target = new qint16[setupadq.num_samples_collect];
     memset(setupadq.data_stream_target, 0, setupadq.num_samples_collect);

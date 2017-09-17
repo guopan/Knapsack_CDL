@@ -38,7 +38,9 @@ SOURCES += \
     admintoolbar.cpp \
     rt_scale.cpp \
     paradialog.cpp \
-    settingfile.cpp
+    settingfile.cpp \
+    dswf.cpp \
+    losvelocity.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -55,13 +57,17 @@ HEADERS += \
     admintoolbar.h \
     rt_scale.h \
     paradialog.h \
-    settingfile.h
+    settingfile.h \
+    dswf.h \
+    losvelocity.h
 
 FORMS += \
         mainwindow.ui \
     paradialog.ui
 win32: LIBS += -L$$quote(C:/Program Files/SP Devices/ADQAPI/) -lADQAPI
-INCLUDEPATH += $$quote(C:/Program Files/SP Devices/ADQAPI/)
+INCLUDEPATH += \
+    $$quote(C:/Program Files/SP Devices/ADQAPI/)\
+ C:\eigen
 
 RESOURCES += \
     icons.qrc
