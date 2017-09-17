@@ -17,6 +17,9 @@ void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      
 
     QSettings settings(path_a,QSettings::IniFormat);
     settings.beginGroup("Laser_parameters");
+    settings.setValue("laserMode",fsetting.isPulseMode);				//激光类型
+    settings.setValue("laserPulseEnergy",fsetting.laserPulseEnergy);	//激光能量
+    settings.setValue("laserPower",fsetting.laserPower);				//激光功率
     settings.setValue("laserRPF",fsetting.laserRPF);					//激光重频
     settings.setValue("laserPulseWidth",fsetting.laserPulseWidth);		//激光脉宽
     settings.setValue("laserWaveLength",fsetting.laserWaveLength);		//激光波长
@@ -31,10 +34,10 @@ void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      
     settings.setValue("circleNum",fsetting.circleNum);					//圆周数
     settings.setValue("anglekey",fsetting.anglekey);					//方向数
     settings.setValue("circlekey",fsetting.circlekey);					//圆周数
-    settings.setValue("continusdete",fsetting.continusdete);            //连续探测
+    settings.setValue("detectMode",fsetting.detectMode);                //探测模式
     settings.setValue("SP",fsetting.SP);								//电机速度
-    settings.setValue("direct_intervalTime",fsetting.IntervalTime);//方向间间隔
-    settings.setValue("time_circle_interval",fsetting.GroupTime);//圆周间间隔
+    settings.setValue("IntervalTime",fsetting.IntervalTime);            //分组间隔
+    settings.setValue("GroupTime",fsetting.GroupTime);                  //每组探测时间
     settings.endGroup();
 
     settings.beginGroup("Sample_parameters");
@@ -46,7 +49,7 @@ void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      
 
     settings.beginGroup("File_store");
     settings.setValue("DatafilePath",fsetting.DatafilePath);					//文件保存路径
-    settings.setValue("autocreate_datafile",fsetting.autocreate_datafile);		//自动创建日期文件夹
+    settings.setValue("autoCreate_DateDir",fsetting.autoCreate_DateDir);		//自动创建日期文件夹
     settings.endGroup();
 
 }
@@ -63,6 +66,7 @@ void settingfile::readFrom_file(const QString &b)
     settings.endGroup();
 
     settings.beginGroup("Scan_parameters");
+    fsetting.detectMode = settings.value("detectMode").toBool();            //探测模式
     fsetting.elevationAngle = settings.value("elevationAngle").toInt();		//俯仰角
     fsetting.start_azAngle = settings.value("start_azAngle").toInt();		//起始角
     fsetting.step_azAngle = settings.value("step_azAngle").toInt();			//步进角
@@ -70,10 +74,9 @@ void settingfile::readFrom_file(const QString &b)
     fsetting.circleNum = settings.value("circleNum").toFloat();				//圆周数
     fsetting.anglekey = settings.value("anglekey").toBool();				//方向键
     fsetting.circlekey = settings.value("circlekey").toBool();				//圆周键
-    fsetting.continusdete = settings.value("continusdete").toBool();        //连续探测
     fsetting.SP = settings.value("SP").toInt();								//电机速度
-    fsetting.IntervalTime = settings.value("direct_intervalTime").toFloat();//方向间间隔
-    fsetting.GroupTime = settings.value("time_circle_interval").toFloat();//圆周间间隔
+    fsetting.IntervalTime = settings.value("IntervalTime").toFloat();       //方向间间隔
+    fsetting.GroupTime = settings.value("GroupTime").toFloat();             //圆周间间隔
     settings.endGroup();
 
     settings.beginGroup("Sample_parameters");
@@ -85,7 +88,7 @@ void settingfile::readFrom_file(const QString &b)
 
     settings.beginGroup("File_store");
     fsetting.DatafilePath = settings.value("DatafilePath").toString();					//文件保存路径
-    fsetting.autocreate_datafile = settings.value("autocreate_datafile").toBool();		//自动创建最小文件夹
+    fsetting.autoCreate_DateDir = settings.value("autoCreate_DateDir").toBool();		//自动创建最小文件夹
     settings.endGroup();
 }
 
@@ -139,7 +142,7 @@ void settingfile::test_create_file(const QString &c)
 //        path_c.chop(16);									//截掉末尾配置文件名
 //        path_c.append("/").append(prefix_str);			//路径末尾加上日期文件夹
         settings.setValue("DatafilePath",path_c);			//文件保存路径
-        settings.setValue("autocreate_datafile",true);		//自动创建日期文件夹
+        settings.setValue("autoCreate_DateDir",true);		//自动创建日期文件夹
         settings.endGroup();
     }
     else
@@ -193,8 +196,8 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
         return true;
     if(fsetting.circlekey != dlgsetting.circlekey)
         return true;
-    if(fsetting.continusdete != dlgsetting.continusdete)            //连续探测
-        return true;
+//    if(fsetting.continusdete != dlgsetting.continusdete)            //连续探测
+//        return true;
     if(fsetting.SP != dlgsetting.SP)								//电机速度
         return true;
     if(fsetting.IntervalTime != dlgsetting.IntervalTime)
@@ -213,7 +216,7 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
 
     if(fsetting.DatafilePath != dlgsetting.DatafilePath)			  //文件保存路径
         return true;
-    if(fsetting.autocreate_datafile != dlgsetting.autocreate_datafile)//自动创建日期文件夹
+    if(fsetting.autoCreate_DateDir != dlgsetting.autoCreate_DateDir)//自动创建日期文件夹
         return true;
 
     return false;

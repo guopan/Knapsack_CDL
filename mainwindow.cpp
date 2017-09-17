@@ -101,7 +101,7 @@ void MainWindow::action_set_triggered()
     ParaSetDlg = new paraDialog(this);
     ParaSetDlg->init_setting(mysetting,stopped);					// mysetting传递给设置窗口psetting
     ParaSetDlg->initial_para();										// 参数显示在设置窗口上，并连接槽
-    ParaSetDlg->on_checkBox_autocreate_datafile_clicked();			// 更新文件存储路径
+    ParaSetDlg->on_checkBox_autoCreate_DateDir_clicked();			// 更新文件存储路径
     if (ParaSetDlg->exec() == QDialog::Accepted)					// 确定键功能
     {
         mysetting =	ParaSetDlg->get_settings();						// mysetting获取修改后的参数

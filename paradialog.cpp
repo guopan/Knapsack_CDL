@@ -70,6 +70,8 @@ void paraDialog::update_show()
     ui->lineEdit_sampleNum->setText(QString::number(psetting.sampleNum));
     ui->lineEdit_plsAccNum->setText(QString::number(psetting.plsAccNum));
 
+    //Ì½²â·½Ê½
+    ui->comboBox_DetetectMoMode->setCurrentIndex(psetting.detectMode);
     //É¨Ãè²ÎÊý¡ª¡ª¸©Ñö½Ç
     ui->lineEdit_elevationAngle->setText(QString::number(psetting.elevationAngle));
     //·½Î»½Ç
@@ -101,7 +103,7 @@ void paraDialog::update_show()
     //ÎÄ¼þ´æ´¢
 
     ui->lineEdit_DatafilePath->setText(psetting.DatafilePath);
-    ui->checkBox_autocreate_datafile->setChecked(psetting.autocreate_datafile);
+    ui->checkBox_autocreate_dateDir->setChecked(psetting.autoCreate_DateDir);
     //¸üÐÂÍ¨µÀÎÄ¼þÃû³Æ
 
     //ÒÔÏÂÊÇ²Î¿¼ÐÅÏ¢
@@ -293,7 +295,7 @@ void paraDialog::set_continusdetekey()
 {
     psetting.anglekey = false;
     psetting.circlekey = false;
-    psetting.continusdete = true;
+    psetting.detectMode = 2;
     ui->lineEdit_angleNum->setEnabled(true);
     ui->lineEdit_circleNum->setEnabled(false);
 }
@@ -336,7 +338,6 @@ void paraDialog::set_sampleFreq()													//²ÉÑùÆµÂÊ Ó°Ïì²ÉÑùµãÊý¡¢µ¥ÎÄ¼þÁ¿¡
     psetting.sampleNum = 256*pagePerPls;
     direct_size = SIZE_OF_FILE_HEADER + psetting.plsAccNum*psetting.sampleNum;		//µ¥¸ö·½ÏòÉÏµÄÊý¾ÝÁ¿
     ui->lineEdit_sampleNum->setText(QString::number(psetting.sampleNum));			//²ÉÑùµãÊý
-
 }
 
 void paraDialog::set_detRange()														//Ì½²â¾àÀë Ó°Ïì²ÉÑùµãÊý¡¢µ¥ÎÄ¼þÁ¿¡¢×ÜÊý¾ÝÁ¿//psetting»ñÈ¡±à¼­¿òÖµ
@@ -406,16 +407,16 @@ void paraDialog::show_DatafilePath(QString str)
     ui->lineEdit_DatafilePath->setText(str);
 }
 
-void paraDialog::on_checkBox_autocreate_datafile_clicked()
+void paraDialog::on_checkBox_autoCreate_DateDir_clicked()
 {
-    psetting.autocreate_datafile = ui->checkBox_autocreate_datafile->isChecked();
+    psetting.autoCreate_DateDir = ui->checkBox_autocreate_dateDir->isChecked();
     QString str = psetting.DatafilePath;
 
     QDir mypath(str);
     QString dirname = mypath.dirName();
     QDateTime time = QDateTime::currentDateTime();
 
-    if(psetting.autocreate_datafile)
+    if(psetting.autoCreate_DateDir)
     {
         int num = dirname.toInt();
         int len = dirname.length();
@@ -468,7 +469,7 @@ void paraDialog::on_pushButton_pathModify_clicked()
             str.resize(2);
         show_DatafilePath(str);
     }
-    on_checkBox_autocreate_datafile_clicked();
+    on_checkBox_autoCreate_DateDir_clicked();
 }
 
 
@@ -553,7 +554,6 @@ void paraDialog::on_pushButton_sure_clicked()
                              Disk_Name.left(1)+QString::fromLocal8Bit("The remaining space of the disk")
                              + QString::number(freeSpace) + QString::fromLocal8Bit("MB"));
 }
-
 
 quint64 paraDialog::getDiskFreeSpace(QString driver)
 {

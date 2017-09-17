@@ -33,6 +33,7 @@ typedef struct
     quint16 AOM_Freq;			//AOM移频量
 
     //扫描参数
+	int     detectMode;			//探测方式：1持续探测2单组探测3定时探测
     quint16 elevationAngle;		//俯仰角
     quint16 start_azAngle;		//起始角
     quint16 step_azAngle;		//步进角
@@ -40,10 +41,9 @@ typedef struct
     float   circleNum;			//圆周数
     bool    anglekey;			//方向键
     bool    circlekey;			//圆周键
-    bool    continusdete;       //持续探测
     quint16 SP;					//驱动器速度
-    float   IntervalTime;	//方向间间隔
-    float   GroupTime;	//圆周间间隔
+    float   IntervalTime;		//方向间间隔
+    float   GroupTime;			//圆周间间隔
 
     //采样参数
     quint16 sampleFreq;			//采样频率
@@ -58,11 +58,11 @@ typedef struct
     quint16 nPointsPerBin;      //距离门内点数
 
     //反演参数
-    float velocity_band;        //径向风速范围,±m/s
+    float 	velocity_band;      //径向风速范围,±m/s
 
     //文件存储
     QString DatafilePath;		//数据存储路径
-    bool autocreate_datafile;	//自动创建日期文件夹
+    bool 	autoCreate_DateDir;	//自动创建日期文件夹
 
 }ACQSETTING;
 

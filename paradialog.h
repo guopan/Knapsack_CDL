@@ -29,7 +29,7 @@ public:
     ACQSETTING get_settings(void);
 
 public slots:
-     void on_checkBox_autocreate_datafile_clicked();
+     void on_checkBox_autoCreate_DateDir_clicked();
 
 private slots:
     //¼¤¹â²ÎÊý
