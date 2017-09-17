@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "initial path = " << path;
     m_setfile.test_create_file(path);									// 检查settings.ini是否存在，若不存在则创建
     m_setfile.readFrom_file(path);										// 读取settings.ini文件
-    mysetting = m_setfile.get_setting();								// mysetting获取文件中的参数
+    mysetting = m_setfile.get_settings();								// mysetting获取文件中的参数
 
     userToolBar = new UserToolBar();
     connect(userToolBar->quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
@@ -112,13 +112,13 @@ void MainWindow::action_set_triggered()
 void MainWindow::on_startButton_clicked()
 {
     Compass.read();
-    moveNorth=true;
+    moveNorth = true;
     Motor.prepare();            // 电机上电并设置速度，加速度参数
 }
 
 void MainWindow::showCompassAngle(const double &s)
 {
-    headAngle=s;                // 记录罗盘数值
+    headAngle = s;                // 记录罗盘数值
 }
 
 void MainWindow::checkMotorAngle(const double &s)
