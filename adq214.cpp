@@ -25,6 +25,11 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     setupadq.pll_divider = 2;        //在Internal clock=0时，设置，f_clk = 800MHz/divider
 }
 
+void ADQ214::Config_Settings(const ACQSETTING &settings)
+{
+    mainSettings = settings;
+}
+
 void ADQ214::connectADQDevice()
 {
     int num_of_devices,num_of_failed,num_of_ADQ214;
@@ -172,77 +177,6 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
 
     success = success && ADQ214_SetStreamStatus(adq_cu, adq_num,0);
     return success;
-}
-
-void ADQ214::WriteData2disk()                   // 将数据直接写入文件
-{
-    // Write to data to file after streaming to RAM, because ASCII output is too slow for realtime.
-    qDebug() << "Writing stream data in RAM to disk" ;
-
-    setupadq.stream_ch &= 0x07;
-    QFile fileA("dataA.txt");
-    QFile fileB("dataB.txt");
-
-    switch(setupadq.stream_ch)
-    {
-    case ADQ214_STREAM_ENABLED_BOTH:
-    {
-        QTextStream out(&fileA);
-        QTextStream out2(&fileB);
-
-        unsigned int samples_to_collect = setupadq.num_samples_collect;
-        if(fileA.open(QFile::WriteOnly)&&fileB.open(QFile::WriteOnly))
-        {
-            while (samples_to_collect > 0)
-            {
-                for (int i=0; (i<4) && (samples_to_collect>0); i++)
-                {
-                    out << setupadq.data_stream_target[setupadq.num_samples_collect-samples_to_collect] << endl;
-                    qDebug()<<"CHA -- "<<setupadq.num_samples_collect-samples_to_collect;
-                    samples_to_collect--;
-                }
-
-                for (int i=0; (i<4) && (samples_to_collect>0); i++)
-                {
-                    out2 << setupadq.data_stream_target[setupadq.num_samples_collect-samples_to_collect] << endl;
-                    qDebug()<<"CHB -- "<<setupadq.num_samples_collect-samples_to_collect;
-                    samples_to_collect--;
-                }
-            }
-        }
-        fileA.close();
-        fileB.close();
-        break;
-    }
-    case ADQ214_STREAM_ENABLED_A:
-    {
-        if(fileA.open(QFile::WriteOnly))
-        {
-            QTextStream out(&fileA);
-            for (int i=0; i<setupadq.num_samples_collect; i++)
-            {
-                out<<setupadq.data_stream_target[i]<<endl;
-            }
-        }
-        fileA.close();
-        break;
-    }
-    case ADQ214_STREAM_ENABLED_B:
-    {
-        if(fileB.open(QFile::WriteOnly))
-        {
-            QTextStream out(&fileB);
-            for (int i=0; i<setupadq.num_samples_collect; i++)
-            {
-                out<<setupadq.data_stream_target[i]<<endl;
-            }
-        }
-        fileB.close();
-        break;
-    }
-    default:
-        break;
-    }
 }
 
 void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
