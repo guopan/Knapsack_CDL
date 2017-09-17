@@ -17,11 +17,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     QDir dirs;
-    QString path = dirs.currentPath()+"/"+"214settings.ini";				//??????????????????
+    QString path = dirs.currentPath()+"/"+"214settings.ini";			// 获取初始默认路径，并添加默认配置文件
     qDebug() << "initial path = " << path;
-    m_setfile.test_create_file(path);									//??settings.ini????????????
-    m_setfile.readFrom_file(path);										//??settings.ini??
-    mysetting = m_setfile.get_setting();								//mysetting????????
+    m_setfile.test_create_file(path);									// 检查settings.ini是否存在，若不存在则创建
+    m_setfile.readFrom_file(path);										// 读取settings.ini文件
+    mysetting = m_setfile.get_setting();								// mysetting获取文件中的参数
 
     userToolBar = new UserToolBar();
     connect(userToolBar->quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     perTime = 60;
 //    adq.connectADQDevice();     // 连接采集卡
 
-    //显示部分
+    // 显示部分
     H_low = 100;
     H_high = 1000;
     for(int i=0;i<nLayers;i++)
@@ -98,12 +98,12 @@ void MainWindow::action_set_triggered()
 {
     qDebug() << " open setting ";
     ParaSetDlg = new paraDialog(this);
-    ParaSetDlg->init_setting(mysetting,stopped);					//mysetting???????psetting
-    ParaSetDlg->initial_para();										//???????????????
-    ParaSetDlg->on_checkBox_autocreate_datafile_clicked();			//????????
-    if (ParaSetDlg->exec() == QDialog::Accepted)					// ?????
+    ParaSetDlg->init_setting(mysetting,stopped);					//mysetting传递给设置窗口psetting
+    ParaSetDlg->initial_para();										//参数显示在设置窗口上，并连接槽
+    ParaSetDlg->on_checkBox_autocreate_datafile_clicked();			//更新文件存储路径
+    if (ParaSetDlg->exec() == QDialog::Accepted)					// 确定键功能
     {
-        mysetting =	ParaSetDlg->get_settings();						//mysetting????????
+        mysetting =	ParaSetDlg->get_settings();						//mysetting获取修改后的参数
     }
     delete ParaSetDlg;
 }
@@ -112,12 +112,12 @@ void MainWindow::on_startButton_clicked()
 {
     Compass.read();
     moveNorth=true;
-    Motor.prepare();            //电机上电并设置速度，加速度参数
+    Motor.prepare();            // 电机上电并设置速度，加速度参数
 }
 
 void MainWindow::showCompassAngle(const double &s)
 {
-    headAngle=s;           // 记录罗盘数值
+    headAngle=s;                // 记录罗盘数值
 }
 
 void MainWindow::checkMotorAngle(const double &s)
@@ -128,9 +128,9 @@ void MainWindow::checkMotorAngle(const double &s)
         if(headAngle-s>=-0.5&&headAngle-s<=0.5)
         {
             qDebug()<<"success ";
-            moveNorth=false;
+            moveNorth = false;
             adq.Start_Capture();        //指北后开始采集卡工作
-            checkReady=false;
+            checkReady = false;
         }
         else
         {
@@ -142,18 +142,18 @@ void MainWindow::checkMotorAngle(const double &s)
     {
         if(!checkReady)           //先确定每次转动前的初始位置
         {
-            motorPX0=s;
+            motorPX0 = s;
             Motor.moveRelative(perTime);
             if(motorPX0>360-perTime)
-            {motorPX0=motorPX0-360;}
-            checkReady=true;
+                motorPX0 = motorPX0-360;
+            checkReady = true;
         }
         else
         {
             if((s-motorPX0-perTime)<=0.5&&(s-motorPX0-perTime)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
             {
                 adq.Start_Capture();
-                checkReady=false;
+                checkReady = false;
             }
             else
             {

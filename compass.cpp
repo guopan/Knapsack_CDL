@@ -11,10 +11,9 @@ compass::compass(QObject *parent) : QObject(parent)
 void compass::read()
 {
     //要发送的命令
-    QString str="6804000408";
+    QString str = "6804000408";
     StringToHex(str,senddata);
     workthread.transaction("COM3",senddata);
-
 }
 
 void compass::StringToHex(QString str, QByteArray &senddata)
@@ -27,7 +26,7 @@ void compass::StringToHex(QString str, QByteArray &senddata)
     for(int i=0; i<len; )
     {
         //char lstr,
-        hstr=str[i].toLatin1();
+        hstr = str[i].toLatin1();
         if(hstr == ' ')
         {
             i++;
@@ -64,14 +63,14 @@ char compass::ConvertHexChar(char ch)
 double compass::toangle(const QString &c)
 {
     double answer;
-    QString sign=c.mid(0,1);                    //截取符号位，整数位和小数位
-    QString round1=c.mid(1,1);
-    QString round2=c.mid(2,2);
-    QString decimal=c.mid(4,2);
-    answer=100*round1.toDouble()+round2.toDouble()+0.01*decimal.toDouble(); //数据整合为实际角度
-    if(sign.toInt()==1)
+    QString sign = c.mid(0,1);                    //截取符号位，整数位和小数位
+    QString round1 = c.mid(1,1);
+    QString round2 = c.mid(2,2);
+    QString decimal = c.mid(4,2);
+    answer = 100*round1.toDouble()+round2.toDouble()+0.01*decimal.toDouble(); //数据整合为实际角度
+    if(sign.toInt() == 1)
     {
-        answer=-1*answer;               //符号位为1时取负
+        answer = -1*answer;               //符号位为1时取负
     }
     return answer;
 }
@@ -81,15 +80,15 @@ double compass::toangle(const QString &c)
 void compass::showResponse(const QByteArray &s)
 {
     double angle;
-    QString temp= s.toHex();             //接收信号转16进制
+    QString temp = s.toHex();             //接收信号转16进制
 
     QString a,b,c;
-    a=temp.mid(8,6);                     //截取接收信号 pitch roll head
-    b=temp.mid(14,6);
-    c=temp.mid(20,6);
+    a = temp.mid(8,6);                     //截取接收信号 pitch roll head
+    b = temp.mid(14,6);
+    c = temp.mid(20,6);
 
-    angle=toangle(c);
-//    qDebug()<<"result="<<result;
+    angle = toangle(c);
+    //    qDebug()<<"result="<<result;
     emit this->compassAngle(angle);
 }
 

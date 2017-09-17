@@ -64,7 +64,6 @@ typedef struct
     //反演参数
     float velocity_band;        //径向风速范围,±m/s
 
-
     //文件存储
     QString DatafilePath;		//数据存储路径
     bool autocreate_datafile;	//自动创建日期文件夹

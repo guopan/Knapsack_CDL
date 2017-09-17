@@ -34,8 +34,6 @@ private:
     bool success;
     PSD_DATA *psd_res;
 
-
-
     int num_of_devices;
     int num_of_failed;
     int num_of_ADQ214;
