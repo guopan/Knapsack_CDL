@@ -522,8 +522,8 @@ void paraDialog::on_pushButton_load_clicked()
     if(!profile_path.isEmpty())
     {
         dlg_setfile.readFrom_file(profile_path);
-        psetting = dlg_setfile.get_setting();
-        defaulsetting = dlg_setfile.get_setting();
+        psetting = dlg_setfile.get_settings();
+        defaulsetting = dlg_setfile.get_settings();
         update_show();
     }
 }

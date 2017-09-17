@@ -16,7 +16,7 @@ public:
     settingfile();
 
     //配置文件
-    ACQSETTING get_setting(void);
+    ACQSETTING get_settings(void);
     void init_fsetting(const ACQSETTING &setting);
     void writeTo_file(const ACQSETTING &setting,const QString &a);	//写入文件中
     void readFrom_file(const QString &b);							//从文件中读取

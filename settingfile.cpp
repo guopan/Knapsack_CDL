@@ -92,7 +92,7 @@ void settingfile::readFrom_file(const QString &b)
     settings.endGroup();
 }
 
-ACQSETTING settingfile::get_setting()
+ACQSETTING settingfile::get_settings()
 {
     return fsetting;
 }
