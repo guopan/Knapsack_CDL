@@ -104,7 +104,7 @@ private:
     bool stop_now;              // 命令：GUI用来控制ControlTimer停止采集，待商榷
     int capture_counter;        // 探测方向计数器
     QTime Start_Time;           // 开始时间，用于定时探测模式
-
+    Control_State State;
 
 
     //参数配置

@@ -112,4 +112,5 @@ static const unsigned short BitReverseIndex[] =
     };
 
 const int nLayers = 10;     //高度层数 = 10
+enum Control_State{ waitMotor, Capture, Quit, Standby};     //探测过程控制状态值
 #endif // GLOBAL_DEFINES_H

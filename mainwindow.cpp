@@ -308,7 +308,7 @@ void MainWindow::action_start_Triggered()
         {
             //****记录当前时间作为开始时间
         }
-
+        State = waitMotor;
         ControlTimer->start(100);       // 定时查询电机（激光器？）状态、采集、处理、显示
 
         TestTimer->start(1000);
@@ -330,40 +330,67 @@ void MainWindow::action_start_Triggered()
 void MainWindow::On_ControlTimer_TimeOut()
 {
     //****查询电机状态，没到位，则直接返回，等下次进入定时器
-    if (mysetting.step_azAngle != 0)
-    {
-        //****判断电机转动到位
-    }
-
-    //****采集
-    adq.Start_Capture();
-    //****相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
-    //****转换功率谱
-    //****径向风速计算
-    //****矢量风速合成
-    //****更新显示
-    //****存储功率谱到文件
-    //****存储风速到文件
-
-    capture_counter++;
-    //****判断是否应该结束，更新结束标志stop_now
-    switch (mysetting.detectMode) {
-    case 0:                 //持续探测
-        //****判断是否应该关闭文件，建立新文件
-        if(capture_counter == mysetting.nMaxDir_inFile)
+    switch (State) {
+    case waitMotor:
+        if (mysetting.step_azAngle != 0)
         {
-            //****关闭文件
-            //****建立新文件，写入文件头
+            //****判断电机转动到位
+            //****如果转动到位，
+            State = Capture;
         }
         break;
-    case 1:                 //单组探测
-        //****判断探测方向数
-        if(capture_counter = mysetting.angleNum)
-            stop_now = true;
-        break;
-    case 2:                 //定时探测
-        //****判断否达到启动条件、待机条件
+    case Capture:
+        //****采集
+        adq.Start_Capture();
+        //****相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
+        //****转换功率谱
+        //****径向风速计算
+        //****矢量风速合成
+        //****更新显示
+        //****存储功率谱到文件
+        //****存储风速到文件
 
+        capture_counter++;
+        //****判断是否应该结束，更新结束标志stop_now
+        switch (mysetting.detectMode) {
+        case 0:                 //持续探测
+            //****判断是否应该关闭文件，建立新文件
+            if(capture_counter == mysetting.nMaxDir_inFile)
+            {
+                //****关闭文件
+                //****建立新文件，写入文件头
+            }
+            break;
+        case 1:                 //单组探测
+            //****判断探测方向数
+            if(capture_counter == mysetting.angleNum)
+                State = Quit;
+            break;
+        case 2:                 //定时探测
+            //****判断否达到待机条件
+            //如果达到待机时间
+        {
+            State = Standby;
+        }
+            break;
+        default:
+            break;
+        }
+        break;
+    case Quit:
+        ControlTimer->stop();
+        break;
+    case Standby:       //也许需要一个停止状态
+        //如果达到启动时间
+    {
+        if (mysetting.step_azAngle != 0)
+        {
+            //****电机转到 mysetting.start_azAngle;
+            State = waitMotor;
+        }
+        else
+        State = Capture;
+    }
         break;
     default:
         break;
