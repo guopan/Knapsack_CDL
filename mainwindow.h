@@ -119,17 +119,12 @@ private:
     paraDialog *ParaSetDlg;             //参数设置对话框
     ACQSETTING mysetting;
     settingfile m_setfile;
-<<<<<<< HEAD
-    bool stopped;									//停止采集
 
     void openLaser();
     void closeLaser();
     laserSeed LaserSeed;
     laserPulse LaserPulse;
-=======
-
     void Create_DataFolder();			//数据存储文件夹的创建
->>>>>>> 5e37420fb609af42e62a64cfbf60b26a42aef858
 };
 
 #endif // MAINWINDOW_H

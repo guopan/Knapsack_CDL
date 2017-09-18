@@ -66,16 +66,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //    adq.connectADQDevice();     // 连接采集卡
 
-<<<<<<< HEAD
     connect(&LaserSeed,&laserSeed::seedOpenReady, &LaserPulse,&laserPulse::beginPulseLaser);
     connect(&LaserPulse,&laserPulse::pulseCloseReady, &LaserSeed,&laserSeed::closeSeedLaser);
     connect(&LaserSeed,&laserSeed::laserSeedError, this,&MainWindow::laserErrorHint);
     connect(&LaserPulse,&laserPulse::laserPulseError, this,&MainWindow::laserErrorHint);
 
     //显示部分
-=======
-    // 显示部分
->>>>>>> 5e37420fb609af42e62a64cfbf60b26a42aef858
     H_low = 100;
     H_high = 1000;
     for(int i=0;i<nLayers;i++)
@@ -476,7 +472,6 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     emit size_changed();
 }
 
-<<<<<<< HEAD
 void MainWindow::openLaser()
 {
     LaserSeed.beginSeedLaser();
@@ -495,12 +490,13 @@ void MainWindow::on_pushButton_2_clicked()
 void MainWindow::on_pushButton_clicked()
 {
     LaserPulse.closePulseLaser();
-=======
+}
+
 //数据存储文件夹的创建
 void MainWindow::Create_DataFolder()
 {
     QDir mypath;
     if(!mypath.exists(mysetting.DatafilePath))		//如果文件夹不存在，创建文件夹
         mypath.mkpath(mysetting.DatafilePath);
->>>>>>> 5e37420fb609af42e62a64cfbf60b26a42aef858
+
 }

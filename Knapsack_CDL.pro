@@ -39,15 +39,12 @@ SOURCES += \
     display\rt_scale.cpp \
     paradialog.cpp \
     settingfile.cpp \
-<<<<<<< HEAD
     laserseed.cpp \
     laserpulse.cpp \
     laserseedthread.cpp \
-    laserpulsethread.cpp
-=======
+    laserpulsethread.cpp \
     dswf.cpp \
     losvelocity.cpp
->>>>>>> 5e37420fb609af42e62a64cfbf60b26a42aef858
 
 HEADERS += \
         mainwindow.h \
@@ -65,16 +62,12 @@ HEADERS += \
     display\rt_scale.h \
     paradialog.h \
     settingfile.h \
-<<<<<<< HEAD
-    acqsettings.h \
     laserseed.h \
     laserpulse.h \
     laserseedthread.h \
-    laserpulsethread.h
-=======
+    laserpulsethread.h \
     dswf.h \
     losvelocity.h
->>>>>>> 5e37420fb609af42e62a64cfbf60b26a42aef858
 
 FORMS += \
         mainwindow.ui \
