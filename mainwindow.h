@@ -22,6 +22,8 @@
 #include <QKeyEvent>
 #include <usertoolbar.h>
 #include <admintoolbar.h>
+#include <laserpulse.h>
+#include <laserseed.h>
 
 
 namespace Ui {
@@ -63,6 +65,11 @@ private slots:
 
     void action_set_triggered();					//…Ë÷√
 
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
+
 private:
     Ui::MainWindow *ui;
     compass Compass;
@@ -72,6 +79,7 @@ private:
     void getPosition();
     void checkMotor();
     void errorSolve();
+    void laserErrorHint(const QString &s);
 
     motor Motor;
     void readyToMove();
@@ -104,6 +112,13 @@ private:
     ACQSETTING mysetting;
     settingfile m_setfile;
     bool stopped;									//Õ£÷π≤…ºØ
+
+    void openLaser();
+    void closeLaser();
+    laserSeed LaserSeed;
+    laserPulse LaserPulse;
 };
 
 #endif // MAINWINDOW_H
+
+

@@ -59,6 +59,11 @@ MainWindow::MainWindow(QWidget *parent) :
     perTime = 60;
 //    adq.connectADQDevice();     // 连接采集卡
 
+    connect(&LaserSeed,&laserSeed::seedOpenReady, &LaserPulse,&laserPulse::beginPulseLaser);
+    connect(&LaserPulse,&laserPulse::pulseCloseReady, &LaserSeed,&laserSeed::closeSeedLaser);
+    connect(&LaserSeed,&laserSeed::laserSeedError, this,&MainWindow::laserErrorHint);
+    connect(&LaserPulse,&laserPulse::laserPulseError, this,&MainWindow::laserErrorHint);
+
     //显示部分
     H_low = 100;
     H_high = 1000;
@@ -234,6 +239,12 @@ void MainWindow::errorSolve()
     }
 }
 
+void MainWindow::laserErrorHint(const QString &s)
+{
+    qDebug()<<s;
+//    LaserPulse.closePulseLaser();
+}
+
 void MainWindow::changeData()
 {
     for (int i = 0; i < nLayers; ++i)
@@ -338,4 +349,24 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 {
     QMainWindow::resizeEvent(event);
     emit size_changed();
+}
+
+void MainWindow::openLaser()
+{
+    LaserSeed.beginSeedLaser();
+}
+
+void MainWindow::closeLaser()
+{
+    LaserPulse.closePulseLaser();
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    LaserSeed.beginSeedLaser();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    LaserPulse.closePulseLaser();
 }
