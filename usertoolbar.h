@@ -10,6 +10,10 @@ public:
     UserToolBar();
     QAction *quitAction;
     QAction *startAction;
+public slots:
+    void changeStartIcon();
+private:
+    bool startIcon;
 };
 
 #endif // USERTOOLBAR_H

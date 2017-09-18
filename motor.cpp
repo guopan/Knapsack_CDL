@@ -12,15 +12,14 @@ motor::motor(QObject *parent) : QObject(parent)
 
 void motor::prepare()
 {
-
-    portname="COM8";
+    portname = "COM8";
     Order_str = "VR;";
     thread_port.transaction(portname,Order_str);   //获取版本后依次上电--设置加减速度--设置速度--发送上电完成信号
 
 }
 
 void motor::moveAbsolute(const double &a)
-{   QString anglePA=QString::number(a*524000/360,'f',2);
+{   QString anglePA = QString::number(a*524000/360,'f',2);
     qDebug()<<"a="<<anglePA;
     Order_str = "PA="+anglePA+";";
     thread_port.transaction(portname,Order_str);
@@ -69,7 +68,7 @@ void motor::receive_response(const QString &s)
         {
             Order_str = "AC=1800;";
             thread_port.transaction(portname,Order_str);
-             qDebug()<<"电机打开";
+            qDebug()<<"电机打开";
         }
         else
             qDebug()<<"电机关闭";
@@ -91,7 +90,7 @@ void motor::receive_response(const QString &s)
             emit this->moveReady();
             qDebug()<<"moveready";
         }
-       else
+        else
         {
             if(s.left(4)=="MS;3")
             {
@@ -116,18 +115,18 @@ void motor::receive_response(const QString &s)
     }
     if(s.left(2) == "PX")
     {
-      QString a=s.split(";").at(1).toLocal8Bit().data();
-      double angle=a.toInt()*360/524000;
-      qDebug()<<"PX"<<angle;
+        QString a=s.split(";").at(1).toLocal8Bit().data();
+        double angle=a.toInt()*360/524000;
+        qDebug()<<"PX"<<angle;
 
-      if(angle<0)
-      {
-          while(angle<0)
-              angle = angle + 360;
-      }
-      while(angle>360)
-          angle = angle - 360;
-      emit this->motorAngle(angle);
+        if(angle<0)
+        {
+            while(angle<0)
+                angle = angle + 360;
+        }
+        while(angle>360)
+            angle = angle - 360;
+        emit this->motorAngle(angle);
 
     }
     if(s.left(2) == "SP")
@@ -145,9 +144,3 @@ void motor::receive_response(const QString &s)
         thread_port.transaction(portname,Order_str);
     }
 }
-
-
-
-
-
-

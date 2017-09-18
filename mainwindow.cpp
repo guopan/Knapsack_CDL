@@ -8,7 +8,8 @@
 #include <QFont>
 #include <QString>
 #include <QGridLayout>
-#include "wind_display.h"
+#include "display/wind_display.h"
+#include "display/rt_display.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,14 +18,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     QDir dirs;
-    QString path = dirs.currentPath()+"/"+"214settings.ini";				//??????????????????
+    QString path = dirs.currentPath()+"/"+"214settings.ini";			// 获取初始默认路径，并添加默认配置文件
     qDebug() << "initial path = " << path;
-    m_setfile.test_create_file(path);									//??settings.ini????????????
-    m_setfile.readFrom_file(path);										//??settings.ini??
-    mysetting = m_setfile.get_setting();								//mysetting????????
+    m_setfile.test_create_file(path);									// 检查settings.ini是否存在，若不存在则创建
+    m_setfile.readFrom_file(path);										// 读取settings.ini文件
+    mysetting = m_setfile.get_settings();								// mysetting获取文件中的参数
 
     userToolBar = new UserToolBar();
-    connect(userToolBar->quitAction, SIGNAL(triggered(bool)), this, SLOT(quitActionTriggered()));
+    connect(userToolBar->quitAction, &QAction::triggered, this, &MainWindow::action_quit_triggered);
+    connect(userToolBar->startAction, &QAction::triggered, this, &MainWindow::action_start_Triggered);
+
     addToolBar(Qt::TopToolBarArea, userToolBar);
     adminToolBar = new AdminToolBar();
     addToolBar(Qt::TopToolBarArea, adminToolBar);
@@ -37,10 +40,10 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBarControlTimer->setSingleShot(true);
     toolBarControlTimer->setInterval(10000);
     connect(toolBarControlTimer, SIGNAL(timeout()), this, SLOT(toolBarControlTimerOutFcn()));
-//    mouseEventClassifyTimer = new QTimer(this);
-//    mouseEventClassifyTimer->setSingleShot(true);
-//    mouseEventClassifyTimer->setInterval(25);
-//    connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
+    //    mouseEventClassifyTimer = new QTimer(this);
+    //    mouseEventClassifyTimer->setSingleShot(true);
+    //    mouseEventClassifyTimer->setInterval(25);
+    //    connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
     doubleAltKeyPressedClassifyTimer = new QTimer(this);
     doubleAltKeyPressedClassifyTimer->setSingleShot(true);
     timeOclock = new QTimer(this);
@@ -54,17 +57,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
     connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
 
+    ControlTimer = new QTimer(this);
+    connect(ControlTimer,&QTimer::timeout, this,&MainWindow::On_ControlTimer_TimeOut);
+
     Compass.read();             // 读取一次罗盘数据确定罗盘连接状况
     checkMotor();               // 检查电机连接
-    perTime = 60;
-//    adq.connectADQDevice();     // 连接采集卡
+    mysetting.step_azAngle = 60;
 
+    //    adq.connectADQDevice();     // 连接采集卡
+
+<<<<<<< HEAD
     connect(&LaserSeed,&laserSeed::seedOpenReady, &LaserPulse,&laserPulse::beginPulseLaser);
     connect(&LaserPulse,&laserPulse::pulseCloseReady, &LaserSeed,&laserSeed::closeSeedLaser);
     connect(&LaserSeed,&laserSeed::laserSeedError, this,&MainWindow::laserErrorHint);
     connect(&LaserPulse,&laserPulse::laserPulseError, this,&MainWindow::laserErrorHint);
 
     //显示部分
+=======
+    // 显示部分
+>>>>>>> 5e37420fb609af42e62a64cfbf60b26a42aef858
     H_low = 100;
     H_high = 1000;
     for(int i=0;i<nLayers;i++)
@@ -79,14 +90,15 @@ MainWindow::MainWindow(QWidget *parent) :
     DisplaySpeed->setHeights(Height_values);
 
     ui->gridLayout->addWidget(DisplaySpeed);
-//    connect(&Motor, &motor::moveReady,this, &MainWindow::getPosition);
-//    connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
-//    connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
+    //    connect(&Motor, &motor::moveReady,this, &MainWindow::getPosition);
+    //    connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
+    //    connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
 
     connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
-    QTimer *timer = new QTimer(this);
-    timer->start(1000);
-    connect(timer, SIGNAL(timeout()), this, SLOT(changeData()));
+    TestTimer = new QTimer(this);
+    //    timer->start(1000);
+    connect(TestTimer, SIGNAL(timeout()), this, SLOT(changeData()));
+    stopped = true;
 }
 
 MainWindow::~MainWindow()
@@ -103,12 +115,12 @@ void MainWindow::action_set_triggered()
 {
     qDebug() << " open setting ";
     ParaSetDlg = new paraDialog(this);
-    ParaSetDlg->init_setting(mysetting,stopped);					//mysetting???????psetting
-    ParaSetDlg->initial_para();										//???????????????
-    ParaSetDlg->on_checkBox_autocreate_datafile_clicked();			//????????
-    if (ParaSetDlg->exec() == QDialog::Accepted)					// ?????
+    ParaSetDlg->init_setting(mysetting,stopped);					// mysetting传递给设置窗口psetting
+    ParaSetDlg->initial_para();										// 参数显示在设置窗口上，并连接槽
+    ParaSetDlg->on_checkBox_autoCreate_DateDir_clicked();			// 更新文件存储路径
+    if (ParaSetDlg->exec() == QDialog::Accepted)					// 确定键功能
     {
-        mysetting =	ParaSetDlg->get_settings();						//mysetting????????
+        mysetting =	ParaSetDlg->get_settings();						// mysetting获取修改后的参数
     }
     delete ParaSetDlg;
 }
@@ -116,13 +128,13 @@ void MainWindow::action_set_triggered()
 void MainWindow::on_startButton_clicked()
 {
     Compass.read();
-    moveNorth=true;
-    Motor.prepare();            //电机上电并设置速度，加速度参数
+    moveNorth = true;
+    Motor.prepare();            // 电机上电并设置速度，加速度参数
 }
 
 void MainWindow::showCompassAngle(const double &s)
 {
-    headAngle=s;           // 记录罗盘数值
+    headAngle = s;                // 记录罗盘数值
 }
 
 void MainWindow::checkMotorAngle(const double &s)
@@ -133,9 +145,9 @@ void MainWindow::checkMotorAngle(const double &s)
         if(headAngle-s>=-0.5&&headAngle-s<=0.5)
         {
             qDebug()<<"success ";
-            moveNorth=false;
+            moveNorth = false;
             adq.Start_Capture();        //指北后开始采集卡工作
-            checkReady=false;
+            checkReady = false;
         }
         else
         {
@@ -147,22 +159,22 @@ void MainWindow::checkMotorAngle(const double &s)
     {
         if(!checkReady)           //先确定每次转动前的初始位置
         {
-            motorPX0=s;
-            Motor.moveRelative(perTime);
-            if(motorPX0>360-perTime)
-            {motorPX0=motorPX0-360;}
-            checkReady=true;
+            motorPX0 = s;
+            Motor.moveRelative(mysetting.step_azAngle);
+            if(motorPX0>360-mysetting.step_azAngle)
+                motorPX0 = motorPX0-360;
+            checkReady = true;
         }
         else
         {
-            if((s-motorPX0-perTime)<=0.5&&(s-motorPX0-perTime)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
+            if((s-motorPX0-mysetting.step_azAngle)<=0.5&&(s-motorPX0-mysetting.step_azAngle)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
             {
                 adq.Start_Capture();
-                checkReady=false;
+                checkReady = false;
             }
             else
             {
-                Motor.moveRelative(motorPX0+perTime-s);
+                Motor.moveRelative(motorPX0+mysetting.step_azAngle-s);
             }
         }
     }
@@ -268,12 +280,12 @@ void MainWindow::changeData()
         V_speed[i] -= 3;
 
     }
-        DisplaySpeed->setHSpeed(H_speed);
-        DisplaySpeed->setHDirection(H_direction);
-        DisplaySpeed->setVSpeed(V_speed);
+    DisplaySpeed->setHSpeed(H_speed);
+    DisplaySpeed->setHDirection(H_direction);
+    DisplaySpeed->setVSpeed(V_speed);
 }
 
-void MainWindow::quitActionTriggered()
+void MainWindow::action_quit_triggered()
 {
     timeOclock->stop();
     Motor.motorQuit();
@@ -281,10 +293,123 @@ void MainWindow::quitActionTriggered()
     this->close();
 }
 
-void MainWindow::startActionTriggered()
+
+//启动：进行采集的准备工作，并开启定时器
+//停止：设定停止标志信号
+void MainWindow::action_start_Triggered()
 {
     qDebug() << "Start Action Triggered!!!";
-    timer->start(1000);
+
+
+    if(stopped)                 //如果当前为停止状态，则可以开始采集
+    {
+        //****判断电机是否在转动，之前的探测是否已经停止，没停止就等，之前的探测没结束（如何能知道？）就等。
+
+        //****计算频率坐标轴
+        if (mysetting.step_azAngle != 0)
+        {
+            //****电机转到 mysetting.start_azAngle;
+        }
+
+        //****新建文件
+        //****写入文件头
+        //****打开激光器本振
+        //****打开激光放大器
+        capture_counter = 0;        // 探测方向计数器置零
+
+
+        stop_now = false;
+        if( mysetting.detectMode == 2)//定时探测
+        {
+            //****记录当前时间作为开始时间
+        }
+        State = waitMotor;
+        ControlTimer->start(100);       // 定时查询电机（激光器？）状态、采集、处理、显示
+
+        TestTimer->start(1000);
+        stopped = false;
+
+    }
+    else
+    {
+        ControlTimer->stop();
+
+        TestTimer->stop();
+        stopped = true;
+        //****关闭激光放大器
+        //****关闭激光器本振
+    }
+}
+
+//
+void MainWindow::On_ControlTimer_TimeOut()
+{
+    //****查询电机状态，没到位，则直接返回，等下次进入定时器
+    switch (State) {
+    case waitMotor:
+        if (mysetting.step_azAngle != 0)
+        {
+            //****判断电机转动到位
+            //****如果转动到位，
+            State = Capture;
+        }
+        break;
+    case Capture:
+        //****采集
+        adq.Start_Capture();
+        //****相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
+        //****转换功率谱
+        //****径向风速计算
+        //****矢量风速合成
+        //****更新显示
+        //****存储功率谱到文件
+        //****存储风速到文件
+
+        capture_counter++;
+        //****判断是否应该结束，更新结束标志stop_now
+        switch (mysetting.detectMode) {
+        case 0:                 //持续探测
+            //****判断是否应该关闭文件，建立新文件
+            if(capture_counter == mysetting.nMaxDir_inFile)
+            {
+                //****关闭文件
+                //****建立新文件，写入文件头
+            }
+            break;
+        case 1:                 //单组探测
+            //****判断探测方向数
+            if(capture_counter == mysetting.angleNum)
+                State = Quit;
+            break;
+        case 2:                 //定时探测
+            //****判断否达到待机条件
+            //如果达到待机时间
+        {
+            State = Standby;
+        }
+            break;
+        default:
+            break;
+        }
+        break;
+    case Quit:
+        ControlTimer->stop();
+        break;
+    case Standby:       //也许需要一个停止状态
+        //如果达到启动时间
+    {
+        if (mysetting.step_azAngle != 0)
+        {
+            //****电机转到 mysetting.start_azAngle;
+            State = waitMotor;
+        }
+        else
+        State = Capture;
+    }
+        break;
+    default:
+        break;
+    }
 }
 
 void MainWindow::toolBarControlTimerOutFcn()
@@ -351,6 +476,7 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     emit size_changed();
 }
 
+<<<<<<< HEAD
 void MainWindow::openLaser()
 {
     LaserSeed.beginSeedLaser();
@@ -369,4 +495,12 @@ void MainWindow::on_pushButton_2_clicked()
 void MainWindow::on_pushButton_clicked()
 {
     LaserPulse.closePulseLaser();
+=======
+//数据存储文件夹的创建
+void MainWindow::Create_DataFolder()
+{
+    QDir mypath;
+    if(!mypath.exists(mysetting.DatafilePath))		//如果文件夹不存在，创建文件夹
+        mypath.mkpath(mysetting.DatafilePath);
+>>>>>>> 5e37420fb609af42e62a64cfbf60b26a42aef858
 }

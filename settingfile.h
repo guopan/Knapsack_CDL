@@ -8,7 +8,7 @@
 #include <QFile>
 #include <QTextStream>
 
-#include "acqsettings.h"
+#include "global_defines.h"
 
 class settingfile
 {
@@ -16,12 +16,12 @@ public:
     settingfile();
 
     //配置文件
-    ACQSETTING get_setting(void);
+    ACQSETTING get_settings(void);
     void init_fsetting(const ACQSETTING &setting);
     void writeTo_file(const ACQSETTING &setting,const QString &a);	//写入文件中
     void readFrom_file(const QString &b);							//从文件中读取
     void checkValid();												//检查加载的配置文件是否有效
-    void test_create_file(const QString &c);						//检查配置文件是否存在，若无则生成
+    void test_create_file(const QString &iniFilePath);				//检查配置文件是否存在，若无则生成
     bool isSettingsChanged(const ACQSETTING &setting);				//设置窗口参数修改后，未保存时提示是否保存
 
     //记录文件

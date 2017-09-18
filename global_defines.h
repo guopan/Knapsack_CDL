@@ -1,5 +1,7 @@
 #ifndef GLOBAL_DEFINES_H
 #define GLOBAL_DEFINES_H
+#include <QString>
+
 typedef struct
 {
     int apirev;
@@ -8,7 +10,6 @@ typedef struct
     int clock_source;                   //时钟源
     int pll_divider;
     int num_samples_collect;
-    int num_sample_skip;
     int trig_mode;
 
     unsigned int buffers_filled;
@@ -18,10 +19,53 @@ typedef struct
     signed short* data_stream_target;
     quint16 spi_data_out[8];
     quint16 spi_data_in[4];
-
-//    FILE* outfileA = NULL;
-//    FILE* outfileB = NULL;
 }setupADQ;
+
+typedef struct
+{
+    //激光参数
+    bool    isPulseMode;        //脉冲探测（true）or连续探测（false）
+    float   laserPulseEnergy;   //激光能量，单位μJ，连续模式下为0
+    float   laserPower;         //激光功率，单位mW，脉冲模式下为0
+    quint16 laserRPF;			//激光频率，脉冲模式下为0
+    quint16 laserPulseWidth;	//脉冲宽度，脉冲模式下为0
+    quint16 laserWaveLength;	//激光波长
+    quint16 AOM_Freq;			//AOM移频量
+
+    //扫描参数
+	int     detectMode;			//探测方式：0持续探测1单组探测2定时探测
+    quint16 elevationAngle;		//俯仰角
+    quint16 start_azAngle;		//起始角
+    quint16 step_azAngle;		//步进角
+    quint32 angleNum;			//方向数
+    float   circleNum;			//圆周数
+    bool    anglekey;			//方向键
+    bool    circlekey;			//圆周键
+    quint16 SP;					//驱动器速度
+    float   IntervalTime;		//定时探测间隔，单位：分钟
+    float   GroupTime;			//定时探测单组时间，单位：分钟
+
+    //采样参数
+    quint16 sampleFreq;			//采样频率
+    float   detRange;   		//采样距离，删除
+    quint32 sampleNum;			//采样点数，删除
+    quint16 Trigger_Level;      //触发电平
+    int     PreTrigger;         //预触发点数，保留，暂不提供设置
+
+    //实时处理参数
+    quint16 plsAccNum;			//单方向累加脉冲数
+    quint16 nRangeBin;          //距离门数
+    quint16 nPointsPerBin;      //距离门内点数
+
+    //反演参数
+    float 	velocity_band;      //径向风速范围,±m/s
+
+    //文件存储
+    QString DatafilePath;		//数据存储路径
+    bool 	autoCreate_DateDir;	//自动创建日期文件夹
+	quint32 nMaxDir_inFile;		//持续模式下，单文件内的方向数
+
+}ACQSETTING;
 
 union PSD_DATA
 {
@@ -68,4 +112,5 @@ static const unsigned short BitReverseIndex[] =
     };
 
 const int nLayers = 10;     //高度层数 = 10
+enum Control_State{ waitMotor, Capture, Quit, Standby};     //探测过程控制状态值
 #endif // GLOBAL_DEFINES_H

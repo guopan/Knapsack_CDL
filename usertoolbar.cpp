@@ -9,4 +9,21 @@ UserToolBar::UserToolBar()
     startAction->setIcon(QIcon(":/images/Start.png"));
     quitAction->setIcon(QIcon(":/images/Standby.png"));
     setMovable(false);
+    startIcon = true;       // µ±Ç°Í¼±ê
+    connect(startAction,&QAction::triggered,this, &UserToolBar::changeStartIcon);
+
+}
+
+void UserToolBar::changeStartIcon()
+{
+    if(startIcon)
+    {
+        startAction->setIcon(QIcon(":/images/Stop.png"));
+        startIcon = false;
+    }
+    else
+    {
+        startAction->setIcon(QIcon(":/images/Start.png"));
+        startIcon = true;
+    }
 }

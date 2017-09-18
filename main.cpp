@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);    //支持高分屏
     QApplication a(argc, argv);
     MainWindow  w; // 先执行构造函数
     w.setWindowTitle(QString::fromLocal8Bit("大气风场"));

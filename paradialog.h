@@ -1,6 +1,6 @@
 #ifndef PARADIALOG_H
 #define PARADIALOG_H
-#include "acqsettings.h"
+#include "global_defines.h"
 #include "settingfile.h"
 #include "qmessagebox.h"
 #include "qfiledialog.h"
@@ -29,7 +29,7 @@ public:
     ACQSETTING get_settings(void);
 
 public slots:
-     void on_checkBox_autocreate_datafile_clicked();
+     void on_checkBox_autoCreate_DateDir_clicked();
 
 private slots:
     //¼¤¹â²ÎÊý
@@ -45,7 +45,7 @@ private slots:
     void set_angleNum();
     void set_anglekey();
     void set_circlekey();
-    void set_continusdetekey();
+    void set_detectMode();
     void set_SP_Interval();
     void set_motorSP();
     void set_time_direct_interval();
@@ -69,6 +69,8 @@ private slots:
     void on_pushButton_reset_clicked();
 
     void on_pushButton_sure_clicked();
+
+    void on_comboBox_DetetectMode_currentIndexChanged(int index);
 
 private:
     Ui::paraDialog *ui;

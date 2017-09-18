@@ -6,12 +6,12 @@
 #include "motor.h"
 #include "motorthread.h"
 #include "adq214.h"
-#include "acqsettings.h"
+#include "global_defines.h"
 #include "settingfile.h"
 #include <paradialog.h>
 
 #include <QDebug>
-#include "wind_display.h"
+#include "display/wind_display.h"
 #include <QLabel>
 #include <QTimer>
 #include <QWidget>
@@ -38,7 +38,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    QTimer *timer;
 
     int H_low;
     int H_high;
@@ -54,16 +53,17 @@ signals:
 
 private slots:
     void on_startButton_clicked();
+    void action_set_triggered();			//设置
+    void action_start_Triggered();          //启动、暂停按钮
+    void action_quit_triggered();           //退出
 
+    void On_ControlTimer_TimeOut();         //采集过程控制主体
     void checkMove();
 
-    void changeData();
-    void quitActionTriggered();
-    void startActionTriggered();
+    void changeData();                      //测试用，显示数据刷新
 
     void toolBarControlTimerOutFcn();
 
-    void action_set_triggered();					//设置
 
     void on_pushButton_clicked();
 
@@ -72,10 +72,22 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    // GUI界面
+    UserToolBar *userToolBar;
+    AdminToolBar *adminToolBar;
+    bool isUserToolBarShowed;
+    bool isAdminToolBarShowed;
+    void showToolBar(bool isUserToolBarShowed, bool isAdminToolBarShowed);
+    void mousePressEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    QTimer *toolBarControlTimer;
+    QTimer *doubleAltKeyPressedClassifyTimer;
+
+    // 外设器件（激光器、采集卡、电机、罗盘）
     compass Compass;
     void showCompassAngle(const double &s);
     void checkMotorAngle(const double &s);
-    void timeStart();
+    void timeStart();                   // ZM？？
     void getPosition();
     void checkMotor();
     void errorSolve();
@@ -88,35 +100,36 @@ private:
     QTimer *timeOclock;
 
     ADQ214 adq;
-    int perTime;     //每次转动的角度，先假设为每60°采一组数
 
-    QWidget *widget;
-
+    // 数据显示
     wind_display *DisplaySpeed;
-    QGridLayout *Glayout;
-
-    QTimer *toolBarControlTimer;
-    QTimer *doubleAltKeyPressedClassifyTimer;
-    UserToolBar *userToolBar;
-    AdminToolBar *adminToolBar;
-    bool isUserToolBarShowed;
-    bool isAdminToolBarShowed;
-    void showToolBar(bool isUserToolBarShowed, bool isAdminToolBarShowed);
-
-    void mousePressEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-
     void resizeEvent(QResizeEvent * event);
+    QTimer *TestTimer;          // 仅测试用
 
-    paraDialog *ParaSetDlg;
+    //过程控制
+    QTimer *ControlTimer;       // 探测过程控制计时器
+    bool stopped;				// 采集未启动状态
+    bool stop_now;              // 命令：GUI用来控制ControlTimer停止采集，待商榷
+    int capture_counter;        // 探测方向计数器
+    QTime Start_Time;           // 开始时间，用于定时探测模式
+    Control_State State;
+
+
+    //参数配置
+    paraDialog *ParaSetDlg;             //参数设置对话框
     ACQSETTING mysetting;
     settingfile m_setfile;
+<<<<<<< HEAD
     bool stopped;									//停止采集
 
     void openLaser();
     void closeLaser();
     laserSeed LaserSeed;
     laserPulse LaserPulse;
+=======
+
+    void Create_DataFolder();			//数据存储文件夹的创建
+>>>>>>> 5e37420fb609af42e62a64cfbf60b26a42aef858
 };
 
 #endif // MAINWINDOW_H
