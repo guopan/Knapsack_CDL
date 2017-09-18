@@ -13,7 +13,7 @@ void compass::read()
     //Òª·¢ËÍµÄÃüÁî
     QString str="6804000408";
     StringToHex(str,senddata);
-    workthread.transaction("COM3",senddata);
+    workthread.transaction("COM8",senddata);
 
 }
 
