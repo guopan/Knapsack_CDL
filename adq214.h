@@ -21,6 +21,7 @@ public:
     void WriteSpecData2disk();      // 写入采集数据到文件
     void ConvertData2Spec();        // 转换采集数据到功率谱
     void Config_Settings(const ACQSETTING &settings);
+    PSD_DATA *get_PSD_data();
 
 signals:
     void collectFinish();

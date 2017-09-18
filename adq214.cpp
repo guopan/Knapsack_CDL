@@ -30,6 +30,11 @@ void ADQ214::Config_Settings(const ACQSETTING &settings)
     mainSettings = settings;
 }
 
+PSD_DATA* ADQ214::get_PSD_data()
+{
+    return psd_res;
+}
+
 void ADQ214::connectADQDevice()
 {
     int num_of_devices,num_of_failed,num_of_ADQ214;
