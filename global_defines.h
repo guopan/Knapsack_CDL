@@ -63,6 +63,7 @@ typedef struct
     //文件存储
     QString DatafilePath;		//数据存储路径
     bool 	autoCreate_DateDir;	//自动创建日期文件夹
+	quint32 nMaxDir_inFile;		//持续模式下，单文件内的方向数
 
 }ACQSETTING;
 

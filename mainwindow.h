@@ -36,7 +36,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    QTimer *timer;
 
     int H_low;
     int H_high;
@@ -57,7 +56,7 @@ private slots:
 
     void changeData();
     void quitActionTriggered();
-    void startActionTriggered();
+    void action_start_Triggered();
 
     void toolBarControlTimerOutFcn();
 
@@ -81,13 +80,13 @@ private:
 
     ADQ214 adq;
 
-    QWidget *widget;
-
     wind_display *DisplaySpeed;
-    QGridLayout *Glayout;
 
     QTimer *toolBarControlTimer;
     QTimer *doubleAltKeyPressedClassifyTimer;
+    QTimer *TestTimer;
+    QTimer *IntervalTimer;      // 定时探测模式下的间隔计时器
+    QTimer *GroupTimer;         // 定时探测模式下的探测计时器
     UserToolBar *userToolBar;
     AdminToolBar *adminToolBar;
     bool isUserToolBarShowed;
