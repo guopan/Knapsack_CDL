@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mysetting = m_setfile.get_settings();								// mysetting获取文件中的参数
 
     userToolBar = new UserToolBar();
-    connect(userToolBar->quitAction, &QAction::triggered, this, &MainWindow::quitActionTriggered);
+    connect(userToolBar->quitAction, &QAction::triggered, this, &MainWindow::action_quit_triggered);
     connect(userToolBar->startAction, &QAction::triggered, this, &MainWindow::action_start_Triggered);
 
     addToolBar(Qt::TopToolBarArea, userToolBar);
@@ -56,6 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&Motor, &motor::motorError, this, &MainWindow::errorSolve);
     connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
     connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
+
+    ControlTimer = new QTimer(this);
+    connect(ControlTimer,&QTimer::timeout, this,&MainWindow::On_ControlTimer_TimeOut);
 
     Compass.read();             // 读取一次罗盘数据确定罗盘连接状况
     checkMotor();               // 检查电机连接
@@ -267,7 +270,7 @@ void MainWindow::changeData()
     DisplaySpeed->setVSpeed(V_speed);
 }
 
-void MainWindow::quitActionTriggered()
+void MainWindow::action_quit_triggered()
 {
     timeOclock->stop();
     Motor.motorQuit();
@@ -275,90 +278,95 @@ void MainWindow::quitActionTriggered()
     this->close();
 }
 
+
+//启动：进行采集的准备工作，并开启定时器
+//停止：设定停止标志信号
 void MainWindow::action_start_Triggered()
 {
     qDebug() << "Start Action Triggered!!!";
-    if(stopped)                 //如果当前为停止状态，则开始采集
+
+
+    if(stopped)                 //如果当前为停止状态，则可以开始采集
     {
+        //****判断电机是否在转动，之前的探测是否已经停止，没停止就等，之前的探测没结束（如何能知道？）就等。
+
+        //****计算频率坐标轴
         if (mysetting.step_azAngle != 0)
         {
             //****电机转到 mysetting.start_azAngle;
-        }
-
-        //****计算频率坐标轴
-
-        switch (mysetting.detectMode) {
-        case 0:                 //持续探测
-
-            break;
-        case 1:                 //单组探测
-            //****计数器置零direction
-            break;
-        case 2:                 //定时探测
-            //****启动定时器
-
-            break;
-        default:
-            break;
         }
 
         //****新建文件
         //****写入文件头
         //****打开激光器本振
         //****打开激光放大器
+        capture_counter = 0;        // 探测方向计数器置零
 
-        bool stop_now = false;
-        int capture_counter = 0;
-        do
+
+        stop_now = false;
+        if( mysetting.detectMode == 2)//定时探测
         {
-            //****采集
-            adq.Start_Capture();
-            //****相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
-            //****转换
-            //****径向风速计算
-            //****矢量风速合成
-            //****更新显示
-            //****存储功率谱到文件
-            //****存储风速到文件
-            if (mysetting.step_azAngle != 0)
-            {
-                //****开启查询电机定时器
-                //****判断电机转动到位
-                //****关闭查询电机定时器
-            }
+            //****记录当前时间作为开始时间
+        }
 
-            capture_counter++;
-            //****判断是否应该结束，更新结束标志stop_now
-            switch (mysetting.detectMode) {
-            case 0:                 //持续探测
-                //****判断是否应该关闭文件，建立新文件
-//                if(capture_counter = mysetting.文件内的方向数量)
-                {
-                    //****
-                }
-                break;
-            case 1:                 //单组探测
-                //****判断探测方向数
-                if(capture_counter = mysetting.angleNum)
-                    stop_now = true;
-                break;
-            case 2:                 //定时探测
-                //****判断定时器是否达到条件
-
-                break;
-            default:
-                break;
-            }
-        }while(!stop_now);
-
+        ControlTimer->start(100);       // 定时查询电机（激光器？）状态、采集、处理、显示
 
         TestTimer->start(1000);
         stopped = false;
+
     }
     else
     {
+        ControlTimer->stop();
+
         TestTimer->stop();
         stopped = true;
+        //****关闭激光放大器
+        //****关闭激光器本振
+    }
+}
+
+//
+void MainWindow::On_ControlTimer_TimeOut()
+{
+    //****查询电机状态，没到位，则直接返回，等下次进入定时器
+    if (mysetting.step_azAngle != 0)
+    {
+        //****判断电机转动到位
+    }
+
+    //****采集
+    adq.Start_Capture();
+    //****相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
+    //****转换功率谱
+    //****径向风速计算
+    //****矢量风速合成
+    //****更新显示
+    //****存储功率谱到文件
+    //****存储风速到文件
+
+    capture_counter++;
+    //****判断是否应该结束，更新结束标志stop_now
+    switch (mysetting.detectMode) {
+    case 0:                 //持续探测
+        //****判断是否应该关闭文件，建立新文件
+        if(capture_counter == mysetting.nMaxDir_inFile)
+        {
+            //****关闭文件
+            //****建立新文件，写入文件头
+        }
+        break;
+    case 1:                 //单组探测
+        //****判断探测方向数
+        if(capture_counter = mysetting.angleNum)
+            stop_now = true;
+        break;
+    case 2:                 //定时探测
+        //****判断否达到启动条件、待机条件
+
+        break;
+    default:
+        break;
     }
 }
 
@@ -424,4 +432,12 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 {
     QMainWindow::resizeEvent(event);
     emit size_changed();
+}
+
+//数据存储文件夹的创建
+void MainWindow::Create_DataFolder()
+{
+    QDir mypath;
+    if(!mypath.exists(mysetting.DatafilePath))		//如果文件夹不存在，创建文件夹
+        mypath.mkpath(mysetting.DatafilePath);
 }
