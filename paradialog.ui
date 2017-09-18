@@ -304,7 +304,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -1099,7 +1099,7 @@
        <string>间隔时间：</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_direct_interval">
+     <widget class="QLineEdit" name="lineEdit_ITV_TimeLength">
       <property name="geometry">
        <rect>
         <x>100</x>
@@ -1140,7 +1140,7 @@
        <string>探测时间：</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_circle_interval">
+     <widget class="QLineEdit" name="lineEdit_DET_TimeLength">
       <property name="geometry">
        <rect>
         <x>300</x>
@@ -1169,7 +1169,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QComboBox" name="comboBox_DetetectMoMode">
+    <widget class="QComboBox" name="comboBox_DetetectMode">
      <property name="geometry">
       <rect>
        <x>270</x>
@@ -1311,7 +1311,7 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>470</x>
@@ -1387,7 +1387,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>470</x>

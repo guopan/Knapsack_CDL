@@ -42,10 +42,10 @@ void paraDialog::initial_para()
     connect(ui->lineEdit_circleNum, &QLineEdit::textChanged,this,&paraDialog::set_angleNum);					//圆周数 -> 方向数
     connect(ui->radioButton_anglekey,&QRadioButton::clicked,this,&paraDialog::set_anglekey);					//方向键
     connect(ui->radioButton_circlekey,&QRadioButton::clicked,this,&paraDialog::set_circlekey);					//圆周键
-//    connect(ui->radioButton_continousdet,&QRadioButton::clicked,this,&paraDialog::set_continusdetekey);        //连续探测
+    //    connect(ui->radioButton_continousdet,&QRadioButton::clicked,this,&paraDialog::set_continusdetekey);        //连续探测
     connect(ui->lineEdit_SP,&QLineEdit::textChanged,this,&paraDialog::set_motorSP);								//最高转速 -> 探测时间
-    connect(ui->lineEdit_direct_interval,&QLineEdit::textChanged,this,&paraDialog::set_time_direct_interval);
-    connect(ui->lineEdit_circle_interval,&QLineEdit::textChanged,this,&paraDialog::set_time_circle_interval);
+    connect(ui->lineEdit_ITV_TimeLength,&QLineEdit::textChanged,this,&paraDialog::set_time_direct_interval);
+    connect(ui->lineEdit_DET_TimeLength,&QLineEdit::textChanged,this,&paraDialog::set_time_circle_interval);
 
     //采样设置
     connect(ui->comboBox_sampleFreq,&QComboBox::currentTextChanged,this,&paraDialog::set_sampleFreq);			//采样频率 -> 采样点数
@@ -53,6 +53,8 @@ void paraDialog::initial_para()
     connect(ui->lineEdit_sampleNum,&QLineEdit::textChanged,this,&paraDialog::set_filesize);						//采样点数 -> 数据量
     connect(ui->lineEdit_plsAccNum,&QLineEdit::textChanged,this,&paraDialog::set_plsAccNum);					//脉冲数	  -> 数据量
 
+    //存储设置
+    connect(ui->checkBox_autocreate_dateDir,&QCheckBox::clicked,this,&paraDialog::on_checkBox_autoCreate_DateDir_clicked);
     ui->lineEdit_DatafilePath->setReadOnly(true);
 }
 
@@ -71,7 +73,8 @@ void paraDialog::update_show()
     ui->lineEdit_plsAccNum->setText(QString::number(psetting.plsAccNum));
 
     //探测方式
-    ui->comboBox_DetetectMoMode->setCurrentIndex(psetting.detectMode);
+    ui->comboBox_DetetectMode->setCurrentIndex(psetting.detectMode);
+    on_comboBox_DetetectMode_currentIndexChanged(psetting.detectMode);
     //扫描参数——俯仰角
     ui->lineEdit_elevationAngle->setText(QString::number(psetting.elevationAngle));
     //方位角
@@ -79,26 +82,28 @@ void paraDialog::update_show()
     ui->lineEdit_step_azAngle->setText(QString::number(psetting.step_azAngle));
     //扫描探测
     ui->groupBox_6->setEnabled(true);
-//    ui->radioButton_continousdet->setChecked(psetting.continusdete);
+    //    ui->radioButton_continousdet->setChecked(psetting.continusdete);
     ui->radioButton_anglekey->setChecked(psetting.anglekey);
     ui->radioButton_circlekey->setChecked(psetting.circlekey);
-    if(psetting.anglekey)
-    {
-        ui->lineEdit_circleNum->setEnabled(false);
-        ui->lineEdit_angleNum->setEnabled(true);
-    }
-    else
-    {
-        ui->lineEdit_circleNum->setEnabled(true);
-        ui->lineEdit_angleNum->setEnabled(false);
-    }
+    if(psetting.detectMode == 1)
+        if(psetting.anglekey)
+        {
+            ui->lineEdit_circleNum->setEnabled(false);
+            ui->lineEdit_angleNum->setEnabled(true);
+        }
+        else
+        {
+            ui->lineEdit_circleNum->setEnabled(true);
+            ui->lineEdit_angleNum->setEnabled(false);
+        }
+
     ui->lineEdit_angleNum->setText(QString::number(psetting.angleNum));
     ui->lineEdit_circleNum->setText(QString::number(psetting.circleNum));
     ui->lineEdit_SP->setText(QString::number(psetting.SP));
 
     //扫描参数——定时设置
-    ui->lineEdit_direct_interval->setText(QString::number(psetting.IntervalTime,'f',2));
-    ui->lineEdit_circle_interval->setText(QString::number(psetting.GroupTime,'f',2));
+    ui->lineEdit_ITV_TimeLength->setText(QString::number(psetting.IntervalTime,'f',2));
+    ui->lineEdit_DET_TimeLength->setText(QString::number(psetting.GroupTime,'f',2));
 
     //文件存储
 
@@ -228,13 +233,13 @@ void paraDialog::set_SP_Interval()
         ui->radioButton_circlekey->setEnabled(false);
         ui->radioButton_circlekey->setChecked(false);
         set_anglekey();
-        ui->lineEdit_circle_interval->setEnabled(false);
+        ui->lineEdit_DET_TimeLength->setEnabled(false);
     }
     else
     {
         ui->lineEdit_SP->setEnabled(true);
         ui->radioButton_circlekey->setEnabled(true);
-        ui->lineEdit_circle_interval->setEnabled(true);
+        ui->lineEdit_DET_TimeLength->setEnabled(true);
     }
 }
 
@@ -291,7 +296,7 @@ void paraDialog::set_circlekey()													//圆周键
     ui->lineEdit_circleNum->setEnabled(true);
 }
 
-void paraDialog::set_continusdetekey()
+void paraDialog::set_detectMode()
 {
     psetting.anglekey = false;
     psetting.circlekey = false;
@@ -316,13 +321,13 @@ void paraDialog::set_motorSP()														//电机转速
 
 void paraDialog::set_time_direct_interval()
 {
-    psetting.IntervalTime = ui->lineEdit_direct_interval->text().toFloat();
+    psetting.IntervalTime = ui->lineEdit_ITV_TimeLength->text().toFloat();
     set_dect_time();
 }
 
 void paraDialog::set_time_circle_interval()
 {
-    psetting.GroupTime = ui->lineEdit_circle_interval->text().toFloat();
+    psetting.GroupTime = ui->lineEdit_DET_TimeLength->text().toFloat();
     set_dect_time();
 }
 
@@ -368,7 +373,6 @@ void paraDialog::set_filesize()
     ui->lineEdit_totalsize->setText(QString::number(4*psetting.angleNum*direct_size/(1024*1024),'f',2));
     set_dect_time();
 }
-
 
 void paraDialog::filesize_over()
 {
@@ -486,8 +490,6 @@ void paraDialog::on_pushButton_pathModify_clicked()
 //    }
 //}
 
-
-
 ACQSETTING paraDialog::get_settings()
 {
     return psetting;
@@ -565,4 +567,39 @@ quint64 paraDialog::getDiskFreeSpace(QString driver)
         return 0;
     }
     return (quint64)liTotalFreeBytes.QuadPart/1024/1024;			//单位为MB
+}
+
+
+// 探测模式切换选择
+void paraDialog::on_comboBox_DetetectMode_currentIndexChanged(int index)
+{
+    psetting.detectMode = index;
+    switch (index) {
+    case 0:     //持续探测
+        ui->radioButton_anglekey->setEnabled(false);
+        ui->radioButton_circlekey->setEnabled(false);
+        ui->lineEdit_angleNum->setEnabled(false);
+        ui->lineEdit_circleNum->setEnabled(false);
+        ui->lineEdit_ITV_TimeLength->setEnabled(false);
+        ui->lineEdit_DET_TimeLength->setEnabled(false);
+        break;
+    case 1:     //单组探测
+        ui->radioButton_anglekey->setEnabled(true);
+        ui->radioButton_circlekey->setEnabled(true);
+        ui->lineEdit_angleNum->setEnabled(true);
+        ui->lineEdit_circleNum->setEnabled(true);
+        ui->lineEdit_ITV_TimeLength->setEnabled(false);
+        ui->lineEdit_DET_TimeLength->setEnabled(false);
+        break;
+    case 2:     //定时探测
+        ui->radioButton_anglekey->setEnabled(false);
+        ui->radioButton_circlekey->setEnabled(false);
+        ui->lineEdit_angleNum->setEnabled(false);
+        ui->lineEdit_circleNum->setEnabled(false);
+        ui->lineEdit_ITV_TimeLength->setEnabled(true);
+        ui->lineEdit_DET_TimeLength->setEnabled(true);
+        break;
+    default:
+        break;
+    }
 }

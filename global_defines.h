@@ -33,7 +33,7 @@ typedef struct
     quint16 AOM_Freq;			//AOM移频量
 
     //扫描参数
-	int     detectMode;			//探测方式：1持续探测2单组探测3定时探测
+	int     detectMode;			//探测方式：0持续探测1单组探测2定时探测
     quint16 elevationAngle;		//俯仰角
     quint16 start_azAngle;		//起始角
     quint16 step_azAngle;		//步进角
@@ -42,8 +42,8 @@ typedef struct
     bool    anglekey;			//方向键
     bool    circlekey;			//圆周键
     quint16 SP;					//驱动器速度
-    float   IntervalTime;		//方向间间隔
-    float   GroupTime;			//圆周间间隔
+    float   IntervalTime;		//定时探测间隔，单位：分钟
+    float   GroupTime;			//定时探测单组时间，单位：分钟
 
     //采样参数
     quint16 sampleFreq;			//采样频率

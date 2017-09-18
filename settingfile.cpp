@@ -102,15 +102,18 @@ void settingfile::checkValid()
 
 }
 
-void settingfile::test_create_file(const QString &c)
+void settingfile::test_create_file(const QString &iniFilePath)
 {
-    QString path_c = c;
+    QString path_c = iniFilePath;
     QString prefix_str = QDateTime::currentDateTime().toString("yyyyMMdd");				//获取最新日期
     QFileInfo file(path_c);                                               //2?
     QSettings settings(path_c,QSettings::IniFormat);
-    if(file.exists() == false)
+    if(file.exists() == false)                              //以下为配置文件不存在时的默认配置
     {
         settings.beginGroup("Laser_parameters");
+        settings.setValue("isPulseMode",true);				//激光模式
+        settings.setValue("laserPulseEnergy",10);			//激光能量，单位μJ
+        settings.setValue("laserPower",100);				//激光功率，单位mW
         settings.setValue("laserRPF",10000);				//激光重频
         settings.setValue("laserPulseWidth",500);			//激光脉宽
         settings.setValue("laserWaveLength",1540);			//激光波长
@@ -118,6 +121,7 @@ void settingfile::test_create_file(const QString &c)
         settings.endGroup();
 
         settings.beginGroup("Scan_parameters");
+        settings.setValue("detectMode",1);                  //探测方式：0持续探测1单组探测2定时探测
         settings.setValue("elevationAngle",70);				//俯仰角
         settings.setValue("start_azAngle",0);				//起始角
         settings.setValue("step_azAngle",90);				//步进角
@@ -125,22 +129,28 @@ void settingfile::test_create_file(const QString &c)
         settings.setValue("circleNum",20);					//圆周数
         settings.setValue("anglekey",false);			    //方向键
         settings.setValue("circlekey",false);				//圆周键
-        settings.setValue("continusdete",true);            //连续探测
+        settings.setValue("continusdete",true);             //连续探测
         settings.setValue("SP",90);							//电机速度
-        settings.setValue("direct_intervalTime",0);			//方向间间隔
-        settings.setValue("time_circle_interval",0);		//圆周间间隔
+        settings.setValue("IntervalTime",15);               //定时探测间隔，单位：分钟
+        settings.setValue("GroupTime",3);                   //定时探测单组时间，单位：分钟
         settings.endGroup();
 
         settings.beginGroup("Sample_parameters");
         settings.setValue("sampleFreq",400);				//采样频率
-        settings.setValue("detRange",6000);					//探测距离
-        settings.setValue("sampleNum",16128);				//采样点数
-        settings.setValue("plsAccNum",100);					//脉冲数
+        settings.setValue("Trigger_Level",2000);             //触发电平
+        settings.setValue("PreTrigger",500);                //预触发点数，保留，暂不提供设置
+        settings.endGroup();
+
+        settings.beginGroup("RealTime_Process");
+
+        settings.setValue("plsAccNum",5000);				//单方向累加脉冲数
+        settings.setValue("nRangeBin",13);                  //距离门数
+        settings.setValue("nPointsPerBin",250);             //距离门内点数
         settings.endGroup();
 
         settings.beginGroup("File_store");
-//        path_c.chop(16);									//截掉末尾配置文件名
-//        path_c.append("/").append(prefix_str);			//路径末尾加上日期文件夹
+        path_c.chop(16);									//截掉末尾配置文件名
+        path_c.append("/").append(prefix_str);              //路径末尾加上日期文件夹？？？？
         settings.setValue("DatafilePath",path_c);			//文件保存路径
         settings.setValue("autoCreate_DateDir",true);		//自动创建日期文件夹
         settings.endGroup();
@@ -196,8 +206,8 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
         return true;
     if(fsetting.circlekey != dlgsetting.circlekey)
         return true;
-//    if(fsetting.continusdete != dlgsetting.continusdete)            //连续探测
-//        return true;
+    //    if(fsetting.continusdete != dlgsetting.continusdete)            //连续探测
+    //        return true;
     if(fsetting.SP != dlgsetting.SP)								//电机速度
         return true;
     if(fsetting.IntervalTime != dlgsetting.IntervalTime)
