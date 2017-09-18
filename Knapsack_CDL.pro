@@ -38,7 +38,11 @@ SOURCES += \
     admintoolbar.cpp \
     rt_scale.cpp \
     paradialog.cpp \
-    settingfile.cpp
+    settingfile.cpp \
+    laserseed.cpp \
+    laserpulse.cpp \
+    laserseedthread.cpp \
+    laserpulsethread.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -56,7 +60,11 @@ HEADERS += \
     rt_scale.h \
     paradialog.h \
     settingfile.h \
-    acqsettings.h
+    acqsettings.h \
+    laserseed.h \
+    laserpulse.h \
+    laserseedthread.h \
+    laserpulsethread.h
 
 FORMS += \
         mainwindow.ui \
