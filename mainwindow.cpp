@@ -371,6 +371,7 @@ void MainWindow::On_ControlTimer_TimeOut()
                 //****关闭文件
                 //****建立新文件，写入文件头
             }
+            State = waitMotor;
             break;
         case 1:                 //单组探测
             //****判断探测方向数
