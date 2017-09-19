@@ -26,6 +26,8 @@ void paraDialog::initial_para()
 {
     update_show();
     //º§π‚≤Œ ˝
+
+    connect(ui->lineEdit_laserEP,&QLineEdit::textChanged,this,&paraDialog::set_laserEP);                        //º§π‚ƒ‹¡ø
     connect(ui->lineEdit_laserRPF,&QLineEdit::textChanged,this,&paraDialog::set_laserRPF);						//º§π‚÷ÿ∆µ
     connect(ui->lineEdit_laserPulseWidth,&QLineEdit::textChanged,this,&paraDialog::set_laserPulseWidth);		//º§π‚¬ˆøÌ
     connect(ui->lineEdit_laserWaveLength,&QLineEdit::textChanged,this,&paraDialog::set_laserWaveLength);		//º§π‚≤®≥§
@@ -42,15 +44,15 @@ void paraDialog::initial_para()
     connect(ui->lineEdit_circleNum, &QLineEdit::textChanged,this,&paraDialog::set_angleNum);					//‘≤÷‹ ˝ -> ∑ΩœÚ ˝
     connect(ui->radioButton_anglekey,&QRadioButton::clicked,this,&paraDialog::set_anglekey);					//∑ΩœÚº¸
     connect(ui->radioButton_circlekey,&QRadioButton::clicked,this,&paraDialog::set_circlekey);					//‘≤÷‹º¸
-    //    connect(ui->radioButton_continousdet,&QRadioButton::clicked,this,&paraDialog::set_continusdetekey);        //¡¨–¯ÃΩ≤‚
     connect(ui->lineEdit_SP,&QLineEdit::textChanged,this,&paraDialog::set_motorSP);								//◊Ó∏ﬂ◊™ÀŸ -> ÃΩ≤‚ ±º‰
     connect(ui->lineEdit_ITV_TimeLength,&QLineEdit::textChanged,this,&paraDialog::set_time_direct_interval);
     connect(ui->lineEdit_DET_TimeLength,&QLineEdit::textChanged,this,&paraDialog::set_time_circle_interval);
 
     //≤…—˘…Ë÷√
     connect(ui->comboBox_sampleFreq,&QComboBox::currentTextChanged,this,&paraDialog::set_sampleFreq);			//≤…—˘∆µ¬  -> ≤…—˘µ„ ˝
-    connect(ui->lineEdit_detRange,&QLineEdit::textChanged,this,&paraDialog::set_detRange);						//ÃΩ≤‚æ‡¿Î -> ≤…—˘µ„ ˝
-    connect(ui->lineEdit_sampleNum,&QLineEdit::textChanged,this,&paraDialog::set_filesize);						//≤…—˘µ„ ˝ ->  ˝æ›¡ø
+    connect(ui->lineEdit_TriggerLevel,&QLineEdit::textChanged,this,&paraDialog::set_Trigger_Level);
+    connect(ui->lineEdit_nRangeBin,&QLineEdit::textChanged,this,&paraDialog::set_nRangeBin);
+    connect(ui->lineEdit_velocity_band_2,&QLineEdit::textChanged,this,&paraDialog::set_velocity_band);
     connect(ui->lineEdit_plsAccNum,&QLineEdit::textChanged,this,&paraDialog::set_plsAccNum);					//¬ˆ≥Â ˝	  ->  ˝æ›¡ø
 
     //¥Ê¥¢…Ë÷√
@@ -61,6 +63,7 @@ void paraDialog::initial_para()
 void paraDialog::update_show()
 {
     //º§π‚≤Œ ˝
+    ui->lineEdit_laserEP->setText(QString::number(psetting.laserPower));
     ui->lineEdit_laserRPF->setText(QString::number(psetting.laserRPF));
     ui->lineEdit_laserPulseWidth->setText(QString::number(psetting.laserPulseWidth));
     ui->lineEdit_laserWaveLength->setText(QString::number(psetting.laserWaveLength));
@@ -68,9 +71,11 @@ void paraDialog::update_show()
 
     //≤…—˘…Ë÷√
     ui->comboBox_sampleFreq->setCurrentText((QString::number(psetting.sampleFreq)));
-    ui->lineEdit_detRange->setText(QString::number(psetting.detRange));
-    ui->lineEdit_sampleNum->setText(QString::number(psetting.sampleNum));
+    ui->lineEdit_TriggerLevel->setText(QString::number(psetting.Trigger_Level));
+    ui->lineEdit_nRangeBin->setText(QString::number(psetting.nRangeBin));
+    ui->lineEdit_nPointsPerBin->setText(QString::number((psetting.nPointsPerBin)));
     ui->lineEdit_plsAccNum->setText(QString::number(psetting.plsAccNum));
+    ui->lineEdit_velocity_band_2->setText(QString::number(psetting.velocity_band));
 
     //ÃΩ≤‚∑Ω Ω
     ui->comboBox_DetetectMode->setCurrentIndex(psetting.detectMode);
@@ -82,7 +87,6 @@ void paraDialog::update_show()
     ui->lineEdit_step_azAngle->setText(QString::number(psetting.step_azAngle));
     //…®√ËÃΩ≤‚
     ui->groupBox_6->setEnabled(true);
-    //    ui->radioButton_continousdet->setChecked(psetting.continusdete);
     ui->radioButton_anglekey->setChecked(psetting.anglekey);
     ui->radioButton_circlekey->setChecked(psetting.circlekey);
     if(psetting.detectMode == 1)
@@ -109,119 +113,49 @@ void paraDialog::update_show()
 
     ui->lineEdit_DatafilePath->setText(psetting.DatafilePath);
     ui->checkBox_autocreate_dateDir->setChecked(psetting.autoCreate_DateDir);
-    //∏¸–¬Õ®µ¿Œƒº˛√˚≥∆
+    ui->lineEdit_nMaxDir_infile_2 ->setText(QString::number(psetting.nMaxDir_inFile));
 
-    //“‘œ¬ «≤Œøº–≈œ¢
-    //ÃΩ≤‚∑Ω Ω
-    show_detect_mode();
-
-    //‘§π¿ÃΩ≤‚ ±º‰
-    set_dect_time();
-
-    //∏¸–¬Œƒº˛ ˝æ›¡ø
-    direct_size = SIZE_OF_FILE_HEADER + psetting.plsAccNum*psetting.sampleNum;								//µ•ŒªB
-    //À´Õ®µ¿ ˝æ›¡ø
-    set_filesize();
 }
 
-//ÃΩ≤‚∑Ω Ω
-void paraDialog::show_detect_mode()
+
+void paraDialog::set_laserEP()
 {
-    if(psetting.elevationAngle == 0)
-    {
-        if(psetting.step_azAngle == 0)
-            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("ÀÆ∆Ωµ•œÚÃΩ≤‚"));        //Horizontal single
-        else
-            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("ÀÆ∆Ω…®√ËÃΩ≤‚£¨√ø÷‹∑ΩœÚ ˝")+QString::number(360/psetting.step_azAngle));//Horizontal scanning£¨directions
-    }
-    else
-        if(psetting.step_azAngle == 0)
-            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("µ•œÚæ∂œÚÃΩ≤‚"));//Single radial
-        else
-            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("‘≤◊∂…®√ËÃΩ≤‚£¨√ø÷‹∑ΩœÚ ˝")+QString::number(360/psetting.step_azAngle));
+    psetting.laserPulseEnergy = ui->lineEdit_laserEP->text().toInt();
 }
 
-//ÃΩ≤‚ ±º‰=µÁª˙◊™∂Ø ±º‰+¥•∑¢ ±º‰+…œ¥´ ±º‰+∑ΩœÚº‰º‰∏Ù ±º‰+‘≤÷‹º‰º‰∏Ù ±º‰
-void paraDialog::set_dect_time()
-{
-    int time_need = psetting.angleNum*psetting.step_azAngle/psetting.SP +
-            psetting.angleNum*psetting.sampleNum/(psetting.sampleFreq*1000000) +
-            psetting.angleNum*ui->lineEdit_sglfilesize->text().toFloat()/UPLOAD_SPEED;
-    if(psetting.step_azAngle == 0)
-        time_need = time_need + (psetting.angleNum-1)*psetting.IntervalTime;
-    else
-        time_need = time_need + (psetting.angleNum-1)*psetting.IntervalTime
-                + psetting.GroupTime*60*psetting.angleNum/(360/psetting.step_azAngle);
-    if(time_need < 1)
-        ui->lineEdit_totalTime->setText("<1s");									//‘⁄1s“‘œ¬
-    else
-        if(time_need < 60)														//‘⁄1min“‘œ¬
-            ui->lineEdit_totalTime->setText(QString::number(time_need)+"s");
-        else
-            if(time_need < 3600)												//‘⁄1h“‘œ¬
-            {
-                int m = time_need/60;
-                int s = time_need%60;
-                if(s == 0)
-                    ui->lineEdit_totalTime->setText(QString::number(m)+"min");	//Œﬁ√Î
-                else
-                    ui->lineEdit_totalTime->setText(QString::number(m)+"min"+QString::number(s)+"s");
-            }
-            else																//‘⁄1h“‘…œ
-            {
-                int h = time_need/3600;
-                int remain = time_need%3600;
-                if(remain == 0)
-                    ui->lineEdit_totalTime->setText(QString::number(h)+"h");//Œﬁ∑÷Œﬁ√Î
-                else
-                {
-                    int m = remain/60;
-                    int s = remain%60;
-                    if(s == 0)
-                        ui->lineEdit_totalTime->setText(QString::number(h)+"h"+QString::number(m)+"m");//Œﬁ√Î
-                    else
-                        ui->lineEdit_totalTime->setText(QString::number(h)+"h"+QString::number(m)+"m"+QString::number(s)+"s");
-                }
-            }
-}
-
-
-void paraDialog::set_laserRPF()														//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_laserRPF()
 {
     psetting.laserRPF = ui->lineEdit_laserRPF->text().toInt();
 }
 
-void paraDialog::set_laserPulseWidth()												//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_laserPulseWidth()
 {
     psetting.laserPulseWidth = ui->lineEdit_laserPulseWidth->text().toInt();
 }
 
-void paraDialog::set_laserWaveLength()												//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_laserWaveLength()
 {
     psetting.laserWaveLength = ui->lineEdit_laserWaveLength->text().toInt();
 }
 
-void paraDialog::set_AOM_Freq()														//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_AOM_Freq()
 {
     psetting.AOM_Freq = ui->lineEdit_AOM_Freq->text().toInt();
 }
 
-void paraDialog::set_elevationAngle()												//∏©—ˆΩ« æˆ∂®ÃΩ≤‚∑ΩœÚ «ÀÆ∆Ωªπ «æ∂œÚ
+void paraDialog::set_elevationAngle()
 {
     psetting.elevationAngle = ui->lineEdit_elevationAngle->text().toInt();
-    show_detect_mode();																//≤Œøº–≈œ¢÷–µƒÃΩ≤‚∑Ω Ω
 }
 
-void paraDialog::set_start_azAngle()												//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_start_azAngle()
 {
     psetting.start_azAngle = ui->lineEdit_start_azAngle->text().toInt();
 }
 
-void paraDialog::set_step_azAngle()													//≤ΩΩ¯Ω«  «∑ÒŒ™0æˆ∂® «≤ª «‘≤÷‹…®√Ë£¨¥Û–°æˆ∂®√ø÷‹…®√Ë ˝//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_step_azAngle()
 {
     psetting.step_azAngle = ui->lineEdit_step_azAngle->text().toInt();
-    show_detect_mode();
-    set_dect_time();
 }
 
 void paraDialog::set_SP_Interval()
@@ -256,10 +190,6 @@ void paraDialog::set_circleNum()													//‘≤÷‹ ˝ ”∞œÏ∑ΩœÚ ˝,psettingªÒ»°±‡º
         ui->lineEdit_circleNum->setText(QString::number(psetting.circleNum,'f',2));
     }
 
-    //    check_update_SN();
-    set_dect_time();																//‘§π¿ ±º‰
-    //À´Õ®µ¿ ˝æ›¡ø
-    ui->lineEdit_totalsize->setText(QString::number(4*psetting.angleNum*direct_size/(1024*1024),'f',2));
 }
 
 //…Ë÷√∑ΩœÚ ˝ ‰»ÎøÚµƒœ‘ æ ˝÷µ
@@ -275,9 +205,6 @@ void paraDialog::set_angleNum()														//∑ΩœÚ ˝ æˆ∂®‘≤÷‹ ˝£¨”∞œÏ◊‹ ˝æ›¡ø£®
         ui->lineEdit_angleNum->setText(QString::number(psetting.angleNum));
     }
 
-    set_dect_time();																//‘§π¿ ±º‰
-    //◊‹ ˝æ›¡ø  À´Õ®µ¿
-    ui->lineEdit_totalsize->setText(QString::number(4*psetting.angleNum*direct_size/(1024*1024),'f',2));
 }
 
 void paraDialog::set_anglekey()														//∑ΩœÚº¸
@@ -315,86 +242,48 @@ void paraDialog::set_motorSP()														//µÁª˙◊™ÀŸ
     else
     {
         psetting.SP = ui->lineEdit_SP->text().toInt();
-        set_dect_time();
     }
 }
 
 void paraDialog::set_time_direct_interval()
 {
     psetting.IntervalTime = ui->lineEdit_ITV_TimeLength->text().toFloat();
-    set_dect_time();
 }
 
 void paraDialog::set_time_circle_interval()
 {
     psetting.GroupTime = ui->lineEdit_DET_TimeLength->text().toFloat();
-    set_dect_time();
 }
 
 
-void paraDialog::set_sampleFreq()													//≤…—˘∆µ¬  ”∞œÏ≤…—˘µ„ ˝°¢µ•Œƒº˛¡ø°¢◊‹ ˝æ›¡ø//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_sampleFreq()													//≤…—˘∆µ¬ 
 {
     psetting.sampleFreq = ui->comboBox_sampleFreq->currentText().toInt();
-    int NumMax_s = psetting.sampleFreq*psetting.detRange/FACTOR;
-    int judge_page_s = NumMax_s%256;
-    pagePerPls = NumMax_s/256;
-    if(judge_page_s != 0)
-        pagePerPls++;
-    psetting.sampleNum = 256*pagePerPls;
-    direct_size = SIZE_OF_FILE_HEADER + psetting.plsAccNum*psetting.sampleNum;		//µ•∏ˆ∑ΩœÚ…œµƒ ˝æ›¡ø
-    ui->lineEdit_sampleNum->setText(QString::number(psetting.sampleNum));			//≤…—˘µ„ ˝
 }
 
-void paraDialog::set_detRange()														//ÃΩ≤‚æ‡¿Î ”∞œÏ≤…—˘µ„ ˝°¢µ•Œƒº˛¡ø°¢◊‹ ˝æ›¡ø//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_Trigger_Level()
 {
-    psetting.detRange = 1000*(ui->lineEdit_detRange->text().toFloat());
-    int NumMax_d = psetting.sampleFreq*psetting.detRange/FACTOR;
-    int judge_page_d = NumMax_d%256;
-    pagePerPls = NumMax_d/256;
-    if(judge_page_d != 0)
-        pagePerPls++;
-    psetting.sampleNum = 256*pagePerPls;
-    direct_size = SIZE_OF_FILE_HEADER + psetting.plsAccNum*psetting.sampleNum;		//µ•∏ˆ∑ΩœÚ…œµƒ ˝æ›¡ø
-    ui->lineEdit_sampleNum->setText(QString::number(psetting.sampleNum));			//≤…—˘µ„ ˝
+    psetting.Trigger_Level = ui->lineEdit_TriggerLevel->text().toFloat();
 }
 
-void paraDialog::set_plsAccNum()													//¬ˆ≥Â ˝”∞œÏµ•Œƒº˛¡ø°¢◊‹ ˝æ›¡ø£®À´Õ®µ¿≥À2£©//psettingªÒ»°±‡º≠øÚ÷µ
+void paraDialog::set_nRangeBin()
+{
+    psetting.nRangeBin = ui->lineEdit_nRangeBin->text().toInt();
+}
+
+void paraDialog::set_nPointsPerBin()
+{
+    psetting.nPointsPerBin = ui->lineEdit_nPointsPerBin->text().toInt();
+}
+
+void paraDialog::set_plsAccNum()
 {
     psetting.plsAccNum = ui->lineEdit_plsAccNum->text().toInt();
-    direct_size = SIZE_OF_FILE_HEADER + psetting.plsAccNum*psetting.sampleNum;       //µ•∑ΩœÚ…œµƒ ˝æ›¡ø À´Õ®µ¿
-    set_filesize();
 }
 
-//À´Õ®µ¿ ˝æ›¥Û–°¡ø
-void paraDialog::set_filesize()
+void paraDialog::set_velocity_band()
 {
-    filesize_over();
-    ui->lineEdit_sglfilesize->setText(QString::number(4*direct_size/(1024*1024),'f',2));
-    ui->lineEdit_totalsize->setText(QString::number(4*psetting.angleNum*direct_size/(1024*1024),'f',2));
-    set_dect_time();
-}
-
-void paraDialog::filesize_over()
-{
-    if(direct_size > DATA_MEMORY)
-    {
-        ui->pushButton_save->setEnabled(false);
-        ui->pushButton_sure->setEnabled(false);
-        ui->comboBox_sampleFreq->setStyleSheet("color: red;""font-size:12pt;""font-family:'Microsoft YaHei UI';");
-        ui->lineEdit_detRange->setStyleSheet("color: red;""font-size:12pt;""font-family:'Microsoft YaHei UI';");
-        ui->lineEdit_plsAccNum->setStyleSheet("color: red;""font-size:12pt;""font-family:'Microsoft YaHei UI';");
-    }
-    else
-    {
-        ui->pushButton_save->setEnabled(true);
-        if(nocollecting == false)																		//»Ù≥Ã–Ú≤…ºØ£¨»∑∂®º¸Œ™∑« πƒ‹◊¥Ã¨
-            ui->pushButton_sure->setEnabled(false);
-        else
-            ui->pushButton_sure->setEnabled(true);
-        ui->comboBox_sampleFreq->setStyleSheet("color: black;""font-size:12pt;""font-family:'Microsoft YaHei UI';");
-        ui->lineEdit_detRange->setStyleSheet("color: black;""font-size:12pt;""font-family:'Microsoft YaHei UI';");
-        ui->lineEdit_plsAccNum->setStyleSheet("color: black;""font-size:12pt;""font-family:'Microsoft YaHei UI';");
-    }
+    psetting.velocity_band = ui->lineEdit_velocity_band_2 ->text().toInt();
 }
 
 //¬∑æ∂œ‘ æ…Ë÷√
@@ -497,12 +386,6 @@ ACQSETTING paraDialog::get_settings()
 
 void paraDialog::on_pushButton_save_clicked()
 {
-    //    if(psetting.dataFileName_Suffix.length() < lenStr.length())
-    //    {
-    //        QMessageBox::information(this,QString::fromLocal8Bit("Ã· æ"),
-    //                                 QString::fromLocal8Bit("«Î÷ÿ–¬…Ë÷√–Ú∫≈£¨◊Ó–°≥§∂»Œ™") + QString::number(lenStr.length()));
-    //        return;
-    //    }
     profile_path = QFileDialog::getSaveFileName(this,QString::fromLocal8Bit("±£¥Ê"),".","*.ini");
     if(!profile_path.isEmpty())
     {
@@ -546,15 +429,15 @@ void paraDialog::on_pushButton_sure_clicked()
     //        return;
     //    }
 
-    QString Disk_Name = psetting.DatafilePath.left(3);								//¬∑æ∂∂‘”¶”≤≈Ã∑÷«¯√˚
-    quint64 freeSpace = getDiskFreeSpace(Disk_Name);								//ªÒ»°¬∑æ∂∂‘”¶”≤≈Ã∑÷«¯µƒø’º‰¥Û–°MB
-    float totalfile_Space = ui->lineEdit_totalsize->text().toFloat();
-    if(freeSpace > totalfile_Space+100)
-        accept();
-    else
-        QMessageBox::warning(this,QString::fromLocal8Bit("Ã· æ"),
-                             Disk_Name.left(1)+QString::fromLocal8Bit("The remaining space of the disk")
-                             + QString::number(freeSpace) + QString::fromLocal8Bit("MB"));
+//    QString Disk_Name = psetting.DatafilePath.left(3);								//¬∑æ∂∂‘”¶”≤≈Ã∑÷«¯√˚
+//    quint64 freeSpace = getDiskFreeSpace(Disk_Name);								//ªÒ»°¬∑æ∂∂‘”¶”≤≈Ã∑÷«¯µƒø’º‰¥Û–°MB
+//    float totalfile_Space = ui->lineEdit_totalsize->text().toFloat();
+//    if(freeSpace > totalfile_Space+100)
+//        accept();
+//    else
+//        QMessageBox::warning(this,QString::fromLocal8Bit("Ã· æ"),
+//                             Disk_Name.left(1)+QString::fromLocal8Bit("The remaining space of the disk")
+//                             + QString::number(freeSpace) + QString::fromLocal8Bit("MB"));
 }
 
 quint64 paraDialog::getDiskFreeSpace(QString driver)

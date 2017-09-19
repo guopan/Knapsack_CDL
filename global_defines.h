@@ -33,7 +33,7 @@ typedef struct
     quint16 AOM_Freq;			//AOM移频量
 
     //扫描参数
-	int     detectMode;			//探测方式：0持续探测1单组探测2定时探测
+    int     detectMode;			//探测方式：0持续探测1单组探测2定时探测
     quint16 elevationAngle;		//俯仰角
     quint16 start_azAngle;		//起始角
     quint16 step_azAngle;		//步进角
@@ -63,7 +63,7 @@ typedef struct
     //文件存储
     QString DatafilePath;		//数据存储路径
     bool 	autoCreate_DateDir;	//自动创建日期文件夹
-	quint32 nMaxDir_inFile;		//持续模式下，单文件内的方向数
+    quint32 nMaxDir_inFile;
 
 }ACQSETTING;
 

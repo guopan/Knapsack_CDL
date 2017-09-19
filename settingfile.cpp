@@ -34,7 +34,7 @@ void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      
     settings.setValue("circleNum",fsetting.circleNum);					//圆周数
     settings.setValue("anglekey",fsetting.anglekey);					//方向数
     settings.setValue("circlekey",fsetting.circlekey);					//圆周数
-    settings.setValue("detectMode",fsetting.detectMode);                //探测模式
+    settings.setValue("detectMode",fsetting.detectMode);                //探测模式：0持续探测1单组探测2定时探测
     settings.setValue("SP",fsetting.SP);								//电机速度
     settings.setValue("IntervalTime",fsetting.IntervalTime);            //分组间隔
     settings.setValue("GroupTime",fsetting.GroupTime);                  //每组探测时间
@@ -42,14 +42,21 @@ void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      
 
     settings.beginGroup("Sample_parameters");
     settings.setValue("sampleFreq",fsetting.sampleFreq);				//采样频率
-    settings.setValue("detRange",fsetting.detRange);					//探测距离
-    settings.setValue("sampleNum",fsetting.sampleNum);                  //采样点数
-    settings.setValue("plsAccNum",fsetting.plsAccNum);					//脉冲数
+    settings.setValue("Trigger_Level",fsetting.Trigger_Level);          //触发电平
+    settings.setValue("PreTrigger",fsetting.PreTrigger);                //预触发点数，保留，暂不提供设置
+    settings.endGroup();
+
+    settings.beginGroup("RealTime_Process");
+    settings.setValue("plsAccNum",fsetting.plsAccNum);					//单方向累加脉冲数
+    settings.setValue("nRangeBin",fsetting.nRangeBin);                  //距离门数
+    settings.setValue("nPointsPerBin",fsetting.nPointsPerBin);          //距离门内点数
+    settings.setValue("velocity_band",fsetting.velocity_band);          //径向风速范围
     settings.endGroup();
 
     settings.beginGroup("File_store");
     settings.setValue("DatafilePath",fsetting.DatafilePath);					//文件保存路径
     settings.setValue("autoCreate_DateDir",fsetting.autoCreate_DateDir);		//自动创建日期文件夹
+    settings.setValue("nMaxDir_infile",fsetting.nMaxDir_inFile);
     settings.endGroup();
 
 }
@@ -59,10 +66,13 @@ void settingfile::readFrom_file(const QString &b)
     QString path_b = b;
     QSettings settings(path_b,QSettings::IniFormat);
     settings.beginGroup("Laser_parameters");
-    fsetting.laserRPF = settings.value("laserRPF").toInt();
-    fsetting.laserPulseWidth = settings.value("laserPulseWidth").toInt();
-    fsetting.laserWaveLength = settings.value("laserWaveLength").toInt();
-    fsetting.AOM_Freq = settings.value("AOM_Freq").toInt();
+    fsetting.isPulseMode = settings.value("isPulseMode").toBool();            //激光类型
+    fsetting.laserPulseEnergy = settings.value("laserPulseEnergy").toInt();   //激光能量
+    fsetting.laserPower = settings.value("laserPower").toInt();               //激光功率
+    fsetting.laserRPF = settings.value("laserRPF").toInt();                   //激光重频
+    fsetting.laserPulseWidth = settings.value("laserPulseWidth").toInt();     //激光脉宽
+    fsetting.laserWaveLength = settings.value("laserWaveLength").toInt();     //激光波长
+    fsetting.AOM_Freq = settings.value("AOM_Freq").toInt();                   //AOM移频量
     settings.endGroup();
 
     settings.beginGroup("Scan_parameters");
@@ -81,14 +91,21 @@ void settingfile::readFrom_file(const QString &b)
 
     settings.beginGroup("Sample_parameters");
     fsetting.sampleFreq = settings.value("sampleFreq").toInt();				//采样频率
-    fsetting.detRange = settings.value("detRange").toFloat();				//探测距离
-    fsetting.sampleNum = settings.value("sampleNum").toInt();				//采样点数
-    fsetting.plsAccNum = settings.value("plsAccNum").toInt();				//脉冲数
+    fsetting.Trigger_Level = settings.value("Trigger_Level").toInt();       //触发电平
+    fsetting.PreTrigger = settings.value("PreTrigger").toInt();             //预触发点数，保留，暂不提供设置
+    settings.endGroup();
+
+    settings.beginGroup("RealTime_Process");
+    fsetting.plsAccNum = settings.value("plsAccNum").toInt();				//单方向累加脉冲数
+    fsetting.nRangeBin = settings.value("nRangeBin").toInt();               //距离门数
+    fsetting.nPointsPerBin = settings.value("nPointsPerBin").toInt();       //距离门内点数
+    fsetting.velocity_band = settings.value("velocity_band").toInt();       //径向风速范围
     settings.endGroup();
 
     settings.beginGroup("File_store");
     fsetting.DatafilePath = settings.value("DatafilePath").toString();					//文件保存路径
     fsetting.autoCreate_DateDir = settings.value("autoCreate_DateDir").toBool();		//自动创建最小文件夹
+    fsetting.nMaxDir_inFile = settings.value("nMaxDir_inFile").toInt();                 //单文件方向数
     settings.endGroup();
 }
 
@@ -106,7 +123,7 @@ void settingfile::test_create_file(const QString &iniFilePath)
 {
     QString path_c = iniFilePath;
     QString prefix_str = QDateTime::currentDateTime().toString("yyyyMMdd");				//获取最新日期
-    QFileInfo file(path_c);                                               //2?
+    QFileInfo file(path_c);
     QSettings settings(path_c,QSettings::IniFormat);
     if(file.exists() == false)                              //以下为配置文件不存在时的默认配置
     {
@@ -137,15 +154,15 @@ void settingfile::test_create_file(const QString &iniFilePath)
 
         settings.beginGroup("Sample_parameters");
         settings.setValue("sampleFreq",400);				//采样频率
-        settings.setValue("Trigger_Level",2000);             //触发电平
+        settings.setValue("Trigger_Level",2000);            //触发电平
         settings.setValue("PreTrigger",500);                //预触发点数，保留，暂不提供设置
         settings.endGroup();
 
         settings.beginGroup("RealTime_Process");
-
         settings.setValue("plsAccNum",5000);				//单方向累加脉冲数
         settings.setValue("nRangeBin",13);                  //距离门数
         settings.setValue("nPointsPerBin",250);             //距离门内点数
+        settings.setValue("velocity_band",20);
         settings.endGroup();
 
         settings.beginGroup("File_store");
@@ -153,6 +170,7 @@ void settingfile::test_create_file(const QString &iniFilePath)
         path_c.append("/").append(prefix_str);              //路径末尾加上日期文件夹？？？？
         settings.setValue("DatafilePath",path_c);			//文件保存路径
         settings.setValue("autoCreate_DateDir",true);		//自动创建日期文件夹
+        settings.setValue("nMaxDir_inFile",1000);              //单文件方向数
         settings.endGroup();
     }
     else
@@ -183,6 +201,12 @@ void settingfile::test_create_file(const QString &iniFilePath)
 bool settingfile::isSettingsChanged(const ACQSETTING &setting)
 {
     ACQSETTING dlgsetting = setting;
+    if(fsetting.isPulseMode != dlgsetting.isPulseMode)              //激光类型
+        return true;
+    if(fsetting.laserPulseEnergy != dlgsetting.laserPulseEnergy)    //激光能量
+        return true;
+    if(fsetting.laserPower != dlgsetting.laserPower)                //激光功率
+        return true;
     if(fsetting.laserRPF != dlgsetting.laserRPF)					//激光重频
         return true;
     if(fsetting.laserPulseWidth != dlgsetting.laserPulseWidth)		//脉冲宽度
@@ -192,6 +216,8 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
     if(fsetting.AOM_Freq != dlgsetting.AOM_Freq)					//AOM移频量
         return true;
 
+    if(fsetting.detectMode != dlgsetting.detectMode)
+        return true;                                                //探测方式
     if(fsetting.elevationAngle != dlgsetting.elevationAngle)		//俯仰角
         return true;
     if(fsetting.start_azAngle != dlgsetting.start_azAngle)			//起始角
@@ -206,8 +232,6 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
         return true;
     if(fsetting.circlekey != dlgsetting.circlekey)
         return true;
-    //    if(fsetting.continusdete != dlgsetting.continusdete)            //连续探测
-    //        return true;
     if(fsetting.SP != dlgsetting.SP)								//电机速度
         return true;
     if(fsetting.IntervalTime != dlgsetting.IntervalTime)
@@ -217,16 +241,25 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
 
     if(fsetting.sampleFreq != dlgsetting.sampleFreq)				//采样频率
         return true;
-    if(fsetting.detRange != dlgsetting.detRange)					//探测距离
+    if(fsetting.Trigger_Level != dlgsetting.Trigger_Level)          //触发电平
         return true;
-    if(fsetting.sampleNum != dlgsetting.sampleNum)
+    if(fsetting.PreTrigger !=dlgsetting.PreTrigger)                 //预触发点数
         return true;
-    if(fsetting.plsAccNum != dlgsetting.plsAccNum)
+
+    if(fsetting.plsAccNum != dlgsetting.plsAccNum)                  //单方向累加脉冲数
+        return true;
+    if(fsetting.nRangeBin !=dlgsetting.nRangeBin)                   //距离门数
+        return true;
+    if(fsetting.nPointsPerBin != dlgsetting.nPointsPerBin)          //距离门内点数
+        return true;
+    if(fsetting.velocity_band != dlgsetting.velocity_band)          //径向风速范围
         return true;
 
     if(fsetting.DatafilePath != dlgsetting.DatafilePath)			  //文件保存路径
         return true;
-    if(fsetting.autoCreate_DateDir != dlgsetting.autoCreate_DateDir)//自动创建日期文件夹
+    if(fsetting.autoCreate_DateDir != dlgsetting.autoCreate_DateDir)  //自动创建日期文件夹
+        return true;
+    if(fsetting.nMaxDir_inFile != dlgsetting.nMaxDir_inFile)          //单文件方向数
         return true;
 
     return false;
