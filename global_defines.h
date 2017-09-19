@@ -59,7 +59,7 @@ typedef struct
 
     //反演参数
     float 	velocity_band;      //径向风速范围,±m/s
-
+    int     nDir_VectorCal;     //计算矢量风速所需的径向风速数量
 
     //文件存储
     QString DatafilePath;		//数据存储路径
