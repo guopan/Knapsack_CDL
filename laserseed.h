@@ -30,7 +30,6 @@ signals:
     void seedOpenReady();
     void laserColseRight();
 private:
-    QTimer *timer;         //延时的定时器
     QByteArray senddata;
     QString laserPort,errorCode;
     char ConvertHexChar(char ch);

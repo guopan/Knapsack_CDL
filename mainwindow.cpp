@@ -144,6 +144,8 @@ void MainWindow::checkMotorAngle(const double &s)
             moveNorth = false;
 //            adq.Start_Capture();        //指北后开始采集卡工作
             readyToCollect=true;
+            LaserPulse.checkLaser();
+            LaserSeed.checkLaser();
             checkReady = false;
             motorPX0 = s;
             if(motorPX0>360-mysetting.step_azAngle)
@@ -161,6 +163,8 @@ void MainWindow::checkMotorAngle(const double &s)
         {
             //adq.Start_Capture();
             readyToCollect=true;
+            LaserPulse.checkLaser();
+            LaserSeed.checkLaser();
             checkReady = false;
             motorPX0 = s;
             if(motorPX0>360-mysetting.step_azAngle)

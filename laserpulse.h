@@ -29,8 +29,7 @@ signals:
     void laserPulseError(QString &s);
     void pulseCloseReady();
     void laserWorkRight();
-private:
-    QTimer *timer;         //延时的定时器
+private:    
     QByteArray senddata;
     QString laserPort,errorCode;
     char ConvertHexChar(char ch);
