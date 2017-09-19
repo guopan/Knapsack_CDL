@@ -17,8 +17,8 @@ public:
     void beginSeedLaser();
     void setSeedPower(const int &s);
     void closeSeedLaser();
-private slots:
     void checkLaser();
+private slots:
     void receive_response(const QString &temp);
     void portError();
     void timeout();

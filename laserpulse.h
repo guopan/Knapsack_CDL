@@ -17,8 +17,8 @@ public:
     void beginPulseLaser();
     void setPulsePower(const int &s);
     void closePulseLaser();
-private slots:
     void checkLaser();
+private slots:
     void receive_response(const QString &temp);
     void portError();
     void timeout();
