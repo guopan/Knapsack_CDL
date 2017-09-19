@@ -51,6 +51,7 @@ signals:
     void data_changed();
     void size_changed();
 
+
 private slots:
     void on_startButton_clicked();
     void action_set_triggered();			//设置
@@ -68,6 +69,7 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
+
 
 
 private:
@@ -125,6 +127,7 @@ private:
     laserSeed LaserSeed;
     laserPulse LaserPulse;
     void Create_DataFolder();			//数据存储文件夹的创建
+    bool readyToCollect;         //----指示电机是否已经停止并达到指定位置
 };
 
 #endif // MAINWINDOW_H
