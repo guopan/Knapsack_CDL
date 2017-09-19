@@ -501,3 +501,69 @@ void MainWindow::Create_DataFolder()
         mypath.mkpath(mysetting.DatafilePath);
 
 }
+void MainWindow::Save_Spec2File()
+{
+    //    KnapsackCDL(20170912_11_30_21).spec
+    Create_DataFolder();
+    QDateTime now = QDateTime::currentDateTime();			//时间
+    QString timestr = now.toString("yyyyMMdd_hh_mm_ss.zzz");
+//    QFile outputfile(mysetting.DatafilePath+"/"+"KnapsackCDL("+timestr+").spec");
+    QFile outputfile(mysetting.DatafilePath+"/"+"KnapsackCDL().spec");
+
+
+    if(outputfile.open(QFile::WriteOnly | QIODevice::Truncate))//QIODevice::Truncate表示将原文件内容清空
+    {
+        QDataStream specFile(&outputfile);
+        specFile << quint32(0x73706563);                    // 文件类型标识
+        specFile << quint32(0x00000100);                    // 文件版本001.0
+        specFile << "Knapsack Coherent Doppler Lidar Original Spectrum";
+        specFile << timestr;
+        qDebug()<< timestr;
+        QDateTime zero = QDateTime::fromSecsSinceEpoch(0,Qt::UTC);
+        qDebug()<< zero.toString("yyyy-MM-dd hh:mm:ss.zzz");
+        specFile << zero.toString("yyyy-MM-dd hh:mm:ss.zzz");
+        specFile << now.toMSecsSinceEpoch();
+//1900-01-01 00:00:00
+
+        //激光参数
+        specFile << mysetting.isPulseMode;		//脉冲探测（true）or连续探测（false） bool
+        specFile << mysetting.laserPulseEnergy;	//激光能量，单位μJ，连续模式下为0     float
+        specFile << mysetting.laserPower;		//激光功率，单位mW，脉冲模式下为0     float
+        specFile << mysetting.laserRPF;			//激光频率                         quint16
+        specFile << mysetting.laserPulseWidth;	//脉冲宽度                         quint16
+        specFile << mysetting.laserWaveLength;	//激光波长                         quint16
+        specFile << mysetting.AOM_Freq;			//AOM移频量                        quint16
+
+        //扫描参数
+        specFile << mysetting.detectMode;		//探测方式：0持续探测1单组探测2定时探测  int
+        specFile << mysetting.elevationAngle;	//俯仰角                             quint16
+        specFile << mysetting.start_azAngle;	//起始角                             quint16
+        specFile << mysetting.step_azAngle;		//步进角                             quint16
+        specFile << mysetting.angleNum;			//方向数                             quint32
+        specFile << mysetting.IntervalTime;		//定时探测间隔，单位：分钟              float
+        specFile << mysetting.GroupTime;		//定时探测单组时间，单位：分钟           float
+
+        //采样参数
+        specFile << mysetting.sampleFreq;		//采样频率                         quint16
+        specFile << mysetting.Trigger_Level;    //触发电平                         quint16
+        specFile << mysetting.PreTrigger;       //预触发点数，保留，暂不提供设置       int
+
+        //实时处理参数
+        specFile << mysetting.plsAccNum;        //单方向累加脉冲数         quint16
+        specFile << mysetting.nRangeBin;        //距离门数                quint16
+        specFile << mysetting.nPointsPerBin;    //距离门内点数            quint16
+
+
+
+        //		int ret;
+        //		ret = specFile.writeRawData((char*)data_a,mysetting.sampleNum*mysetting.plsAccNum*2);//返回值为写入的数据的字节数
+//        specFile.writeRawData((char*)data_a,mysetting.sampleNum*mysetting.plsAccNum*2);
+        //采样数据的写入
+        outputfile.close();
+        qDebug() << "Specfile saving is finished!";
+    }
+}
+void MainWindow::on_pushButton_test_clicked()
+{
+    Save_Spec2File();
+}

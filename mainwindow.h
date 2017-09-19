@@ -70,6 +70,9 @@ private slots:
     void on_pushButton_2_clicked();
 
 
+    void Save_Spec2File();
+    void on_pushButton_test_clicked();
+
 private:
     Ui::MainWindow *ui;
     // GUIΩÁ√Ê
