@@ -433,7 +433,7 @@ void paraDialog::on_pushButton_sure_clicked()
 //    quint64 freeSpace = getDiskFreeSpace(Disk_Name);								//获取路径对应硬盘分区的空间大小MB
 //    float totalfile_Space = ui->lineEdit_totalsize->text().toFloat();
 //    if(freeSpace > totalfile_Space+100)
-//        accept();
+    accept();
 //    else
 //        QMessageBox::warning(this,QString::fromLocal8Bit("提示"),
 //                             Disk_Name.left(1)+QString::fromLocal8Bit("The remaining space of the disk")
