@@ -6,8 +6,7 @@ laserPulse::laserPulse(QObject *parent) : QObject(parent)
     connect(&Laserpulsethread,SIGNAL(responsePulse(QString)),this,SLOT(receive_response(QString)));
     connect(&Laserpulsethread,SIGNAL(Pulse_PortNotOpen()),this,SLOT(portError()));
     connect(&Laserpulsethread,SIGNAL(timeoutPulse()),this,SLOT(timeout()));
-    timer = new QTimer(this);
-    connect(timer,SIGNAL(timeout()),this,SLOT(checkLaser()));
+
     laserPort="COM4";
     powerSet=true;
     fire=false;
@@ -23,10 +22,6 @@ void laserPulse::beginPulseLaser()
 
 void laserPulse::setPulsePower(const int &s)
 {
-    if(timer->isActive())
-    {
-        timer->stop();
-    }
     QString key =QString("%1").arg(s,4,16,QLatin1Char('0')).toUpper();
     bool ok;
     int aa=key.left(2).toInt(&ok,16)+key.right(2).toInt(&ok,16);
@@ -39,10 +34,6 @@ void laserPulse::setPulsePower(const int &s)
 
 void laserPulse::closePulseLaser()
 {
-    if(timer->isActive())
-    {
-        timer->stop();
-    }
     StringToHex("AA 55 C1 01 00 00 00",senddata);
     Laserpulsethread.transaction(laserPort,senddata);
     close=true;
@@ -60,9 +51,7 @@ void laserPulse::receive_response(const QString &temp)
         }
         else
         {
-            timer->start(1000);
             powerSet=true;
-            StringToHex("AA 55 D3 00 00 00",senddata);
             emit this->laserWorkRight();
             qDebug()<<"脉冲激光器功率设置成功";
         }
@@ -108,7 +97,6 @@ void laserPulse::receive_response(const QString &temp)
             {
                 errorCode="脉冲激光器打开异常";
                 emit this->laserPulseError(errorCode);
-                timer->stop();
             }
             else
             {
@@ -127,7 +115,6 @@ void laserPulse::receive_response(const QString &temp)
                     if(key.mid(2,1)=="1")
                     {errorCode.append("种子脉冲激光器温度异常;");}
                     emit this->laserPulseError(errorCode);
-                    timer->stop();
                 }
                 else
                 {
@@ -141,7 +128,7 @@ void laserPulse::receive_response(const QString &temp)
 
 void laserPulse::checkLaser()
 {
-//    StringToHex("AA 55 D3 00 00 00",senddata);
+    StringToHex("AA 55 D3 00 00 00",senddata);
     Laserpulsethread.transaction(laserPort,senddata);
 }
 

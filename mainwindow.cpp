@@ -71,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&LaserSeed,&laserSeed::laserSeedError, this,&MainWindow::laserErrorHint);
     connect(&LaserPulse,&laserPulse::laserPulseError, this,&MainWindow::laserErrorHint);
 
+
     //显示部分
     H_low = 100;
     H_high = 1000;
@@ -86,15 +87,14 @@ MainWindow::MainWindow(QWidget *parent) :
     DisplaySpeed->setHeights(Height_values);
 
     ui->gridLayout->addWidget(DisplaySpeed);
-    //    connect(&Motor, &motor::moveReady,this, &MainWindow::getPosition);
-    //    connect(&Motor, &motor::motorAngle, this, &MainWindow::checkMotorAngle);
-    //    connect(&adq, &ADQ214::collectFinish, this, &MainWindow::getPosition);
+
 
     connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
     TestTimer = new QTimer(this);
     //    timer->start(1000);
     connect(TestTimer, SIGNAL(timeout()), this, SLOT(changeData()));
     stopped = true;
+    readyToCollect=false;
 }
 
 MainWindow::~MainWindow()
@@ -142,8 +142,14 @@ void MainWindow::checkMotorAngle(const double &s)
         {
             qDebug()<<"success ";
             moveNorth = false;
-            adq.Start_Capture();        //指北后开始采集卡工作
+//            adq.Start_Capture();        //指北后开始采集卡工作
+            readyToCollect=true;
+            LaserPulse.checkLaser();
+            LaserSeed.checkLaser();
             checkReady = false;
+            motorPX0 = s;
+            if(motorPX0>360-mysetting.step_azAngle)
+                motorPX0 = motorPX0-360;
         }
         else
         {
@@ -153,32 +159,28 @@ void MainWindow::checkMotorAngle(const double &s)
     }
     else
     {
-        if(!checkReady)           //先确定每次转动前的初始位置
+        if((s-motorPX0-mysetting.step_azAngle)<=0.5&&(s-motorPX0-mysetting.step_azAngle)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
         {
+            //adq.Start_Capture();
+            readyToCollect=true;
+            LaserPulse.checkLaser();
+            LaserSeed.checkLaser();
+            checkReady = false;
             motorPX0 = s;
-            Motor.moveRelative(mysetting.step_azAngle);
             if(motorPX0>360-mysetting.step_azAngle)
                 motorPX0 = motorPX0-360;
-            checkReady = true;
         }
         else
         {
-            if((s-motorPX0-mysetting.step_azAngle)<=0.5&&(s-motorPX0-mysetting.step_azAngle)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
-            {
-                adq.Start_Capture();
-                checkReady = false;
-            }
-            else
-            {
-                Motor.moveRelative(motorPX0+mysetting.step_azAngle-s);
-            }
+            Motor.moveRelative(motorPX0+mysetting.step_azAngle-s);
         }
+
     }
 }
 
 void MainWindow::readyToMove()
 {
-    Motor.position();    //电机转动前先读取一次电机位置
+    Motor.position();
 }
 
 void MainWindow::checkMove()
@@ -193,7 +195,10 @@ void MainWindow::timeStart()
 
 void MainWindow::getPosition()
 {
-    timeOclock->stop();
+    if(timeOclock->isActive())
+    {
+       timeOclock->stop();
+    }
     Motor.position();
 }
 
@@ -296,7 +301,6 @@ void MainWindow::action_start_Triggered()
 {
     qDebug() << "Start Action Triggered!!!";
 
-
     if(stopped)                 //如果当前为停止状态，则可以开始采集
     {
         //****判断电机是否在转动，之前的探测是否已经停止，没停止就等，之前的探测没结束（如何能知道？）就等。
@@ -304,13 +308,15 @@ void MainWindow::action_start_Triggered()
         //****计算频率坐标轴
         if (mysetting.step_azAngle != 0)
         {
-            //****电机转到 mysetting.start_azAngle;
+
+            moveNorth=true;
+            Motor.position();        //-----电机转到 mysetting.start_azAngle;
+
         }
 
         //****新建文件
         //****写入文件头
-        //****打开激光器本振
-        //****打开激光放大器
+        LaserSeed.beginSeedLaser();   //------打开激光器本振,打开激光放大器
         capture_counter = 0;        // 探测方向计数器置零
 
 
@@ -329,11 +335,9 @@ void MainWindow::action_start_Triggered()
     else
     {
         ControlTimer->stop();
-
         TestTimer->stop();
         stopped = true;
-        //****关闭激光放大器
-        //****关闭激光器本振
+        LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
     }
 }
 
@@ -345,15 +349,18 @@ void MainWindow::On_ControlTimer_TimeOut()
     case waitMotor:
         if (mysetting.step_azAngle != 0)
         {
-            //****判断电机转动到位
-            //****如果转动到位，
-            State = Capture;
+            if(readyToCollect)
+            {
+                 State = Capture;
+            }
+                //---------判断电机转动到位
         }
         break;
     case Capture:
         //****采集
         adq.Start_Capture();
-        //****相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
+        Motor.moveRelative(mysetting.step_azAngle);
+        readyToCollect=false;    //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
         //****转换功率谱
         //****径向风速计算
         //****矢量风速合成
@@ -397,7 +404,10 @@ void MainWindow::On_ControlTimer_TimeOut()
     {
         if (mysetting.step_azAngle != 0)
         {
-            //****电机转到 mysetting.start_azAngle;
+            moveNorth=true;
+            Motor.position();
+            //---------电机转到 mysetting.start_azAngle;
+
             State = waitMotor;
         }
         else
@@ -501,6 +511,7 @@ void MainWindow::Create_DataFolder()
         mypath.mkpath(mysetting.DatafilePath);
 
 }
+
 void MainWindow::Save_Spec2File()
 {
     //    KnapsackCDL(20170912_11_30_21).spec
@@ -567,3 +578,4 @@ void MainWindow::on_pushButton_test_clicked()
 {
     Save_Spec2File();
 }
+

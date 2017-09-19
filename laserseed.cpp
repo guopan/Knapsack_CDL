@@ -5,8 +5,7 @@ laserSeed::laserSeed(QObject *parent) : QObject(parent)
     connect(&Laserseedthread,SIGNAL(responseSeed(QString)),this,SLOT(receive_response(QString)));
     connect(&Laserseedthread,SIGNAL(seed_PortNotOpen()),this,SLOT(portError()));
     connect(&Laserseedthread,SIGNAL(timeoutSeed()),this,SLOT(timeout()));
-    timer = new QTimer(this);
-    connect(timer,SIGNAL(timeout()),this,SLOT(checkLaser()));
+
     laserPort="COM3";
     powerSet=true;
     fire=false;
@@ -23,10 +22,6 @@ void laserSeed::beginSeedLaser()
 
 void laserSeed::setSeedPower(const int &s)
 {
-    if(timer->isActive())
-    {
-        timer->stop();
-    }
     QString key =QString("%1").arg(s,4,16,QLatin1Char('0')).toUpper();
     bool ok;
     int aa=key.left(2).toInt(&ok,16)+key.right(2).toInt(&ok,16);
@@ -39,13 +34,10 @@ void laserSeed::setSeedPower(const int &s)
 
 void laserSeed::closeSeedLaser()
 {
-    if(timer->isActive())
-    {
-        timer->stop();
-    }
+    close=true;
     StringToHex("AA 55 C1 01 00 00 00",senddata);
     Laserseedthread.transaction(laserPort,senddata);
-    close=true;
+
 }
 
 void laserSeed::receive_response(const QString &temp)
@@ -60,9 +52,7 @@ void laserSeed::receive_response(const QString &temp)
         }
         else
         {
-            timer->start(1000);
             powerSet=true;
-            StringToHex("AA 55 D3 00 00 00",senddata);
             if(openPulse)
             {
                 emit this->seedOpenReady();
@@ -112,7 +102,6 @@ void laserSeed::receive_response(const QString &temp)
             {
                 errorCode="种子源激光器打开异常";
                 emit this->laserSeedError(errorCode);
-                timer->stop();
             }
             else
             {
@@ -131,7 +120,6 @@ void laserSeed::receive_response(const QString &temp)
                     if(key.mid(2,1)=="1")
                     {errorCode.append("种子激光器温度异常;");}
                     emit this->laserSeedError(errorCode);
-                    timer->stop();
                 }
                 else
                 {
@@ -144,7 +132,7 @@ void laserSeed::receive_response(const QString &temp)
 
 void laserSeed::checkLaser()
 {
-    //    StringToHex("AA 55 D3 00 00 00",senddata);
+    StringToHex("AA 55 D3 00 00 00",senddata);
     Laserseedthread.transaction(laserPort,senddata);
 }
 
