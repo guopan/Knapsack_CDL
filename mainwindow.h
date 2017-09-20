@@ -41,10 +41,10 @@ public:
     int H_low;
     int H_high;
 
-    double H_speed[10];
-    double H_direction[10];
-    double V_speed[10];
-    double Height_values[10];
+    double H_speed[Max_nLayers];
+    double H_direction[Max_nLayers];
+    double V_speed[Max_nLayers];
+    double Height_values[Max_nLayers];
 
 signals:
     void data_changed();
@@ -75,6 +75,8 @@ private slots:
     void Generate_freqAxis();               // 生成频率坐标轴
     void LOSVelocityCal(const int heightNum, const int totalSpecPoints, const int objSpecPoints, const double lambda, const double *freqAxis, const double *specData);
     void Init_Buffers();
+    void UpdateHeightsValue();
+
 private:
     Ui::MainWindow *ui;
     // GUI界面
@@ -144,5 +146,3 @@ private:
 };
 
 #endif // MAINWINDOW_H
-
-

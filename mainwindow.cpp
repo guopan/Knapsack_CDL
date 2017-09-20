@@ -75,12 +75,12 @@ MainWindow::MainWindow(QWidget *parent) :
     //显示部分
     H_low = 100;
     H_high = 1000;
-    for(int i=0;i<nLayers;i++)
+    for(int i=0;i<Max_nLayers;i++)
     {
         H_speed[i] = 0;
         H_direction[i] = 0;
         V_speed[i] = 0;
-        Height_values[i] = H_high - i*100;
+        Height_values[i] = H_low + i*100;
     }
 
     DisplaySpeed = new wind_display(this);
@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
     losVelocity = nullptr;
     aomSpec = nullptr;
     specArray = nullptr;
-
+    SaveSpec_FileHead();
 }
 
 MainWindow::~MainWindow()
@@ -123,6 +123,8 @@ void MainWindow::action_set_triggered()
     if (ParaSetDlg->exec() == QDialog::Accepted)					// 确定键功能
     {
         mysetting =	ParaSetDlg->get_settings();						// mysetting获取修改后的参数
+        DisplaySpeed->set_nLayers(mysetting.nRangeBin);
+        UpdateHeightsValue();
     }
     delete ParaSetDlg;
 }
@@ -266,7 +268,7 @@ void MainWindow::laserErrorHint(const QString &s)
 
 void MainWindow::changeData()
 {
-    for (int i = 0; i < nLayers; ++i)
+    for (int i = 0; i < mysetting.nRangeBin ; ++i)
     {
         // 水平风速
         H_speed[i] += (1.9 - H_speed[i]*0.02*i);
@@ -300,7 +302,6 @@ void MainWindow::action_quit_triggered()
     this->close();
 }
 
-
 //启动：进行采集的准备工作，并开启定时器
 //停止：设定停止标志信号
 void MainWindow::action_start_Triggered()
@@ -329,18 +330,19 @@ void MainWindow::action_start_Triggered()
         stop_now = false;
         if( mysetting.detectMode == 2)//定时探测
         {
-            //****记录当前时间作为开始时间
+            Start_Time = QDateTime::currentDateTimeUtc();   //记录当前时间作为开始时间
+
         }
         State = waitMotor;
-        ControlTimer->start(100);       // 定时查询电机（激光器？）状态、采集、处理、显示
+        ControlTimer->start(CheckPeriod);       // 定时查询电机（激光器？）状态、采集、处理、显示
 
-        TestTimer->start(1000);
+//        TestTimer->start(1000);
         stopped = false;
     }
     else
     {
         stop_now = true;
-        TestTimer->stop();
+//        TestTimer->stop();
 
     }
 }
@@ -371,18 +373,25 @@ void MainWindow::On_ControlTimer_TimeOut()
         break;
 
     case Capture:
-        //****采集
-        adq.Start_Capture();
+
+        adq.Start_Capture();                                //采集
         CaptureTime = QDateTime::currentDateTimeUtc();      //记录当前时间，将来写入文件
-        Motor.moveRelative(mysetting.step_azAngle);    //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
+        Motor.moveRelative(mysetting.step_azAngle);         //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
         readyToCollect = false;
         adq.ConvertData2Spec();//转换功率谱
-        //径向风速计算
-        LOSVelocityCal(mysetting.nRangeBin, nFFT_half,
+
+        LOSVelocityCal(mysetting.nRangeBin+2, nFFT_half,
                        20, mysetting.laserWaveLength,
-                       freqAxis, adq.get_PSD_double());
+                       freqAxis, adq.get_PSD_double());     //径向风速计算
         //****矢量风速合成
         //****更新显示
+        for(int i = 0;i<mysetting.nRangeBin;i++)
+            H_speed[i] = qAbs(H_speed[i]);
+
+        DisplaySpeed->setHSpeed(H_speed);
+        for(int i = 0;i<mysetting.nRangeBin;i++)
+            H_direction[i] = H_speed[i]>0?0:(180);
+        DisplaySpeed->setHDirection(H_direction);
 
         SaveSpec_AddData();        //存储功率谱到文件
 
@@ -596,9 +605,10 @@ void MainWindow::LOSVelocityCal(const int heightNum, const int totalSpecPoints,
 void MainWindow::SaveSpec_FileHead()
 {
     Create_DataFolder();
-    SpecFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hh_mm_ss.zzz");
+    SpecFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hh_mm_ss");
     //    KnapsackCDL(20170912_11_30_21).spec
     SpecFileName = mysetting.DatafilePath+"/"+"KnapsackCDL("+ SpecFileName +").spec";
+    qDebug()<<"SpecFileName = "<<SpecFileName;
     QFile outputSpec(SpecFileName);
 
     if(outputSpec.open(QFile::WriteOnly | QIODevice::Truncate))//QIODevice::Truncate表示将原文件内容清空
@@ -644,21 +654,26 @@ void MainWindow::SaveSpec_FileHead()
         //        Frequency Axis: 1.00 2.00 3.00 4.00 ...							#字符串形式保存频率坐标轴各点频率，精确到小数点后两位，单位是MHz
         //        Height Axis: 100.00 200.00 300.00 400.00 ...						#字符串形式保存高度坐标轴各点高度，精确到小数点后两位，单位是m
         //        Spectrum Point Size: 8 Bytes int
-
+        QString str = "";
+        for(int i = 0;i<mysetting.nRangeBin;i++)
+            str = str + QString::number(Height_values[i],'f', 2) + " ";
+        specFile << str;
+        specFile << sizeof(quint64);
         outputSpec.close();
         qDebug() << "Specfile Header added!";
     }
 }
 
+// 在已经写好文件头的文件中，添加一条数据记录
 void MainWindow::SaveSpec_AddData()
 {
     QFile outputSpec(SpecFileName);
-    if(outputSpec.open(QFile::WriteOnly))       //追加
+    if(outputSpec.open(QFile::WriteOnly|QIODevice::Append))       //追加
     {
         QDataStream specFile(&outputSpec);
         specFile << CaptureTime.toMSecsSinceEpoch();
         specFile << currentMotorAngle;
-        specFile.writeRawData((char*)adq.get_PSD_Union(), mysetting.nRangeBin *nFFT_half*8);      // 8为Uint64所占字节数
+        specFile.writeRawData((char*)adq.get_PSD_Union(), mysetting.nRangeBin * nFFT_half*8);      // 8为Uint64所占字节数
 
         //		int ret;
         //		ret = specFile.writeRawData((char*)data_a,mysetting.sampleNum*mysetting.plsAccNum*2);//返回值为写入的数据的字节数
@@ -670,7 +685,8 @@ void MainWindow::SaveSpec_AddData()
 
 void MainWindow::on_pushButton_test_clicked()
 {
-    SaveSpec_FileHead();
+//    SaveSpec_FileHead();
+    SaveSpec_AddData();
 }
 
 void MainWindow::Generate_freqAxis()
@@ -695,4 +711,13 @@ void MainWindow::Init_Buffers()           // 初始化各个数据存储缓冲区
 
     adq.Init_Buffers();
 
+}
+void MainWindow::UpdateHeightsValue()           //
+{
+    double range_resolution = 300.0/mysetting.sampleFreq/2.0*mysetting.nPointsPerBin;
+    for(int i=0;i<mysetting.nRangeBin;i++)
+    {
+        Height_values[i] = (i+1.5)*range_resolution;
+    }
+    DisplaySpeed->setHeights(Height_values);
 }
