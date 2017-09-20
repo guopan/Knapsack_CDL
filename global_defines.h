@@ -110,6 +110,8 @@ static const unsigned short BitReverseIndex[] =
     480,224,352,96,416,160,288,32,448,192,320,64,384,128,256,0
     };
 
-const int nLayers = 10;     //高度层数 = 10
+const int nLayers = 10;             //高度层数 = 10
+const int nFFT = 1024;              //FFT点数数 = 1024
+const int nFFT_half = nFFT/2;       //FFT点数数的一半 = 512
 enum Control_State{ waitMotor, Capture, Quit, Standby};     //探测过程控制状态值
 #endif // GLOBAL_DEFINES_H
