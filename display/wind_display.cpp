@@ -9,7 +9,8 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
     my_scale = new rt_scale;
     Vlayout->addWidget(my_title);
     Vlayout->setStretch(0, 1);
-    for (int i = 0; i < nLayers; ++i)
+    nLayers = 10;
+    for (int i = 0; i < 20; ++i)
     {
         // 设置100~1000米的10个标签
         my_display[i] = new rt_display;
@@ -17,8 +18,11 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
         my_display[i]->setHSpeed(0,1);
         my_display[i]->setHdirection(0);
         my_display[i]->setVSpeed(0);
-        Vlayout->addWidget(my_display[i]);
-        Vlayout->setStretch(i+1, 1);
+        if (i < nLayers)
+        {
+            Vlayout->addWidget(my_display[i]);
+            Vlayout->setStretch(i+1, 1);
+        }
     }
     Vlayout->addWidget(my_scale);
     Vlayout->setStretch(nLayers+1, 1);
@@ -40,7 +44,7 @@ wind_display::~wind_display()
 
 void wind_display::setHSpeed(const double *sp)
 {
-
+    // 求最大值，确定缩放比例
     int MaxHSpeed = 0;
     for(int i=0;i<nLayers;i++)
         if(MaxHSpeed < *(sp+i))
@@ -51,27 +55,28 @@ void wind_display::setHSpeed(const double *sp)
     else
         New_HSpeedScale = qCeil((qreal)(MaxHSpeed) / 10);
 
+    //
     for(int i=0;i<nLayers;i++)
-        if(HSpeed[i] != *(sp+i))
+        if(HSpeed[i] != sp[nLayers - i - 1])
         {
-            HSpeed[i] = *(sp+i);
+            HSpeed[i] = sp[nLayers - i - 1];
             my_display[i]->setHSpeed(HSpeed[i], New_HSpeedScale);
         }
-//    qDebug()<<"ssssssp = "<<MaxHSpeed<<"   SSSSSSSCALE= "<<New_HSpeedScale;
+    //    qDebug()<<"ssssssp = "<<MaxHSpeed<<"   SSSSSSSCALE= "<<New_HSpeedScale;
     if(New_HSpeedScale != HSpeedScale)
     {
         HSpeedScale = New_HSpeedScale;
         my_scale->setH_speed_scale(HSpeedScale);
     }
-//    qDebug()<<"=============";
+    //    qDebug()<<"=============";
 }
 
 void wind_display::setHDirection(const double *dir)
 {
     for(int i=0;i<nLayers;i++)
-        if(H_direction[i] != *(dir+i))
+        if(H_direction[i] != dir[nLayers - i - 1])
         {
-            H_direction[i] = *(dir+i);
+            H_direction[i] = dir[nLayers - i - 1];
             my_display[i]->setHdirection(H_direction[i]);
         }
 }
@@ -79,9 +84,9 @@ void wind_display::setHDirection(const double *dir)
 void wind_display::setVSpeed(const double *sp)
 {
     for(int i=0;i<nLayers;i++)
-        if(VSpeed[i] != *(sp+i))
+        if(VSpeed[i] != sp[nLayers - i - 1])
         {
-            VSpeed[i] = *(sp+i);
+            VSpeed[i] = sp[nLayers - i - 1];
             my_display[i]->setVSpeed(VSpeed[i]);
         }
 }
@@ -89,9 +94,9 @@ void wind_display::setVSpeed(const double *sp)
 void wind_display::setHeights(const double *h)
 {
     for(int i=0;i<nLayers;i++)
-        if(Heights[i] != *(h+i))
+        if(Heights[i] != h[nLayers - i - 1])
         {
-            Heights[i] = *(h+i);
+            Heights[i] = h[nLayers - i - 1];
             my_display[i]->setHeight(Heights[i]);
         }
 }
@@ -107,4 +112,30 @@ void wind_display::setSubSize()
         my_display[i]->setHSizeHint(h);
     }
     my_scale->setHSizeHint(h);
+}
+
+void wind_display::set_nLayers(int n)
+{
+    // 先remove所有标签
+    Vlayout->removeWidget(my_scale);
+    for (int i = 0; i < nLayers; ++i)
+    {
+        Vlayout->removeWidget(my_display[i]);
+        my_display[i]->hide();
+    }
+    nLayers = n;
+    // 再add需要的标签
+    for (int i = 0; i < nLayers; ++i)
+    {
+        my_display[i]->setHeight(0);
+        my_display[i]->setHSpeed(0,1);
+        my_display[i]->setHdirection(0);
+        my_display[i]->setVSpeed(0);
+        my_display[i]->show();
+        Vlayout->addWidget(my_display[i]);
+        Vlayout->setStretch(i+1, 1);
+    }
+    Vlayout->addWidget(my_scale);
+    Vlayout->setStretch(nLayers+1, 1);
+
 }
