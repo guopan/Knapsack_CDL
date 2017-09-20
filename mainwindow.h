@@ -100,7 +100,13 @@ private:
     void readyToMove();
     bool moveNorth, checkReady;
     double headAngle, motorPX0;
+    double currentMotorAngle;    //电机的当前位置，是否就是motorPX0？
     QTimer *timeOclock;
+
+    void openLaser();
+    void closeLaser();
+    laserSeed LaserSeed;
+    laserPulse LaserPulse;
 
     ADQ214 adq;
 
@@ -116,6 +122,7 @@ private:
     int capture_counter;        // 探测方向计数器
     QTime Start_Time;           // 开始时间，用于定时探测模式
     Control_State State;
+    bool readyToCollect;        //----指示电机是否已经停止并达到指定位置
 
 
     //参数配置
@@ -123,12 +130,9 @@ private:
     ACQSETTING mysetting;
     settingfile m_setfile;
 
-    void openLaser();
-    void closeLaser();
-    laserSeed LaserSeed;
-    laserPulse LaserPulse;
+    //数据记录
+    QDateTime CaptureTime;        // 当前方向的采集时间
     void Create_DataFolder();			//数据存储文件夹的创建
-    bool readyToCollect;         //----指示电机是否已经停止并达到指定位置
 };
 
 #endif // MAINWINDOW_H

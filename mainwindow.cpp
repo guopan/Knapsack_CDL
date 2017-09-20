@@ -509,7 +509,6 @@ void MainWindow::Create_DataFolder()
     QDir mypath;
     if(!mypath.exists(mysetting.DatafilePath))		//如果文件夹不存在，创建文件夹
         mypath.mkpath(mysetting.DatafilePath);
-
 }
 
 void MainWindow::Save_Spec2File()
@@ -525,14 +524,14 @@ void MainWindow::Save_Spec2File()
     if(outputfile.open(QFile::WriteOnly | QIODevice::Truncate))//QIODevice::Truncate表示将原文件内容清空
     {
         QDataStream specFile(&outputfile);
-        specFile << quint32(0x73706563);                    // 文件类型标识
+        specFile << quint32(0xA1A0A1A8);                    // 文件类型标识
         specFile << quint32(0x00000100);                    // 文件版本001.0
         specFile << "Knapsack Coherent Doppler Lidar Original Spectrum";
-        specFile << timestr;
+        specFile << timestr.toLatin1();
         qDebug()<< timestr;
         QDateTime zero = QDateTime::fromSecsSinceEpoch(0,Qt::UTC);
-        qDebug()<< zero.toString("yyyy-MM-dd hh:mm:ss.zzz");
-        specFile << zero.toString("yyyy-MM-dd hh:mm:ss.zzz");
+        qDebug()<< zero.toString("yyyy-MM-dd hh:mm:ss");
+        specFile << zero.toString("yyyy-MM-dd hh:mm:ss").toLatin1();
         specFile << now.toMSecsSinceEpoch();
 //1900-01-01 00:00:00
 
@@ -564,11 +563,15 @@ void MainWindow::Save_Spec2File()
         specFile << mysetting.nRangeBin;        //距离门数                quint16
         specFile << mysetting.nPointsPerBin;    //距离门内点数            quint16
 
-
+        specFile << CaptureTime.toMSecsSinceEpoch();
+        specFile << currentMotorAngle;
+        adq.Transfer_Settings(mysetting);
+        adq.Start_Capture();
+        PSD_DATA *p = adq.get_PSD_data();
+        specFile.writeRawData((char*)p, mysetting.nRangeBin *512*8);
 
         //		int ret;
         //		ret = specFile.writeRawData((char*)data_a,mysetting.sampleNum*mysetting.plsAccNum*2);//返回值为写入的数据的字节数
-//        specFile.writeRawData((char*)data_a,mysetting.sampleNum*mysetting.plsAccNum*2);
         //采样数据的写入
         outputfile.close();
         qDebug() << "Specfile saving is finished!";

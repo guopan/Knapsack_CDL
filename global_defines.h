@@ -2,14 +2,14 @@
 #define GLOBAL_DEFINES_H
 #include <QString>
 
+
+// 与采集卡有关的，通过API访问的参数
 typedef struct
 {
     int apirev;
-    int trig_channel;                   //触发通道
     int stream_ch;
     int clock_source;                   //时钟源
     int pll_divider;
-    int num_samples_collect;
     int trig_mode;
 
     unsigned int buffers_filled;
@@ -17,8 +17,6 @@ typedef struct
     int num_buffers;			         //Number of buffers
     int size_buffers;			         //Size of each buffer
     signed short* data_stream_target;
-    quint16 spi_data_out[8];
-    quint16 spi_data_in[4];
 }setupADQ;
 
 typedef struct

@@ -16,16 +16,17 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     num_of_failed = 0;
     num_of_ADQ214 = 0;
 
-    setupadq.num_samples_collect = 2048;  // 设置采样点数
+//    setupadq.num_samples_collect = 2048;  // 设置采样点数
     setupadq.stream_ch = ADQ214_STREAM_ENABLED_BOTH;
     setupadq.stream_ch &= 0x7;
     setupadq.num_buffers = 64;
     setupadq.size_buffers = 1024;
     setupadq.clock_source = 0;       //0 = Internal clock
     setupadq.pll_divider = 2;        //在Internal clock=0时，设置，f_clk = 800MHz/divider
+    psd_res = nullptr;
 }
 
-void ADQ214::Config_Settings(const ACQSETTING &settings)
+void ADQ214::Transfer_Settings(const ACQSETTING &settings)
 {
     mainSettings = settings;
 }
@@ -56,29 +57,29 @@ void ADQ214::connectADQDevice()
 
 void ADQ214::Start_Capture()
 {
-    if(!Config_ADQ214())
-        return;
+   // if(!Config_ADQ214())
+     //   return;
 
-    setupadq.data_stream_target = new qint16[setupadq.num_samples_collect];
-    memset(setupadq.data_stream_target, 0, setupadq.num_samples_collect);
+    setupadq.data_stream_target = new qint16[mainSettings.nRangeBin*512*4];
+    memset(setupadq.data_stream_target, 0, mainSettings.nRangeBin*512*8);
 
-    if(!CaptureData2Buffer())
-    {
-        qDebug() << ("Collect failed!");
-        delete setupadq.data_stream_target;
-        return;
-    }
-    qDebug() << ("Collect finished!");
+//    if(!CaptureData2Buffer())
+//    {
+//        qDebug() << ("Collect failed!");
+//        delete setupadq.data_stream_target;
+//        return;
+//    }
+//    qDebug() << ("Collect finished!");
 
     ConvertData2Spec();
-    WriteSpecData2disk();
+//    WriteSpecData2disk();
 
     delete setupadq.data_stream_target;
-    if(success == 0)
-    {
-        qDebug() << "Error!";
-        DeleteADQControlUnit(adq_cu);
-    }
+//    if(success == 0)
+//    {
+//        qDebug() << "Error!";
+//        DeleteADQControlUnit(adq_cu);
+//    }
 }
 
 bool ADQ214::Config_ADQ214()                   // 配置采集卡
@@ -122,7 +123,7 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
     success = success && ADQ214_ArmTrigger(adq_cu, adq_num);
 
     unsigned int samples_to_collect;
-    samples_to_collect = setupadq.num_samples_collect;
+    samples_to_collect = mainSettings.nRangeBin*512*4;
 
     int nloops = 0;
 
@@ -166,7 +167,7 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
             // Buffer all data in RAM before writing to disk, if streaming to disk is need a high performance
             // procedure could be implemented here.
             // Data format is set to 16 bits, so buffer size is Samples*2 bytes
-            memcpy((void*)&setupadq.data_stream_target[setupadq.num_samples_collect - samples_to_collect],
+            memcpy((void*)&setupadq.data_stream_target[mainSettings.nRangeBin*512*8 - samples_to_collect],
                     ADQ214_GetPtrStream(adq_cu, adq_num), samples_in_buffer* sizeof(signed short));
             samples_to_collect -= samples_in_buffer;
             qDebug() << " AA= "<<samples_to_collect;
@@ -205,7 +206,7 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
     psd_res = new PSD_DATA[mainSettings.nPointsPerBin*512];
 
     int i = 0, k = 0, l = 0;
-    for (l=0;l<mainSettings.nPointsPerBin;l++)
+    for (l=0;l<mainSettings.nRangeBin;l++)
         for (k=0,i=0; (k<512); k++,k++)
         {
             psd_res[512*l + k].pos[3] = setupadq.data_stream_target[2048*l + i];
