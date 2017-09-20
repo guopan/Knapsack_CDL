@@ -209,14 +209,14 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
     for (l=0;l<mainSettings.nRangeBin;l++)
         for (k=0,i=0; (k<512); k++,k++)
         {
-            psd_res[512*l + k].pos[3] = setupadq.data_stream_target[2048*l + i];
-            psd_res[512*l + k].pos[2] = setupadq.data_stream_target[2048*l + i+1];
-            psd_res[512*l + k].pos[1] = setupadq.data_stream_target[2048*l + i+4];
-            psd_res[512*l + k].pos[0] = setupadq.data_stream_target[2048*l + i+5];
-            psd_res[512*l + k+1].pos[3] = setupadq.data_stream_target[2048*l + i+2];
-            psd_res[512*l + k+1].pos[2] = setupadq.data_stream_target[2048*l + i+3];
-            psd_res[512*l + k+1].pos[1] = setupadq.data_stream_target[2048*l + i+6];
-            psd_res[512*l + k+1].pos[0] = setupadq.data_stream_target[2048*l + i+7];
+            psd_res[512*l + 511 - k].pos[3] = setupadq.data_stream_target[2048*l + i];
+            psd_res[512*l + 511 - k].pos[2] = setupadq.data_stream_target[2048*l + i+1];
+            psd_res[512*l + 511 - k].pos[1] = setupadq.data_stream_target[2048*l + i+4];
+            psd_res[512*l + 511 - k].pos[0] = setupadq.data_stream_target[2048*l + i+5];
+            psd_res[512*l + 511 - k-1].pos[3] = setupadq.data_stream_target[2048*l + i+2];
+            psd_res[512*l + 511 - k-1].pos[2] = setupadq.data_stream_target[2048*l + i+3];
+            psd_res[512*l + 511 - k-1].pos[1] = setupadq.data_stream_target[2048*l + i+6];
+            psd_res[512*l + 511 - k-1].pos[0] = setupadq.data_stream_target[2048*l + i+7];
 
             i = i + 8;
         }
