@@ -16,7 +16,7 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     num_of_failed = 0;
     num_of_ADQ214 = 0;
 
-    //    setupadq.num_samples_collect = 2048;  // 设置采样点数
+    //    setupadq.num_samples_collect = nFFT*2;  // 设置采样点数
     setupadq.stream_ch = ADQ214_STREAM_ENABLED_BOTH;
     setupadq.stream_ch &= 0x7;
     setupadq.num_buffers = 64;
@@ -68,8 +68,8 @@ void ADQ214::Start_Capture()
     if(!Config_ADQ214())
         return;
 
-    setupadq.data_stream_target = new qint16[mainSettings.nRangeBin * nFFT_half * 4];
-    memset(setupadq.data_stream_target, 0, mainSettings.nRangeBin * nFFT_half * 8);
+    setupadq.data_stream_target = new qint16[(mainSettings.nRangeBin + 2) * nFFT_half * 4];
+    memset(setupadq.data_stream_target, 0, (mainSettings.nRangeBin + 2) * nFFT_half * 8);
 
     if(!CaptureData2Buffer())
     {
@@ -115,10 +115,10 @@ bool ADQ214::Config_ADQ214()                   // 配置采集卡
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.Trigger_Level);  //触发电平
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.plsAccNum);      //累加脉冲数
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  //距离门点数，需要为偶数
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+2);      //距离门数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+3);      //距离门数
         // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,write_data5);              //目标频带下限，保留
         // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x36,0,write_data6);              //目标频带上限，保留
-        uint Total_Points_Num = mainSettings.nPointsPerBin * (mainSettings.nRangeBin+2);            // 内部信号，处理总点数
+        uint Total_Points_Num = mainSettings.nPointsPerBin * (mainSettings.nRangeBin+3);            // 内部信号，处理总点数
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x37,0,Total_Points_Num);            //单脉冲处理总点数
     }
     return success;
@@ -131,7 +131,7 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
     success = success && ADQ214_ArmTrigger(adq_cu, adq_num);
 
     unsigned int samples_to_collect;
-    samples_to_collect = mainSettings.nRangeBin*512*4;
+    samples_to_collect = (mainSettings.nRangeBin + 2)*nFFT_half*4;
 
     int nloops = 0;
 
@@ -175,7 +175,7 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
             // Buffer all data in RAM before writing to disk, if streaming to disk is need a high performance
             // procedure could be implemented here.
             // Data format is set to 16 bits, so buffer size is Samples*2 bytes
-            memcpy((void*)&setupadq.data_stream_target[mainSettings.nRangeBin*512*8 - samples_to_collect],
+            memcpy((void*)&setupadq.data_stream_target[(mainSettings.nRangeBin + 2)*nFFT_half*8 - samples_to_collect],
                     ADQ214_GetPtrStream(adq_cu, adq_num), samples_in_buffer* sizeof(signed short));
             samples_to_collect -= samples_in_buffer;
             qDebug() << " AA= "<<samples_to_collect;
@@ -201,7 +201,7 @@ void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
     if(Specfile.open(QFile::WriteOnly))
     {
         QTextStream out(&Specfile);
-        for (int k=0; (k<mainSettings.nPointsPerBin*512); k++)
+        for (int k=0; (k<mainSettings.nPointsPerBin*nFFT_half); k++)
             out <<psd_res[k].data64 << endl;
     }
     Specfile.close();
@@ -209,20 +209,20 @@ void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
 
 void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 {
-    int nPSD = mainSettings.nPointsPerBin*512;  // PSD功率谱长度
+    int nPSD = mainSettings.nPointsPerBin*nFFT_half;  // PSD功率谱长度
 
     int i = 0, k = 0, l = 0;
-    for (l=0;l<mainSettings.nRangeBin;l++)
-        for (k=0,i=0; (k<512); k++,k++)
+    for (l=0;l<(mainSettings.nRangeBin + 2);l++)
+        for (k=0,i=0; (k<nFFT_half); k++,k++)
         {
-            psd_res[512*l + 511 - k].pos[3] = setupadq.data_stream_target[2048*l + i];
-            psd_res[512*l + 511 - k].pos[2] = setupadq.data_stream_target[2048*l + i+1];
-            psd_res[512*l + 511 - k].pos[1] = setupadq.data_stream_target[2048*l + i+4];
-            psd_res[512*l + 511 - k].pos[0] = setupadq.data_stream_target[2048*l + i+5];
-            psd_res[512*l + 511 - k-1].pos[3] = setupadq.data_stream_target[2048*l + i+2];
-            psd_res[512*l + 511 - k-1].pos[2] = setupadq.data_stream_target[2048*l + i+3];
-            psd_res[512*l + 511 - k-1].pos[1] = setupadq.data_stream_target[2048*l + i+6];
-            psd_res[512*l + 511 - k-1].pos[0] = setupadq.data_stream_target[2048*l + i+7];
+            psd_res[nFFT_half*l + nFFT_half-1 - k].pos[3] = setupadq.data_stream_target[nFFT*2*l + i];
+            psd_res[nFFT_half*l + nFFT_half-1 - k].pos[2] = setupadq.data_stream_target[nFFT*2*l + i+1];
+            psd_res[nFFT_half*l + nFFT_half-1 - k].pos[1] = setupadq.data_stream_target[nFFT*2*l + i+4];
+            psd_res[nFFT_half*l + nFFT_half-1 - k].pos[0] = setupadq.data_stream_target[nFFT*2*l + i+5];
+            psd_res[nFFT_half*l + nFFT_half-1 - k-1].pos[3] = setupadq.data_stream_target[nFFT*2*l + i+2];
+            psd_res[nFFT_half*l + nFFT_half-1 - k-1].pos[2] = setupadq.data_stream_target[nFFT*2*l + i+3];
+            psd_res[nFFT_half*l + nFFT_half-1 - k-1].pos[1] = setupadq.data_stream_target[nFFT*2*l + i+6];
+            psd_res[nFFT_half*l + nFFT_half-1 - k-1].pos[0] = setupadq.data_stream_target[nFFT*2*l + i+7];
 
             i = i + 8;
         }
@@ -234,7 +234,7 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 
 void ADQ214::Init_Buffers()           // 初始化功率谱数据存储缓冲区
 {
-    int nPSD = mainSettings.nPointsPerBin*512;  // PSD功率谱长度
+    int nPSD = mainSettings.nPointsPerBin * nFFT_half;  // PSD功率谱长度
 
     if (psd_res != nullptr)
         delete psd_res;
