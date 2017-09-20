@@ -16,7 +16,7 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     num_of_failed = 0;
     num_of_ADQ214 = 0;
 
-//    setupadq.num_samples_collect = 2048;  // 设置采样点数
+    //    setupadq.num_samples_collect = 2048;  // 设置采样点数
     setupadq.stream_ch = ADQ214_STREAM_ENABLED_BOTH;
     setupadq.stream_ch &= 0x7;
     setupadq.num_buffers = 64;
@@ -24,6 +24,7 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     setupadq.clock_source = 0;       //0 = Internal clock
     setupadq.pll_divider = 2;        //在Internal clock=0时，设置，f_clk = 800MHz/divider
     psd_res = nullptr;
+    psd_array = nullptr;
 }
 
 void ADQ214::Transfer_Settings(const ACQSETTING &settings)
@@ -31,10 +32,17 @@ void ADQ214::Transfer_Settings(const ACQSETTING &settings)
     mainSettings = settings;
 }
 
-PSD_DATA* ADQ214::get_PSD_data()
+PSD_DATA* ADQ214::get_PSD_Union()
 {
     return psd_res;
 }
+
+double* ADQ214::get_PSD_double()
+{
+    return psd_array;
+}
+
+
 
 void ADQ214::connectADQDevice()
 {
@@ -57,29 +65,29 @@ void ADQ214::connectADQDevice()
 
 void ADQ214::Start_Capture()
 {
-   // if(!Config_ADQ214())
-     //   return;
+    if(!Config_ADQ214())
+        return;
 
-    setupadq.data_stream_target = new qint16[mainSettings.nRangeBin*512*4];
-    memset(setupadq.data_stream_target, 0, mainSettings.nRangeBin*512*8);
+    setupadq.data_stream_target = new qint16[mainSettings.nRangeBin * nFFT_half * 4];
+    memset(setupadq.data_stream_target, 0, mainSettings.nRangeBin * nFFT_half * 8);
 
-//    if(!CaptureData2Buffer())
-//    {
-//        qDebug() << ("Collect failed!");
-//        delete setupadq.data_stream_target;
-//        return;
-//    }
-//    qDebug() << ("Collect finished!");
+    if(!CaptureData2Buffer())
+    {
+        qDebug() << ("Collect failed!");
+        delete setupadq.data_stream_target;
+        return;
+    }
+    qDebug() << ("Collect finished!");
 
     ConvertData2Spec();
-//    WriteSpecData2disk();
+    WriteSpecData2disk();
 
     delete setupadq.data_stream_target;
-//    if(success == 0)
-//    {
-//        qDebug() << "Error!";
-//        DeleteADQControlUnit(adq_cu);
-//    }
+    if(success == 0)
+    {
+        qDebug() << "Error!";
+        DeleteADQControlUnit(adq_cu);
+    }
 }
 
 bool ADQ214::Config_ADQ214()                   // 配置采集卡
@@ -107,7 +115,7 @@ bool ADQ214::Config_ADQ214()                   // 配置采集卡
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.Trigger_Level);  //触发电平
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.plsAccNum);      //累加脉冲数
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  //距离门点数，需要为偶数
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin);      //距离门数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+2);      //距离门数
         // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,write_data5);              //目标频带下限，保留
         // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x36,0,write_data6);              //目标频带上限，保留
         uint Total_Points_Num = mainSettings.nPointsPerBin * (mainSettings.nRangeBin+2);            // 内部信号，处理总点数
@@ -201,9 +209,7 @@ void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
 
 void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 {
-    if (psd_res != nullptr)
-        delete psd_res;
-    psd_res = new PSD_DATA[mainSettings.nPointsPerBin*512];
+    int nPSD = mainSettings.nPointsPerBin*512;  // PSD功率谱长度
 
     int i = 0, k = 0, l = 0;
     for (l=0;l<mainSettings.nRangeBin;l++)
@@ -220,4 +226,21 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 
             i = i + 8;
         }
+    for (k=0; k<nPSD; k++)
+    {
+        psd_array[k] = double(psd_res[k].data64);
+    }
+}
+
+void ADQ214::Init_Buffers()           // 初始化功率谱数据存储缓冲区
+{
+    int nPSD = mainSettings.nPointsPerBin*512;  // PSD功率谱长度
+
+    if (psd_res != nullptr)
+        delete psd_res;
+    psd_res = new PSD_DATA[nPSD];       //待优化，不用每次new
+
+    if (psd_array != nullptr)           //待优化，不用每次new
+        delete psd_array;
+    psd_array = new double[nPSD];
 }
