@@ -95,6 +95,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(TestTimer, SIGNAL(timeout()), this, SLOT(changeData()));
     stopped = true;
     readyToCollect=false;
+
+    // 缓冲区指针置空
+    losVelocity = nullptr;
+    aomSpec = nullptr;
+    specArray = nullptr;
+
 }
 
 MainWindow::~MainWindow()
@@ -142,7 +148,7 @@ void MainWindow::checkMotorAngle(const double &s)
         {
             qDebug()<<"success ";
             moveNorth = false;
-//            adq.Start_Capture();        //指北后开始采集卡工作
+            //            adq.Start_Capture();        //指北后开始采集卡工作
             readyToCollect=true;
             LaserPulse.checkLaser();
             LaserSeed.checkLaser();
@@ -197,7 +203,7 @@ void MainWindow::getPosition()
 {
     if(timeOclock->isActive())
     {
-       timeOclock->stop();
+        timeOclock->stop();
     }
     Motor.position();
 }
@@ -255,7 +261,7 @@ void MainWindow::errorSolve()
 void MainWindow::laserErrorHint(const QString &s)
 {
     qDebug()<<s;
-//    LaserPulse.closePulseLaser();
+    //    LaserPulse.closePulseLaser();
 }
 
 void MainWindow::changeData()
@@ -305,7 +311,7 @@ void MainWindow::action_start_Triggered()
     {
         //****判断电机是否在转动，之前的探测是否已经停止，没停止就等，之前的探测没结束（如何能知道？）就等。
 
-        //****计算频率坐标轴
+
         if (mysetting.step_azAngle != 0)
         {
 
@@ -313,12 +319,12 @@ void MainWindow::action_start_Triggered()
             Motor.position();        //-----电机转到 mysetting.start_azAngle;
 
         }
-
-        //****新建文件
-        //****写入文件头
-        LaserSeed.beginSeedLaser();   //------打开激光器本振,打开激光放大器
+        Generate_freqAxis();        //计算频率坐标轴
+        Init_Buffers();             //申请各个缓存空间
+        adq.Transfer_Settings(mysetting);   //传递配置参数到adq
+        SaveSpec_FileHead();        // 新建文件、写入文件头
+        LaserSeed.beginSeedLaser(); //------打开激光器本振，打开激光放大器
         capture_counter = 0;        // 探测方向计数器置零
-
 
         stop_now = false;
         if( mysetting.detectMode == 2)//定时探测
@@ -330,90 +336,114 @@ void MainWindow::action_start_Triggered()
 
         TestTimer->start(1000);
         stopped = false;
-
     }
     else
     {
-        ControlTimer->stop();
+        stop_now = true;
         TestTimer->stop();
-        stopped = true;
-        LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
+
     }
 }
 
 //
 void MainWindow::On_ControlTimer_TimeOut()
 {
-    //****查询电机状态，没到位，则直接返回，等下次进入定时器
+    QDateTime currentTime;
+    qint64 dt;
+    if (stop_now)
+    {
+        State = Quit;
+        stop_now = false;
+    }
+
     switch (State) {
-    case waitMotor:
+    case waitMotor:    //****查询电机状态，没到位，则直接返回，等下次进入定时器
         if (mysetting.step_azAngle != 0)
         {
             if(readyToCollect)
             {
-                 State = Capture;
+                State = Capture;
             }
-                //---------判断电机转动到位
+            //---------判断电机转动到位
         }
+        else
+            State = Capture;
         break;
+
     case Capture:
         //****采集
         adq.Start_Capture();
-        Motor.moveRelative(mysetting.step_azAngle);
-        readyToCollect=false;    //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
-        //****转换功率谱
-        //****径向风速计算
+        CaptureTime = QDateTime::currentDateTimeUtc();      //记录当前时间，将来写入文件
+        Motor.moveRelative(mysetting.step_azAngle);    //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
+        readyToCollect = false;
+        adq.ConvertData2Spec();//转换功率谱
+        //径向风速计算
+        LOSVelocityCal(mysetting.nRangeBin, nFFT_half,
+                       20, mysetting.laserWaveLength,
+                       freqAxis, adq.get_PSD_double());
         //****矢量风速合成
         //****更新显示
-        //****存储功率谱到文件
+
+        SaveSpec_AddData();        //存储功率谱到文件
+
         //****存储风速到文件
 
         capture_counter++;
         //****判断是否应该结束，更新结束标志stop_now
         switch (mysetting.detectMode) {
         case 0:                 //持续探测
-            //****判断是否应该关闭文件，建立新文件
+            //判断是否应该关闭文件，建立新文件
             if(capture_counter == mysetting.nMaxDir_inFile)
             {
-                //****关闭文件
-                //****建立新文件，写入文件头
+                SaveSpec_FileHead();        //建立新文件，写入文件头
             }
             State = waitMotor;
             break;
         case 1:                 //单组探测
-            //****判断探测方向数
+            //判断探测方向数
             if(capture_counter == mysetting.angleNum)
                 State = Quit;
+            else
+                State = waitMotor;
             break;
         case 2:                 //定时探测
-            //****判断否达到待机条件
-            //如果达到待机时间
-        {
-            State = Standby;
-        }
+            // 判断否达到待机条件
+            dt = currentTime.msecsTo(Start_Time);
+            if(dt > qint64(mysetting.GroupTime*60*1000))  // *60s? *1000ms?// 如果达到待机时间
+            {
+                State = Standby;
+            }
             break;
         default:
             break;
         }
         break;
+
     case Quit:
         ControlTimer->stop();
+        LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
+        stopped = true;
+        userToolBar->set_to_stopped();
         break;
-    case Standby:       //也许需要一个停止状态
-        //如果达到启动时间
-    {
-        if (mysetting.step_azAngle != 0)
-        {
-            moveNorth=true;
-            Motor.position();
-            //---------电机转到 mysetting.start_azAngle;
 
-            State = waitMotor;
+    case Standby:       //也许之前需要一个停止状态
+        currentTime = QDateTime::currentDateTimeUtc();
+        dt = currentTime.msecsTo(Start_Time);
+        if(dt > qint64(mysetting.IntervalTime*60*1000))  // *60s? *1000ms?      //如果达到启动时间
+        {
+            Start_Time = Start_Time.addMSecs(mysetting.IntervalTime*60*1000);   //更新开始时间，为了下次计时
+            if (mysetting.step_azAngle != 0)
+            {
+                moveNorth = true;
+                Motor.position();
+                //---------电机转到 mysetting.start_azAngle;
+                State = waitMotor;
+            }
+            else
+                State = Capture;
         }
-        else
-        State = Capture;
-    }
         break;
+
     default:
         break;
     }
@@ -511,29 +541,77 @@ void MainWindow::Create_DataFolder()
         mypath.mkpath(mysetting.DatafilePath);
 }
 
-void MainWindow::Save_Spec2File()
+
+// 径向风速计算程序
+void MainWindow::LOSVelocityCal(const int heightNum, const int totalSpecPoints,
+                                const int objSpecPoints, const double lambda,
+                                const double *freqAxis, const double *specData)
 {
-    //    KnapsackCDL(20170912_11_30_21).spec
+    for (int k = 0; k < totalSpecPoints; k++) {
+        aomSpec[k] = specData[totalSpecPoints+k] - specData[k];
+        for (int l = 0; l < heightNum - 2; l++){
+            specArray[l*totalSpecPoints+k] = specData[totalSpecPoints*(l+2) + k] - specData[k];
+        }
+    }
+
+    for (int i=0; i<totalSpecPoints; i++) {
+        qDebug() << aomSpec[i];
+    }
+    int aomIndex = 0;
+    double temp = aomSpec[0];
+    for (int k = 1; k < totalSpecPoints; k++) {
+        if (aomSpec[k] > temp) {
+            temp = aomSpec[k];
+            aomIndex = k;
+        }
+    }
+
+    qDebug() << aomIndex;
+    int startIndex = aomIndex - objSpecPoints;
+    int endIndex = aomIndex + objSpecPoints;
+
+    int *losVelocityIndex = new int[heightNum - 2];
+    temp = 0;
+    for (int l = 0; l < heightNum -2; l++) {
+        losVelocityIndex[l] = startIndex;
+        temp = specArray[l*totalSpecPoints+ startIndex];
+        for (int k = startIndex + 1; k <= endIndex; k++) {
+            if (specArray[l*totalSpecPoints+ k] >temp) {
+                temp = specArray[l*totalSpecPoints+ k];
+                losVelocityIndex[l] = k;
+            }
+        }
+    }
+
+    for (int l = 0; l < heightNum -2; l++) {
+        qDebug() << losVelocityIndex[l];
+    }
+
+    memset(losVelocity, 0, sizeof(double)*(heightNum-2));
+    for(int i=0; i<heightNum-2; i++) {
+        losVelocity[i] = (freqAxis[losVelocityIndex[i]] - freqAxis[aomIndex])*lambda/2;
+    }
+}
+
+void MainWindow::SaveSpec_FileHead()
+{
     Create_DataFolder();
-    QDateTime now = QDateTime::currentDateTime();			//时间
-    QString timestr = now.toString("yyyyMMdd_hh_mm_ss.zzz");
-//    QFile outputfile(mysetting.DatafilePath+"/"+"KnapsackCDL("+timestr+").spec");
-    QFile outputfile(mysetting.DatafilePath+"/"+"KnapsackCDL().spec");
+    SpecFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hh_mm_ss.zzz");
+    //    KnapsackCDL(20170912_11_30_21).spec
+    SpecFileName = mysetting.DatafilePath+"/"+"KnapsackCDL("+ SpecFileName +").spec";
+    QFile outputSpec(SpecFileName);
 
-
-    if(outputfile.open(QFile::WriteOnly | QIODevice::Truncate))//QIODevice::Truncate表示将原文件内容清空
+    if(outputSpec.open(QFile::WriteOnly | QIODevice::Truncate))//QIODevice::Truncate表示将原文件内容清空
     {
-        QDataStream specFile(&outputfile);
+        QDataStream specFile(&outputSpec);
         specFile << quint32(0xA1A0A1A8);                    // 文件类型标识
         specFile << quint32(0x00000100);                    // 文件版本001.0
         specFile << "Knapsack Coherent Doppler Lidar Original Spectrum";
-        specFile << timestr.toLatin1();
-        qDebug()<< timestr;
+
         QDateTime zero = QDateTime::fromSecsSinceEpoch(0,Qt::UTC);
         qDebug()<< zero.toString("yyyy-MM-dd hh:mm:ss");
-        specFile << zero.toString("yyyy-MM-dd hh:mm:ss").toLatin1();
-        specFile << now.toMSecsSinceEpoch();
-//1900-01-01 00:00:00
+        specFile << zero.toString("yyyy-MM-dd hh:mm:ss").toLatin1();          //1970-01-01 00:00:00
+
 
         //激光参数
         specFile << mysetting.isPulseMode;		//脉冲探测（true）or连续探测（false） bool
@@ -561,24 +639,60 @@ void MainWindow::Save_Spec2File()
         //实时处理参数
         specFile << mysetting.plsAccNum;        //单方向累加脉冲数         quint16
         specFile << mysetting.nRangeBin;        //距离门数                quint16
-        specFile << mysetting.nPointsPerBin;    //距离门内点数            quint16
+        specFile << mysetting.nPointsPerBin;    //距离门内点数             quint16
 
+        //        Frequency Axis: 1.00 2.00 3.00 4.00 ...							#字符串形式保存频率坐标轴各点频率，精确到小数点后两位，单位是MHz
+        //        Height Axis: 100.00 200.00 300.00 400.00 ...						#字符串形式保存高度坐标轴各点高度，精确到小数点后两位，单位是m
+        //        Spectrum Point Size: 8 Bytes int
+
+        outputSpec.close();
+        qDebug() << "Specfile Header added!";
+    }
+}
+
+void MainWindow::SaveSpec_AddData()
+{
+    QFile outputSpec(SpecFileName);
+    if(outputSpec.open(QFile::WriteOnly))       //追加
+    {
+        QDataStream specFile(&outputSpec);
         specFile << CaptureTime.toMSecsSinceEpoch();
         specFile << currentMotorAngle;
-        adq.Transfer_Settings(mysetting);
-        adq.Start_Capture();
-        PSD_DATA *p = adq.get_PSD_data();
-        specFile.writeRawData((char*)p, mysetting.nRangeBin *512*8);
+        specFile.writeRawData((char*)adq.get_PSD_Union(), mysetting.nRangeBin *nFFT_half*8);      // 8为Uint64所占字节数
 
         //		int ret;
         //		ret = specFile.writeRawData((char*)data_a,mysetting.sampleNum*mysetting.plsAccNum*2);//返回值为写入的数据的字节数
         //采样数据的写入
-        outputfile.close();
-        qDebug() << "Specfile saving is finished!";
+        outputSpec.close();
+        qDebug() << "Specfile 1 Dir added!";
     }
 }
+
 void MainWindow::on_pushButton_test_clicked()
 {
-    Save_Spec2File();
+    SaveSpec_FileHead();
 }
 
+void MainWindow::Generate_freqAxis()
+{
+    for (int i = 0; i < nFFT_half; i++)
+        freqAxis[i] = mysetting.sampleFreq*(i+1)/nFFT_half;
+}
+
+void MainWindow::Init_Buffers()           // 初始化各个数据存储缓冲区
+{
+    if (losVelocity != nullptr)
+        delete losVelocity;
+    losVelocity = new double[mysetting.nRangeBin];
+
+    if (aomSpec != nullptr)
+        delete aomSpec;
+    aomSpec = new double[nFFT_half];
+
+    if (specArray != nullptr)
+        delete specArray;
+    specArray = new double[mysetting.nRangeBin * nFFT_half];
+
+    adq.Init_Buffers();
+
+}

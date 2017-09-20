@@ -38,7 +38,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-
     int H_low;
     int H_high;
 
@@ -49,11 +48,9 @@ public:
 
 signals:
     void data_changed();
-    void size_changed();
-
+    void size_changed();                    // 用于调整实时风速显示的widget高度
 
 private slots:
-    void on_startButton_clicked();
     void action_set_triggered();			//设置
     void action_start_Triggered();          //启动、暂停按钮
     void action_quit_triggered();           //退出
@@ -63,16 +60,21 @@ private slots:
 
     void changeData();                      //测试用，显示数据刷新
 
+    // GUI界面相关
     void toolBarControlTimerOutFcn();
-
-
+    void on_startButton_clicked();
     void on_pushButton_clicked();
-
     void on_pushButton_2_clicked();
-
-    void Save_Spec2File();
     void on_pushButton_test_clicked();
 
+    // 文件存储
+    void SaveSpec_FileHead();
+    void SaveSpec_AddData();
+
+    // 反演计算
+    void Generate_freqAxis();               // 生成频率坐标轴
+    void LOSVelocityCal(const int heightNum, const int totalSpecPoints, const int objSpecPoints, const double lambda, const double *freqAxis, const double *specData);
+    void Init_Buffers();
 private:
     Ui::MainWindow *ui;
     // GUI界面
@@ -115,24 +117,30 @@ private:
     void resizeEvent(QResizeEvent * event);
     QTimer *TestTimer;          // 仅测试用
 
+    //反演计算
+    double freqAxis [nFFT_half];    // 频率轴
+    double *losVelocity;            // 径向风速值
+    double *aomSpec;
+    double *specArray;
+
     //过程控制
     QTimer *ControlTimer;       // 探测过程控制计时器
     bool stopped;				// 采集未启动状态
     bool stop_now;              // 命令：GUI用来控制ControlTimer停止采集，待商榷
     int capture_counter;        // 探测方向计数器
-    QTime Start_Time;           // 开始时间，用于定时探测模式
+    QDateTime Start_Time;           // 开始时间，用于定时探测模式
     Control_State State;
     bool readyToCollect;        //----指示电机是否已经停止并达到指定位置
 
-
     //参数配置
-    paraDialog *ParaSetDlg;             //参数设置对话框
+    paraDialog *ParaSetDlg;         // 参数设置对话框
     ACQSETTING mysetting;
     settingfile m_setfile;
 
     //数据记录
-    QDateTime CaptureTime;        // 当前方向的采集时间
-    void Create_DataFolder();			//数据存储文件夹的创建
+    QDateTime CaptureTime;          // 当前方向的采集时间
+    QString SpecFileName;
+    void Create_DataFolder();       // 数据存储文件夹的创建
 };
 
 #endif // MAINWINDOW_H
