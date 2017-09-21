@@ -67,21 +67,12 @@ void settingfile::readFrom_file(const QString &b)
     QSettings settings(path_b,QSettings::IniFormat);
     settings.beginGroup("Laser_parameters");
     fsetting.isPulseMode = settings.value("isPulseMode").toBool();            //激光类型
-<<<<<<< HEAD
     fsetting.laserPulseEnergy = settings.value("laserPulseEnergy").toDouble();   //激光能量
     fsetting.laserPower = settings.value("laserPower").toDouble();               //激光功率
     fsetting.laserRPF = settings.value("laserRPF").toDouble();                   //激光重频
     fsetting.laserPulseWidth = settings.value("laserPulseWidth").toDouble();     //激光脉宽
     fsetting.laserWaveLength = settings.value("laserWaveLength").toDouble();     //激光波长
     fsetting.AOM_Freq = settings.value("AOM_Freq").toDouble();                   //AOM移频量
-=======
-    fsetting.laserPulseEnergy = settings.value("laserPulseEnergy").toInt();   //激光能量
-    fsetting.laserPower = settings.value("laserPower").toInt();               //激光功率
-    fsetting.laserRPF = settings.value("laserRPF").toInt();                   //激光重频
-    fsetting.laserPulseWidth = settings.value("laserPulseWidth").toInt();     //激光脉宽
-    fsetting.laserWaveLength = settings.value("laserWaveLength").toInt();     //激光波长
-    fsetting.AOM_Freq = settings.value("AOM_Freq").toInt();                   //AOM移频量
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     settings.endGroup();
 
     settings.beginGroup("Scan_parameters");
@@ -99,13 +90,8 @@ void settingfile::readFrom_file(const QString &b)
     settings.endGroup();
 
     settings.beginGroup("Sample_parameters");
-<<<<<<< HEAD
     fsetting.sampleFreq = settings.value("sampleFreq").toDouble();				//采样频率
     fsetting.Trigger_Level = settings.value("Trigger_Level").toDouble();       //触发电平
-=======
-    fsetting.sampleFreq = settings.value("sampleFreq").toInt();				//采样频率
-    fsetting.Trigger_Level = settings.value("Trigger_Level").toInt();       //触发电平
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     fsetting.PreTrigger = settings.value("PreTrigger").toInt();             //预触发点数，保留，暂不提供设置
     settings.endGroup();
 
@@ -113,11 +99,7 @@ void settingfile::readFrom_file(const QString &b)
     fsetting.plsAccNum = settings.value("plsAccNum").toInt();				//单方向累加脉冲数
     fsetting.nRangeBin = settings.value("nRangeBin").toInt();               //距离门数
     fsetting.nPointsPerBin = settings.value("nPointsPerBin").toInt();       //距离门内点数
-<<<<<<< HEAD
     fsetting.velocity_band = settings.value("velocity_band").toDouble();       //径向风速范围
-=======
-    fsetting.velocity_band = settings.value("velocity_band").toInt();       //径向风速范围
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     settings.endGroup();
 
     settings.beginGroup("File_store");
@@ -265,19 +247,11 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
         return true;
 
     if(fsetting.plsAccNum != dlgsetting.plsAccNum)                  //单方向累加脉冲数
-<<<<<<< HEAD
         return true;
     if(fsetting.nRangeBin !=dlgsetting.nRangeBin)                   //距离门数
         return true;
     if(fsetting.nPointsPerBin != dlgsetting.nPointsPerBin)          //距离门内点数
         return true;
-=======
-        return true;
-    if(fsetting.nRangeBin !=dlgsetting.nRangeBin)                   //距离门数
-        return true;
-    if(fsetting.nPointsPerBin != dlgsetting.nPointsPerBin)          //距离门内点数
-        return true;
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     if(fsetting.velocity_band != dlgsetting.velocity_band)          //径向风速范围
         return true;
 

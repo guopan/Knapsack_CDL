@@ -16,11 +16,7 @@ typedef struct
     unsigned int collect_result;
     int num_buffers;			         //Number of buffers
     int size_buffers;			         //Size of each buffer
-<<<<<<< HEAD
     quint16* data_stream_target;
-=======
-    signed short* data_stream_target;
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }setupADQ;
 
 typedef struct
@@ -36,19 +32,11 @@ typedef struct
 
     //扫描参数
     int     detectMode;			//探测方式：0持续探测1单组探测2定时探测
-<<<<<<< HEAD
     double  elevationAngle;		//俯仰角，单位°
     double  start_azAngle;		//起始角，单位°
     double  step_azAngle;		//步进角，单位°
     double  angleNum;			//方向数
     double  circleNum;			//圆周数
-=======
-    quint16 elevationAngle;		//俯仰角
-    quint16 start_azAngle;		//起始角
-    quint16 step_azAngle;		//步进角
-    quint32 angleNum;			//方向数
-    float   circleNum;			//圆周数
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     bool    anglekey;			//方向键
     bool    circlekey;			//圆周键
     quint16 SP;					//驱动器速度
@@ -68,13 +56,8 @@ typedef struct
     quint16 nPointsPerBin;      //距离门内点数
 
     //反演参数
-<<<<<<< HEAD
     double velocity_band;       //径向风速范围,±m/s
     int    nDir_VectorCal;     //计算矢量风速所需的径向风速数量
-=======
-    float 	velocity_band;      //径向风速范围,±m/s
-    int     nDir_VectorCal;     //计算矢量风速所需的径向风速数量
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 
     //文件存储
     QString DatafilePath;		//数据存储路径

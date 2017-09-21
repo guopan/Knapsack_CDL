@@ -27,10 +27,6 @@ void paraDialog::initial_para()
     update_show();
 
     //激光参数
-<<<<<<< HEAD
-=======
-
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     connect(ui->lineEdit_laserEP,&QLineEdit::textChanged,this,&paraDialog::set_laserEP);                        //激光能量
     connect(ui->lineEdit_laserRPF,&QLineEdit::textChanged,this,&paraDialog::set_laserRPF);						//激光重频
     connect(ui->lineEdit_laserPulseWidth,&QLineEdit::textChanged,this,&paraDialog::set_laserPulseWidth);		//激光脉宽
@@ -119,20 +115,13 @@ void paraDialog::update_show()
     ui->checkBox_autocreate_dateDir->setChecked(psetting.autoCreate_DateDir);
     ui->lineEdit_nMaxDir_infile_2 ->setText(QString::number(psetting.nMaxDir_inFile));
 
-<<<<<<< HEAD
     on_comboBox_DetetectMode_currentIndexChanged(psetting.detectMode);
-=======
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 
 void paraDialog::set_laserEP()
 {
-<<<<<<< HEAD
     psetting.laserPulseEnergy = ui->lineEdit_laserEP->text().toDouble();
-=======
-    psetting.laserPulseEnergy = ui->lineEdit_laserEP->text().toInt();
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 void paraDialog::set_laserRPF()
@@ -157,11 +146,7 @@ void paraDialog::set_AOM_Freq()
 
 void paraDialog::set_elevationAngle()
 {
-<<<<<<< HEAD
     psetting.elevationAngle = ui->lineEdit_elevationAngle->text().toDouble();
-=======
-    psetting.elevationAngle = ui->lineEdit_elevationAngle->text().toInt();
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 void paraDialog::set_start_azAngle()
@@ -171,11 +156,7 @@ void paraDialog::set_start_azAngle()
 
 void paraDialog::set_step_azAngle()
 {
-<<<<<<< HEAD
     psetting.step_azAngle = ui->lineEdit_step_azAngle->text().toDouble();
-=======
-    psetting.step_azAngle = ui->lineEdit_step_azAngle->text().toInt();
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 void paraDialog::set_SP_Interval()
@@ -267,39 +248,23 @@ void paraDialog::set_motorSP()														//电机转速
 
 void paraDialog::set_time_direct_interval()
 {
-<<<<<<< HEAD
     psetting.IntervalTime = ui->lineEdit_ITV_TimeLength->text().toDouble();
-=======
-    psetting.IntervalTime = ui->lineEdit_ITV_TimeLength->text().toFloat();
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 void paraDialog::set_time_circle_interval()
 {
-<<<<<<< HEAD
     psetting.GroupTime = ui->lineEdit_DET_TimeLength->text().toDouble();
-=======
-    psetting.GroupTime = ui->lineEdit_DET_TimeLength->text().toFloat();
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 
 void paraDialog::set_sampleFreq()													//采样频率
 {
-<<<<<<< HEAD
     psetting.sampleFreq = ui->comboBox_sampleFreq->currentText().toDouble();
-=======
-    psetting.sampleFreq = ui->comboBox_sampleFreq->currentText().toInt();
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 void paraDialog::set_Trigger_Level()
 {
-<<<<<<< HEAD
     psetting.Trigger_Level = ui->lineEdit_TriggerLevel->text().toDouble();
-=======
-    psetting.Trigger_Level = ui->lineEdit_TriggerLevel->text().toFloat();
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 void paraDialog::set_nRangeBin()
@@ -319,11 +284,7 @@ void paraDialog::set_plsAccNum()
 
 void paraDialog::set_velocity_band()
 {
-<<<<<<< HEAD
     psetting.velocity_band = ui->lineEdit_velocity_band_2 ->text().toDouble();
-=======
-    psetting.velocity_band = ui->lineEdit_velocity_band_2 ->text().toInt();
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 //路径显示设置

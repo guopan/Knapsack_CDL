@@ -44,12 +44,9 @@ wind_display::~wind_display()
 
 void wind_display::setHSpeed(const double *sp)
 {
-<<<<<<< HEAD
     qDebug() << "nLayers = " << nLayers;
     for(int i = 0;i<nLayers;i++)
         qDebug() << sp[i];
-=======
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     // 求最大值，确定缩放比例
     int MaxHSpeed = 0;
     for(int i=0;i<nLayers;i++)
@@ -123,7 +120,6 @@ void wind_display::setSubSize()
 void wind_display::set_nLayers(int n)
 {
     // 先remove所有标签
-<<<<<<< HEAD
     if(n != nLayers)
     {
         Vlayout->removeWidget(my_scale);
@@ -147,27 +143,4 @@ void wind_display::set_nLayers(int n)
         Vlayout->addWidget(my_scale);
         Vlayout->setStretch(nLayers+1, 1);
     }
-=======
-    Vlayout->removeWidget(my_scale);
-    for (int i = 0; i < nLayers; ++i)
-    {
-        Vlayout->removeWidget(my_display[i]);
-        my_display[i]->hide();
-    }
-    nLayers = n;
-    // 再add需要的标签
-    for (int i = 0; i < nLayers; ++i)
-    {
-        my_display[i]->setHeight(0);
-        my_display[i]->setHSpeed(0,1);
-        my_display[i]->setHdirection(0);
-        my_display[i]->setVSpeed(0);
-        my_display[i]->show();
-        Vlayout->addWidget(my_display[i]);
-        Vlayout->setStretch(i+1, 1);
-    }
-    Vlayout->addWidget(my_scale);
-    Vlayout->setStretch(nLayers+1, 1);
-
->>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
