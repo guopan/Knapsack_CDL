@@ -17,10 +17,13 @@ public:
     void setPulsePower(const int &s);
     void closePulseLaser();
     void checkLaser();
+<<<<<<< HEAD
 
 public slots:
     void beginPulseLaser();
 
+=======
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 private slots:
     void receive_response(const QString &temp);
     void portError();

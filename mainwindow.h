@@ -145,7 +145,10 @@ private:
     QDateTime CaptureTime;          // 当前方向的采集时间
     QString SpecFileName;
     void Create_DataFolder();       // 数据存储文件夹的创建
+<<<<<<< HEAD
     bool isPulseLaserOpened;
+=======
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 };
 
 #endif // MAINWINDOW_H

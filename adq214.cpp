@@ -68,7 +68,11 @@ void ADQ214::Start_Capture()
     if(!Config_ADQ214())
         return;
 
+<<<<<<< HEAD
     setupadq.data_stream_target = new quint16[(mainSettings.nRangeBin + 2) * nFFT_half * 4];
+=======
+    setupadq.data_stream_target = new qint16[(mainSettings.nRangeBin + 2) * nFFT_half * 4];
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     memset(setupadq.data_stream_target, 0, (mainSettings.nRangeBin + 2) * nFFT_half * 8);
 
     if(!CaptureData2Buffer())
@@ -134,7 +138,10 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
 
     unsigned int samples_to_collect;
     samples_to_collect = (mainSettings.nRangeBin + 2)*nFFT_half*4;
+<<<<<<< HEAD
     unsigned int total_sample_points = samples_to_collect;
+=======
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 
     int nloops = 0;
 
@@ -175,8 +182,16 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
 
         if (setupadq.collect_result)
         {
+<<<<<<< HEAD
             memcpy((void*)&setupadq.data_stream_target[total_sample_points - samples_to_collect],
                     ADQ214_GetPtrStream(adq_cu, adq_num), samples_in_buffer* sizeof(quint16));
+=======
+            // Buffer all data in RAM before writing to disk, if streaming to disk is need a high performance
+            // procedure could be implemented here.
+            // Data format is set to 16 bits, so buffer size is Samples*2 bytes
+            memcpy((void*)&setupadq.data_stream_target[(mainSettings.nRangeBin + 2)*nFFT_half*8 - samples_to_collect],
+                    ADQ214_GetPtrStream(adq_cu, adq_num), samples_in_buffer* sizeof(signed short));
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
             samples_to_collect -= samples_in_buffer;
             qDebug() << "samples_to_collect = "<<samples_to_collect;
         }
@@ -202,10 +217,14 @@ void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
     {
 //        qDebug() << "File opens";
         QTextStream out(&Specfile);
+<<<<<<< HEAD
 //        qDebug() << "mainSettings.nRangeBin+2 = " << mainSettings.nRangeBin+2;
         for (int k=0; (k<(mainSettings.nRangeBin+2)*nFFT_half); k++)
         {
 //            qDebug() << "k = " << k;
+=======
+        for (int k=0; (k<mainSettings.nPointsPerBin*nFFT_half); k++)
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
             out <<psd_res[k].data64 << endl;
         }
         Specfile.close();
@@ -216,12 +235,19 @@ void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
 
 void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 {
+<<<<<<< HEAD
     qDebug() << "Start Convert!!";
     int nPSD = (mainSettings.nRangeBin+2)*nFFT_half;  // PSD功率谱长度
 
     int i = 0, k = 0, l = 0;
     for (l=0;l<(mainSettings.nRangeBin + 2);l++) {
         qDebug() << "l = " << l;
+=======
+    int nPSD = mainSettings.nPointsPerBin*nFFT_half;  // PSD功率谱长度
+
+    int i = 0, k = 0, l = 0;
+    for (l=0;l<(mainSettings.nRangeBin + 2);l++)
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
         for (k=0,i=0; (k<nFFT_half); k++,k++)
         {
             psd_res[nFFT_half*l + nFFT_half-1 - k].pos[3] = setupadq.data_stream_target[nFFT*2*l + i];
@@ -235,18 +261,28 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 
             i = i + 8;
         }
+<<<<<<< HEAD
     }
 
+=======
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
     for (k=0; k<nPSD; k++)
     {
         psd_array[k] = double(psd_res[k].data64);
     }
+<<<<<<< HEAD
     qDebug() << "Covert finished!!!";
+=======
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
 
 void ADQ214::Init_Buffers()           // 初始化功率谱数据存储缓冲区
 {
+<<<<<<< HEAD
     int nPSD = (mainSettings.nRangeBin+2) * nFFT_half;  // PSD功率谱长度
+=======
+    int nPSD = mainSettings.nPointsPerBin * nFFT_half;  // PSD功率谱长度
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 
     if (psd_res != nullptr)
         delete psd_res;
@@ -255,5 +291,8 @@ void ADQ214::Init_Buffers()           // 初始化功率谱数据存储缓冲区
     if (psd_array != nullptr)           //待优化，不用每次new
         delete psd_array;
     psd_array = new double[nPSD];
+<<<<<<< HEAD
     qDebug() << "nPSD = " << nPSD;
+=======
+>>>>>>> 29a516f3a8eb99e7d1d50f689e2d086dbb1b3ae7
 }
