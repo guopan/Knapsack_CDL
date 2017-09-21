@@ -17,8 +17,8 @@ public:
     void beginSeedLaser();
     void setSeedPower(const int &s);
     void closeSeedLaser();
-private slots:
     void checkLaser();
+private slots:
     void receive_response(const QString &temp);
     void portError();
     void timeout();
@@ -30,7 +30,6 @@ signals:
     void seedOpenReady();
     void laserColseRight();
 private:
-    QTimer *timer;         //延时的定时器
     QByteArray senddata;
     QString laserPort,errorCode;
     char ConvertHexChar(char ch);

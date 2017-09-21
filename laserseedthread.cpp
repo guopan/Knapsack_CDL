@@ -53,14 +53,14 @@ void laserseedthread::run()
             serial.setPortName(currentPortName);
             if(!serial.open(QIODevice::ReadWrite))
             {
-                emit this->seed_PortNotOpen();						//ä¸²å£æœªæˆåŠŸæ‰“å¼€ï¼Œä¿¡å·è¿”å›åˆ°ä¸»ç¨‹åº
+                emit this->seed_PortNotOpen();						//´®¿ÚÎ´³É¹¦´ò¿ª£¬ĞÅºÅ·µ»Øµ½Ö÷³ÌĞò
                 return;
             }
-            serial.setBaudRate(QSerialPort::Baud9600);			//æ³¢ç‰¹ç‡
-            serial.setDataBits(QSerialPort::Data8);				//æ•°æ®ä½
-            serial.setParity(QSerialPort::NoParity);			//æ ¡éªŒä½
-            serial.setStopBits(QSerialPort::OneStop);			//åœæ­¢ä½
-            serial.setFlowControl(QSerialPort::NoFlowControl);	//æµæ§åˆ¶
+            serial.setBaudRate(QSerialPort::Baud9600);			//²¨ÌØÂÊ
+            serial.setDataBits(QSerialPort::Data8);				//Êı¾İÎ»
+            serial.setParity(QSerialPort::NoParity);			//Ğ£ÑéÎ»
+            serial.setStopBits(QSerialPort::OneStop);			//Í£Ö¹Î»
+            serial.setFlowControl(QSerialPort::NoFlowControl);	//Á÷¿ØÖÆ
         }
         serial.write(currentRequest);
         if(serial.waitForBytesWritten(waitTimeout))

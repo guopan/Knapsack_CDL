@@ -52,9 +52,9 @@ private slots:
     void set_time_circle_interval();
     //采样设置
     void set_sampleFreq();
-    void set_detRange();
+
     void set_plsAccNum();
-    void set_filesize();
+
     //文件存储
 
 
@@ -72,6 +72,11 @@ private slots:
 
     void on_comboBox_DetetectMode_currentIndexChanged(int index);
 
+    void set_laserEP();
+    void set_velocity_band();
+    void set_Trigger_Level();
+    void set_nRangeBin();
+    void set_nPointsPerBin();
 private:
     Ui::paraDialog *ui;
 

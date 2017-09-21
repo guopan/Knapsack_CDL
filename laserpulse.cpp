@@ -6,8 +6,7 @@ laserPulse::laserPulse(QObject *parent) : QObject(parent)
     connect(&Laserpulsethread,SIGNAL(responsePulse(QString)),this,SLOT(receive_response(QString)));
     connect(&Laserpulsethread,SIGNAL(Pulse_PortNotOpen()),this,SLOT(portError()));
     connect(&Laserpulsethread,SIGNAL(timeoutPulse()),this,SLOT(timeout()));
-    timer = new QTimer(this);
-    connect(timer,SIGNAL(timeout()),this,SLOT(checkLaser()));
+
     laserPort="COM4";
     powerSet=true;
     fire=false;
@@ -23,10 +22,6 @@ void laserPulse::beginPulseLaser()
 
 void laserPulse::setPulsePower(const int &s)
 {
-    if(timer->isActive())
-    {
-        timer->stop();
-    }
     QString key =QString("%1").arg(s,4,16,QLatin1Char('0')).toUpper();
     bool ok;
     int aa=key.left(2).toInt(&ok,16)+key.right(2).toInt(&ok,16);
@@ -39,10 +34,6 @@ void laserPulse::setPulsePower(const int &s)
 
 void laserPulse::closePulseLaser()
 {
-    if(timer->isActive())
-    {
-        timer->stop();
-    }
     StringToHex("AA 55 C1 01 00 00 00",senddata);
     Laserpulsethread.transaction(laserPort,senddata);
     close=true;
@@ -55,16 +46,14 @@ void laserPulse::receive_response(const QString &temp)
         QString powerAnswer=temp.mid(8,2);
         if(powerAnswer!="00")
         {
-            errorCode="è„‰å†²æ¿€å…‰å™¨åŠŸçŽ‡è®¾ç½®é”™è¯¯";
+            errorCode="Âö³å¼¤¹âÆ÷¹¦ÂÊÉèÖÃ´íÎó";
             emit this->laserPulseError(errorCode);
         }
         else
         {
-            timer->start(1000);
             powerSet=true;
-            StringToHex("AA 55 D3 00 00 00",senddata);
             emit this->laserWorkRight();
-            qDebug()<<"è„‰å†²æ¿€å…‰å™¨åŠŸçŽ‡è®¾ç½®æˆåŠŸ";
+            qDebug()<<"Âö³å¼¤¹âÆ÷¹¦ÂÊÉèÖÃ³É¹¦";
         }
     }
     else
@@ -75,12 +64,12 @@ void laserPulse::receive_response(const QString &temp)
             {
                 if(temp=="55aac101000000")
                 {
-                    setPulsePower(1000); //æ‰“å¼€æ­£å¸¸
-                    qDebug()<<"è„‰å†²æ¿€å…‰å™¨æ‰“å¼€æˆåŠŸ";
+                    setPulsePower(1000); //´ò¿ªÕý³£
+                    qDebug()<<"Âö³å¼¤¹âÆ÷´ò¿ª³É¹¦";
                 }
                 else
                 {
-                    errorCode="è„‰å†²æ¿€å…‰å™¨æ‰“å¼€å¼‚å¸¸";
+                    errorCode="Âö³å¼¤¹âÆ÷´ò¿ªÒì³£";
                     emit this->laserPulseError(errorCode);
                 }
                 fire=false;
@@ -90,11 +79,11 @@ void laserPulse::receive_response(const QString &temp)
                 if(temp=="55aac101000000")
                 {
                    emit this->pulseCloseReady();
-                    qDebug()<<"è„‰å†²æ¿€å…‰å™¨å…³é—­æ­£å¸¸";
+                    qDebug()<<"Âö³å¼¤¹âÆ÷¹Ø±ÕÕý³£";
                 }
                 else
                 {
-                    errorCode="è„‰å†²æ¿€å…‰å™¨å…³é—­å¼‚å¸¸";
+                    errorCode="Âö³å¼¤¹âÆ÷¹Ø±ÕÒì³£";
                     emit this->laserPulseError(errorCode);
                 }
                 close=false;
@@ -106,9 +95,8 @@ void laserPulse::receive_response(const QString &temp)
             QString checkAnswer=temp.mid(8,2);
             if(checkAnswer=="00")
             {
-                errorCode="è„‰å†²æ¿€å…‰å™¨æ‰“å¼€å¼‚å¸¸";
+                errorCode="Âö³å¼¤¹âÆ÷´ò¿ªÒì³£";
                 emit this->laserPulseError(errorCode);
-                timer->stop();
             }
             else
             {
@@ -119,19 +107,18 @@ void laserPulse::receive_response(const QString &temp)
                     int s=checkAnswer.right(1).toInt(&ok,16);
                     QString key =QString("%1").arg(s,4,2,QLatin1Char('0'));
                     if(key.left(1)=="1")
-                    {errorCode.append("æ³µæµ¦æ¸©åº¦å¼‚å¸¸;");}
+                    {errorCode.append("±ÃÆÖÎÂ¶ÈÒì³£;");}
                     if(key.right(1)=="1")
-                    {errorCode.append("æ¨¡å—æ¸©åº¦å¼‚å¸¸;");}
+                    {errorCode.append("Ä£¿éÎÂ¶ÈÒì³£;");}
                     if(key.mid(1,1)=="1")
-                    {errorCode.append("è¾“å…¥åŠŸçŽ‡å¼‚å¸¸;");}
+                    {errorCode.append("ÊäÈë¹¦ÂÊÒì³£;");}
                     if(key.mid(2,1)=="1")
-                    {errorCode.append("ç§å­è„‰å†²æ¿€å…‰å™¨æ¸©åº¦å¼‚å¸¸;");}
+                    {errorCode.append("ÖÖ×ÓÂö³å¼¤¹âÆ÷ÎÂ¶ÈÒì³£;");}
                     emit this->laserPulseError(errorCode);
-                    timer->stop();
                 }
                 else
                 {
-                   qDebug()<<"è„‰å†²æ¿€å…‰å™¨å·¥ä½œæ­£å¸¸";
+                   qDebug()<<"Âö³å¼¤¹âÆ÷¹¤×÷Õý³£";
                 }
 
             }
@@ -141,7 +128,7 @@ void laserPulse::receive_response(const QString &temp)
 
 void laserPulse::checkLaser()
 {
-//    StringToHex("AA 55 D3 00 00 00",senddata);
+    StringToHex("AA 55 D3 00 00 00",senddata);
     Laserpulsethread.transaction(laserPort,senddata);
 }
 
@@ -191,12 +178,12 @@ void laserPulse::StringToHex(QString str, QByteArray &senddata)
 
 void laserPulse::portError()
 {
-    errorCode="è„‰å†²æ¿€å…‰å™¨ä¸²å£æ‰“å¼€å¼‚å¸¸";
+    errorCode="Âö³å¼¤¹âÆ÷´®¿Ú´ò¿ªÒì³£";
     emit this->laserPulseError(errorCode);
 }
 
 void laserPulse::timeout()
 {
-    errorCode="è„‰å†²æ¿€å…‰å™¨ä¸²å£æ•°æ®è¯»å–å¼‚å¸¸";
+    errorCode="Âö³å¼¤¹âÆ÷´®¿ÚÊý¾Ý¶ÁÈ¡Òì³£";
     emit this->laserPulseError(errorCode);
 }

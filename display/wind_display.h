@@ -22,7 +22,7 @@ public slots:
     void setVSpeed(const double *sp);
     void setHeights(const double *h);
     void setSubSize();
-
+    void set_nLayers(int n);
 signals:
     void HSpeed_changed();
     void VSpeed_changed();
@@ -30,18 +30,19 @@ signals:
     void Heights_changed();
 
 private:
-    rt_display *my_display [nLayers];
+    rt_display *my_display [Max_nLayers];
     rt_title *my_title;
     rt_scale *my_scale;
 
     QVBoxLayout *Vlayout;
-    double HSpeed[nLayers];
-    double H_direction[nLayers];
-    double VSpeed[nLayers];
-    double Heights[nLayers];
+    double HSpeed[Max_nLayers];
+    double H_direction[Max_nLayers];
+    double VSpeed[Max_nLayers];
+    double Heights[Max_nLayers];
     double Height_low;
     double Heithe_high;
     int HSpeedScale;
+    int nLayers;
 
 //    void resizeEvent(QResizeEvent * event);
 

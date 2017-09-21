@@ -2,55 +2,53 @@
 #define GLOBAL_DEFINES_H
 #include <QString>
 
+
+// 与采集卡有关的，通过API访问的参数
 typedef struct
 {
     int apirev;
-    int trig_channel;                   //触发通道
     int stream_ch;
     int clock_source;                   //时钟源
     int pll_divider;
-    int num_samples_collect;
     int trig_mode;
 
     unsigned int buffers_filled;
     unsigned int collect_result;
     int num_buffers;			         //Number of buffers
     int size_buffers;			         //Size of each buffer
-    signed short* data_stream_target;
-    quint16 spi_data_out[8];
-    quint16 spi_data_in[4];
+    quint16* data_stream_target;
 }setupADQ;
 
 typedef struct
 {
     //激光参数
-    bool    isPulseMode;        //脉冲探测（true）or连续探测（false）
-    float   laserPulseEnergy;   //激光能量，单位μJ，连续模式下为0
-    float   laserPower;         //激光功率，单位mW，脉冲模式下为0
-    quint16 laserRPF;			//激光频率，脉冲模式下为0
-    quint16 laserPulseWidth;	//脉冲宽度，脉冲模式下为0
-    quint16 laserWaveLength;	//激光波长
-    quint16 AOM_Freq;			//AOM移频量
+    bool   isPulseMode;        //脉冲探测（true）or连续探测（false）
+    double laserPulseEnergy;    //激光能量，单位μJ，连续模式下为0
+    double laserPower;          //激光功率，单位mW，脉冲模式下为0
+    double laserRPF;			//激光频率，脉冲模式下为0
+    double laserPulseWidth;     //脉冲宽度，单位ns，脉冲模式下为0
+    double laserWaveLength;     //激光波长，单位μm
+    double AOM_Freq;			//AOM移频量，单位MHz
 
     //扫描参数
-	int     detectMode;			//探测方式：0持续探测1单组探测2定时探测
-    quint16 elevationAngle;		//俯仰角
-    quint16 start_azAngle;		//起始角
-    quint16 step_azAngle;		//步进角
-    quint32 angleNum;			//方向数
-    float   circleNum;			//圆周数
+    int     detectMode;			//探测方式：0持续探测1单组探测2定时探测
+    double  elevationAngle;		//俯仰角，单位°
+    double  start_azAngle;		//起始角，单位°
+    double  step_azAngle;		//步进角，单位°
+    double  angleNum;			//方向数
+    double  circleNum;			//圆周数
     bool    anglekey;			//方向键
     bool    circlekey;			//圆周键
     quint16 SP;					//驱动器速度
-    float   IntervalTime;		//定时探测间隔，单位：分钟
-    float   GroupTime;			//定时探测单组时间，单位：分钟
+    double  IntervalTime;		//定时探测间隔，单位：分钟
+    double  GroupTime;			//定时探测单组时间，单位：分钟
 
     //采样参数
-    quint16 sampleFreq;			//采样频率
-    float   detRange;   		//采样距离，删除
-    quint32 sampleNum;			//采样点数，删除
-    quint16 Trigger_Level;      //触发电平
-    int     PreTrigger;         //预触发点数，保留，暂不提供设置
+    double sampleFreq;			//采样频率，单位MHz
+    double detRange;            //采样距离，删除
+    double sampleNum;			//采样点数，删除
+    double Trigger_Level;       //触发电平
+    int    PreTrigger;          //预触发点数，保留，暂不提供设置
 
     //实时处理参数
     quint16 plsAccNum;			//单方向累加脉冲数
@@ -58,12 +56,13 @@ typedef struct
     quint16 nPointsPerBin;      //距离门内点数
 
     //反演参数
-    float 	velocity_band;      //径向风速范围,±m/s
+    double velocity_band;       //径向风速范围,±m/s
+    int    nDir_VectorCal;     //计算矢量风速所需的径向风速数量
 
     //文件存储
     QString DatafilePath;		//数据存储路径
     bool 	autoCreate_DateDir;	//自动创建日期文件夹
-	quint32 nMaxDir_inFile;		//持续模式下，单文件内的方向数
+    quint32 nMaxDir_inFile;     //持续模式下，单文件内的方向数
 
 }ACQSETTING;
 
@@ -111,6 +110,9 @@ static const unsigned short BitReverseIndex[] =
     480,224,352,96,416,160,288,32,448,192,320,64,384,128,256,0
     };
 
-const int nLayers = 10;     //高度层数 = 10
+const int Max_nLayers = 20;         //最大高度层数 = 20
+const int nFFT = 1024;              //FFT点数数 = 1024
+const int nFFT_half = nFFT/2;       //FFT点数数的一半 = 512
+const int CheckPeriod = 40;         //采集过程中，状态转换定时器的查询间隔（ms）
 enum Control_State{ waitMotor, Capture, Quit, Standby};     //探测过程控制状态值
 #endif // GLOBAL_DEFINES_H
