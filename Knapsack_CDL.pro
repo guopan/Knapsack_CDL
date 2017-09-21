@@ -44,7 +44,9 @@ SOURCES += \
     laserseedthread.cpp \
     laserpulsethread.cpp \
     dswf.cpp \
-    losvelocity.cpp
+    losvelocity.cpp \
+    control.cpp \
+    controlthread.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -67,7 +69,9 @@ HEADERS += \
     laserseedthread.h \
     laserpulsethread.h \
     dswf.h \
-    losvelocity.h
+    losvelocity.h \
+    control.h \
+    controlthread.h
 
 FORMS += \
         mainwindow.ui \
