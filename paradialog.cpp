@@ -60,6 +60,7 @@ void paraDialog::initial_para()
     //存储设置
     connect(ui->checkBox_autocreate_dateDir,&QCheckBox::clicked,this,&paraDialog::on_checkBox_autoCreate_DateDir_clicked);
     ui->lineEdit_DatafilePath->setReadOnly(true);
+    connect(ui->lineEdit_nMaxDir_infile,&QLineEdit::textChanged,this,&paraDialog::set_nMaxDir_infile);
 
     connect(ui->lineEdit_nPointsPerBin,&QLineEdit::textChanged,this,&paraDialog::show_RangeReso);
     connect(ui->comboBox_sampleFreq,&QComboBox::currentTextChanged,this,&paraDialog::show_RangeReso);
@@ -348,6 +349,13 @@ void paraDialog::set_nDir_VectorCal()
     QRegExp regExp("^[0-9]*/d{3}$");
     ui->lineEdit_nDir_VectorCal->setValidator(new QRegExpValidator(regExp, this));
     psetting.nDir_VectorCal = ui->lineEdit_nDir_VectorCal->text().toInt();
+}
+
+void paraDialog::set_nMaxDir_infile()
+{
+    QRegExp regExp("^[0-9]*/d{5}$");
+    ui->lineEdit_nMaxDir_infile->setValidator(new QRegExpValidator(regExp, this));
+    psetting.nMaxDir_inFile = ui->lineEdit_nMaxDir_infile->text().toDouble();
 }
 
 //路径显示设置

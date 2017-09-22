@@ -62,6 +62,7 @@ private slots:
 
     //ÎÄ¼þ´æ´¢
     void on_pushButton_pathModify_clicked();
+    void set_nMaxDir_infile();
 
     void on_pushButton_save_clicked();
 
