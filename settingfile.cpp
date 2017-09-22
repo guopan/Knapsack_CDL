@@ -51,6 +51,8 @@ void settingfile::writeTo_file(const ACQSETTING &setting,const QString &a)      
     settings.setValue("nRangeBin",fsetting.nRangeBin);                  //距离门数
     settings.setValue("nPointsPerBin",fsetting.nPointsPerBin);          //距离门内点数
     settings.setValue("velocity_band",fsetting.velocity_band);          //径向风速范围
+    settings.setValue("objFreqPoints",fsetting.objFreqPoints);          //径向风速点数范围
+    settings.setValue("nDir_VectorCal",fsetting.nDir_VectorCal);        //矢量风速所需的径向风速数量
     settings.endGroup();
 
     settings.beginGroup("File_store");
@@ -66,7 +68,7 @@ void settingfile::readFrom_file(const QString &b)
     QString path_b = b;
     QSettings settings(path_b,QSettings::IniFormat);
     settings.beginGroup("Laser_parameters");
-    fsetting.isPulseMode = settings.value("isPulseMode").toBool();            //激光类型
+    fsetting.isPulseMode = settings.value("isPulseMode").toInt();             //激光类型
     fsetting.laserPulseEnergy = settings.value("laserPulseEnergy").toDouble();   //激光能量
     fsetting.laserPower = settings.value("laserPower").toDouble();               //激光功率
     fsetting.laserRPF = settings.value("laserRPF").toDouble();                   //激光重频
@@ -76,30 +78,32 @@ void settingfile::readFrom_file(const QString &b)
     settings.endGroup();
 
     settings.beginGroup("Scan_parameters");
-    fsetting.detectMode = settings.value("detectMode").toBool();            //探测模式
+    fsetting.detectMode = settings.value("detectMode").toInt();                 //探测模式
     fsetting.elevationAngle = settings.value("elevationAngle").toDouble();		//俯仰角
     fsetting.start_azAngle = settings.value("start_azAngle").toDouble();		//起始角
     fsetting.step_azAngle = settings.value("step_azAngle").toDouble();			//步进角
     fsetting.angleNum = settings.value("angleNum").toDouble();					//方向数
     fsetting.circleNum = settings.value("circleNum").toDouble();				//圆周数
-    fsetting.anglekey = settings.value("anglekey").toBool();				//方向键
-    fsetting.circlekey = settings.value("circlekey").toBool();				//圆周键
-    fsetting.SP = settings.value("SP").toInt();								//电机速度
-    fsetting.IntervalTime = settings.value("IntervalTime").toDouble();       //方向间间隔
-    fsetting.GroupTime = settings.value("GroupTime").toDouble();             //圆周间间隔
+    fsetting.anglekey = settings.value("anglekey").toBool();				    //方向键
+    fsetting.circlekey = settings.value("circlekey").toBool();				    //圆周键
+    fsetting.SP = settings.value("SP").toInt();								    //电机速度
+    fsetting.IntervalTime = settings.value("IntervalTime").toDouble();          //方向间间隔
+    fsetting.GroupTime = settings.value("GroupTime").toDouble();                //圆周间间隔
     settings.endGroup();
 
     settings.beginGroup("Sample_parameters");
     fsetting.sampleFreq = settings.value("sampleFreq").toDouble();				//采样频率
-    fsetting.Trigger_Level = settings.value("Trigger_Level").toDouble();       //触发电平
-    fsetting.PreTrigger = settings.value("PreTrigger").toInt();             //预触发点数，保留，暂不提供设置
+    fsetting.Trigger_Level = settings.value("Trigger_Level").toDouble();        //触发电平
+    fsetting.PreTrigger = settings.value("PreTrigger").toInt();                 //预触发点数，保留，暂不提供设置
     settings.endGroup();
 
     settings.beginGroup("RealTime_Process");
     fsetting.plsAccNum = settings.value("plsAccNum").toInt();				//单方向累加脉冲数
     fsetting.nRangeBin = settings.value("nRangeBin").toInt();               //距离门数
     fsetting.nPointsPerBin = settings.value("nPointsPerBin").toInt();       //距离门内点数
-    fsetting.velocity_band = settings.value("velocity_band").toDouble();       //径向风速范围
+    fsetting.velocity_band = settings.value("velocity_band").toDouble();    //径向风速范围
+    fsetting.objFreqPoints = settings.value("objFreqPoints").toInt();       //径向风速点数范围
+    fsetting.nDir_VectorCal = settings.value("nDir_VectorCal").toInt();     //矢量风速所需的径向风速数量
     settings.endGroup();
 
     settings.beginGroup("File_store");
@@ -128,7 +132,7 @@ void settingfile::test_create_file(const QString &iniFilePath)
     if(file.exists() == false)                              //以下为配置文件不存在时的默认配置
     {
         settings.beginGroup("Laser_parameters");
-        settings.setValue("isPulseMode",true);				//激光模式
+        settings.setValue("isPulseMode",0);				    //激光模式:0脉冲模式1连续模式
         settings.setValue("laserPulseEnergy",10);			//激光能量，单位μJ
         settings.setValue("laserPower",100);				//激光功率，单位mW
         settings.setValue("laserRPF",10000);				//激光重频
@@ -144,9 +148,8 @@ void settingfile::test_create_file(const QString &iniFilePath)
         settings.setValue("step_azAngle",0);				//步进角
         settings.setValue("angleNum",80);					//方向数
         settings.setValue("circleNum",20);					//圆周数
-        settings.setValue("anglekey",false);			    //方向键
+        settings.setValue("anglekey",true);			        //方向键
         settings.setValue("circlekey",false);				//圆周键
-        settings.setValue("continusdete",true);             //连续探测
         settings.setValue("SP",90);							//电机速度
         settings.setValue("IntervalTime",15);               //定时探测间隔，单位：分钟
         settings.setValue("GroupTime",3);                   //定时探测单组时间，单位：分钟
@@ -163,6 +166,8 @@ void settingfile::test_create_file(const QString &iniFilePath)
         settings.setValue("nRangeBin",13);                  //距离门数
         settings.setValue("nPointsPerBin",250);             //距离门内点数
         settings.setValue("velocity_band",20);
+        settings.setValue("objFreqPoints",40);
+        settings.setValue("nDir_VectorCal",4);
         settings.endGroup();
 
         settings.beginGroup("File_store");
@@ -170,7 +175,7 @@ void settingfile::test_create_file(const QString &iniFilePath)
         path_c.append("/").append(prefix_str);              //路径末尾加上日期文件夹？？？？
         settings.setValue("DatafilePath",path_c);			//文件保存路径
         settings.setValue("autoCreate_DateDir",true);		//自动创建日期文件夹
-        settings.setValue("nMaxDir_inFile",1000);              //单文件方向数
+        settings.setValue("nMaxDir_inFile",1000);           //单文件方向数
         settings.endGroup();
     }
     else
@@ -254,6 +259,10 @@ bool settingfile::isSettingsChanged(const ACQSETTING &setting)
         return true;
     if(fsetting.velocity_band != dlgsetting.velocity_band)          //径向风速范围
         return true;
+    if(fsetting.objFreqPoints != dlgsetting.objFreqPoints)
+        return true;
+    if(fsetting.nDir_VectorCal != dlgsetting.nDir_VectorCal)        //矢量风速所需的径向风速数量
+        return true;
 
     if(fsetting.DatafilePath != dlgsetting.DatafilePath)			  //文件保存路径
         return true;
@@ -281,6 +290,7 @@ void settingfile::updatelogFile(const QString &addInstruct)
     if(instruct_str != NULL)
         record_str << instruct_str << endl;
     last_LF.close();
+
 }
 
 

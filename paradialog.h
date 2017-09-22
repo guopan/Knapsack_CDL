@@ -7,10 +7,10 @@
 #include <QDialog>
 #include <QMessageBox>
 
-const int FACTOR  = 150;								//采样点计算公式系数
-const int SIZE_OF_FILE_HEADER = 6;						//单个单文件头的大小
-const int DATA_MEMORY = 64*1000*1000;					//采集卡内存空间（点）
-const int UPLOAD_SPEED = 20;							//上传速度MB/s
+const double Factor = 150;                    //光速/2
+const int SIZE_OF_FILE_HEADER = 6;			  //单个单文件头的大小,单位：字节
+//const int DATA_MEMORY = 64*1000*1000;		  //采集卡内存空间（点）
+//const int UPLOAD_SPEED = 20;				  //上传速度MB/s
 
 namespace Ui {
 class paraDialog;
@@ -33,6 +33,7 @@ public slots:
 
 private slots:
     //激光参数
+    void set_laserEP();
     void set_laserRPF();
     void set_laserPulseWidth();
     void set_laserWaveLength();
@@ -46,18 +47,20 @@ private slots:
     void set_anglekey();
     void set_circlekey();
     void set_detectMode();
-    void set_SP_Interval();
+//    void set_SP_Interval();
     void set_motorSP();
     void set_time_direct_interval();
     void set_time_circle_interval();
     //采样设置
     void set_sampleFreq();
-
     void set_plsAccNum();
+    void set_velocity_band();
+    void set_Trigger_Level();
+    void set_nRangeBin();
+    void set_nPointsPerBin();
+    void set_nDir_VectorCal();
 
     //文件存储
-
-
     void on_pushButton_pathModify_clicked();
 
     void on_pushButton_save_clicked();
@@ -72,11 +75,14 @@ private slots:
 
     void on_comboBox_DetetectMode_currentIndexChanged(int index);
 
-    void set_laserEP();
-    void set_velocity_band();
-    void set_Trigger_Level();
-    void set_nRangeBin();
-    void set_nPointsPerBin();
+//    void show_detect_mode();                    //参考信息——探测方式
+    void show_deteRange();                       //探测距离
+    void show_RangeReso();                       //距离分辨率
+
+
+
+    void on_comboBox_lasermode_currentIndexChanged(int index);
+
 private:
     Ui::paraDialog *ui;
 
@@ -85,19 +91,26 @@ private:
     settingfile dlg_setfile;
     QString profile_path;                      //配置文件路径
 
-    double direct_size;		                   //单方向上的数据量
-    int sampleNum;			                   //单个脉冲的采样点数
+//    double triggerlevel;                      //触发电压
+    double deteRange;
+    double filesize;
+    double velodatafilesize;		           //单方向上的数据量
+    double specdatafilesize;
+    double RangeReso;                          //距离分辨率
+//    int sampleNum;			               //单个脉冲的采样点数
     bool nocollecting;		                   //是否正在采集数据
-    int pagePerPls;			                   //单个脉冲的page数
+//    int pagePerPls;			                   //单个脉冲的page数
     QString lenStr;
 
-    void set_dect_time();				         //计算预估探测时间
     void filesize_over();				         //判断单文件量超过采集卡内存
     void show_DatafilePath(QString str);
     quint64 getDiskFreeSpace(QString driver);	 //获取路径下的硬盘剩余空间大小
 
     void update_show();
-    void show_detect_mode();    //参考信息——探测方式
+//    void show_detect_mode();                     //参考信息——探测方式
+//    void show_deteRange();                       //探测距离
+//    void show_RangeReso();                       //距离分辨率
+    void show_filesize();
 
 };
 

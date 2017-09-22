@@ -22,7 +22,7 @@ typedef struct
 typedef struct
 {
     //激光参数
-    bool   isPulseMode;        //脉冲探测（true）or连续探测（false）
+    bool   isPulseMode;         //脉冲探测（true）or连续探测（false）
     double laserPulseEnergy;    //激光能量，单位μJ，连续模式下为0
     double laserPower;          //激光功率，单位mW，脉冲模式下为0
     double laserRPF;			//激光频率，脉冲模式下为0
@@ -57,7 +57,8 @@ typedef struct
 
     //反演参数
     double velocity_band;       //径向风速范围,±m/s
-    int    nDir_VectorCal;     //计算矢量风速所需的径向风速数量
+    int objFreqPoints;          //径向风速点数范围=Velo/velorseo
+    int nDir_VectorCal;         //计算矢量风速所需的径向风速数量
 
     //文件存储
     QString DatafilePath;		//数据存储路径

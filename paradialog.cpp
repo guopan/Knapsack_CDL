@@ -37,27 +37,36 @@ void paraDialog::initial_para()
     connect(ui->lineEdit_elevationAngle,&QLineEdit::textChanged,this,&paraDialog::set_elevationAngle);			//¸©Ñö½Ç -> Ì½²â·½Ê½
     connect(ui->lineEdit_start_azAngle,&QLineEdit::textChanged,this,&paraDialog::set_start_azAngle);			//ÆğÊ¼½Ç
     connect(ui->lineEdit_step_azAngle,&QLineEdit::textChanged,this,&paraDialog::set_step_azAngle);				//²½½ø½Ç -> Ì½²â·½Ê½
-    connect(ui->lineEdit_step_azAngle,&QLineEdit::textChanged,this,&paraDialog::set_SP_Interval);				//²½½ø½Ç -> ËÙ¶ÈºÍÔ²ÖÜ¼ä¼ä¸ôÊ¹ÄÜ×´Ì¬
+//    connect(ui->lineEdit_step_azAngle,&QLineEdit::textChanged,this,&paraDialog::set_SP_Interval);				//²½½ø½Ç -> ËÙ¶ÈºÍÔ²ÖÜ¼ä¼ä¸ôÊ¹ÄÜ×´Ì¬
     connect(ui->lineEdit_step_azAngle,&QLineEdit::textChanged,this,&paraDialog::set_circleNum);					//²½½ø½Ç -> Ô²ÖÜÊı
     connect(ui->lineEdit_step_azAngle,&QLineEdit::textChanged,this,&paraDialog::set_angleNum);					//²½½ø½Ç -> ·½ÏòÊı
     connect(ui->lineEdit_angleNum,&QLineEdit::textChanged,this,&paraDialog::set_circleNum);						//·½ÏòÊı -> Ô²ÖÜÊı
     connect(ui->lineEdit_circleNum, &QLineEdit::textChanged,this,&paraDialog::set_angleNum);					//Ô²ÖÜÊı -> ·½ÏòÊı
     connect(ui->radioButton_anglekey,&QRadioButton::clicked,this,&paraDialog::set_anglekey);					//·½Ïò¼ü
-    connect(ui->radioButton_circlekey,&QRadioButton::clicked,this,&paraDialog::set_circlekey);					//Ô²ÖÜ¼ü
+    connect(ui->radioButton_circlekey,&QRadioButton::clicked,this,&paraDialog::set_circlekey);			        //Ô²ÖÜ¼ü
     connect(ui->lineEdit_SP,&QLineEdit::textChanged,this,&paraDialog::set_motorSP);								//×î¸ß×ªËÙ -> Ì½²âÊ±¼ä
     connect(ui->lineEdit_ITV_TimeLength,&QLineEdit::textChanged,this,&paraDialog::set_time_direct_interval);
     connect(ui->lineEdit_DET_TimeLength,&QLineEdit::textChanged,this,&paraDialog::set_time_circle_interval);
 
     //²ÉÑùÉèÖÃ
-    connect(ui->comboBox_sampleFreq,&QComboBox::currentTextChanged,this,&paraDialog::set_sampleFreq);			//²ÉÑùÆµÂÊ -> ²ÉÑùµãÊı
+    connect(ui->comboBox_sampleFreq,&QComboBox::currentTextChanged,this,&paraDialog::set_sampleFreq);			//²ÉÑùÆµÂÊ
     connect(ui->lineEdit_TriggerLevel,&QLineEdit::textChanged,this,&paraDialog::set_Trigger_Level);
     connect(ui->lineEdit_nRangeBin,&QLineEdit::textChanged,this,&paraDialog::set_nRangeBin);
-    connect(ui->lineEdit_velocity_band_2,&QLineEdit::textChanged,this,&paraDialog::set_velocity_band);
-    connect(ui->lineEdit_plsAccNum,&QLineEdit::textChanged,this,&paraDialog::set_plsAccNum);					//Âö³åÊı	  -> Êı¾İÁ¿
+    connect(ui->lineEdit_nPointsPerBin,&QLineEdit::textChanged,this,&paraDialog::set_nPointsPerBin);
+    connect(ui->lineEdit_velocity_band,&QLineEdit::textChanged,this,&paraDialog::set_velocity_band);
+    connect(ui->lineEdit_nDir_VectorCal,&QLineEdit::textChanged,this,&paraDialog::set_nDir_VectorCal);
+    connect(ui->lineEdit_plsAccNum,&QLineEdit::textChanged,this,&paraDialog::set_plsAccNum);
 
     //´æ´¢ÉèÖÃ
     connect(ui->checkBox_autocreate_dateDir,&QCheckBox::clicked,this,&paraDialog::on_checkBox_autoCreate_DateDir_clicked);
     ui->lineEdit_DatafilePath->setReadOnly(true);
+
+    connect(ui->lineEdit_nPointsPerBin,&QLineEdit::textChanged,this,&paraDialog::show_RangeReso);
+    connect(ui->comboBox_sampleFreq,&QComboBox::currentTextChanged,this,&paraDialog::show_RangeReso);
+    connect(ui->lineEdit_nRangeBin,&QLineEdit::textChanged,this,&paraDialog::show_deteRange);
+    connect(ui->lineEdit_nPointsPerBin,&QLineEdit::textChanged,this,&paraDialog::show_deteRange);
+    connect(ui->comboBox_sampleFreq,&QComboBox::currentTextChanged,this,&paraDialog::show_deteRange);
+
 }
 
 void paraDialog::update_show()
@@ -72,10 +81,13 @@ void paraDialog::update_show()
     //²ÉÑùÉèÖÃ
     ui->comboBox_sampleFreq->setCurrentText((QString::number(psetting.sampleFreq)));
     ui->lineEdit_TriggerLevel->setText(QString::number(psetting.Trigger_Level));
+    double triggerlevel = psetting.Trigger_Level*1.1/pow(2,13);
+    ui->label_trigger_level->setText(QString::number(triggerlevel)+QString("V"));
     ui->lineEdit_nRangeBin->setText(QString::number(psetting.nRangeBin));
     ui->lineEdit_nPointsPerBin->setText(QString::number((psetting.nPointsPerBin)));
     ui->lineEdit_plsAccNum->setText(QString::number(psetting.plsAccNum));
-    ui->lineEdit_velocity_band_2->setText(QString::number(psetting.velocity_band));
+    ui->lineEdit_velocity_band->setText(QString::number(psetting.velocity_band));
+    ui->lineEdit_nDir_VectorCal->setText(QString::number(psetting.nDir_VectorCal));
 
     //Ì½²â·½Ê½
     ui->comboBox_DetetectMode->setCurrentIndex(psetting.detectMode);
@@ -86,7 +98,7 @@ void paraDialog::update_show()
     ui->lineEdit_start_azAngle->setText(QString::number(psetting.start_azAngle));
     ui->lineEdit_step_azAngle->setText(QString::number(psetting.step_azAngle));
     //É¨ÃèÌ½²â
-    ui->groupBox_6->setEnabled(true);
+//    ui->groupBox_6->setEnabled(true);
     ui->radioButton_anglekey->setChecked(psetting.anglekey);
     ui->radioButton_circlekey->setChecked(psetting.circlekey);
     if(psetting.detectMode == 1)
@@ -110,77 +122,106 @@ void paraDialog::update_show()
     ui->lineEdit_DET_TimeLength->setText(QString::number(psetting.GroupTime,'f',2));
 
     //ÎÄ¼ş´æ´¢
-
     ui->lineEdit_DatafilePath->setText(psetting.DatafilePath);
     ui->checkBox_autocreate_dateDir->setChecked(psetting.autoCreate_DateDir);
-    ui->lineEdit_nMaxDir_infile_2 ->setText(QString::number(psetting.nMaxDir_inFile));
+    ui->lineEdit_nMaxDir_infile ->setText(QString::number(psetting.nMaxDir_inFile));
 
-    on_comboBox_DetetectMode_currentIndexChanged(psetting.detectMode);
+    //²Î¿¼ĞÅÏ¢--Ì½²âÄ£Ê½
+    ui->comboBox_lasermode->setCurrentIndex(psetting.isPulseMode);
+    on_comboBox_lasermode_currentIndexChanged(psetting.isPulseMode);
+
+    show_deteRange();
+
+    show_RangeReso();
+
+    show_filesize();
+
 }
-
 
 void paraDialog::set_laserEP()
 {
+    QRegExp regExp("^[0-9]*/d{6}$");
+    ui->lineEdit_laserEP->setValidator(new QRegExpValidator(regExp, this));
     psetting.laserPulseEnergy = ui->lineEdit_laserEP->text().toDouble();
 }
 
 void paraDialog::set_laserRPF()
 {
+    QRegExp regExp("^[0-9]*/d{7}$");
+    ui->lineEdit_laserRPF->setValidator(new QRegExpValidator(regExp, this));
     psetting.laserRPF = ui->lineEdit_laserRPF->text().toDouble();
 }
 
 void paraDialog::set_laserPulseWidth()
 {
-    psetting.laserPulseWidth = ui->lineEdit_laserPulseWidth->text().toDouble();
+    QRegExp regExp("^[0-9]*/d{5}$");
+    ui->lineEdit_laserPulseWidth->setValidator(new QRegExpValidator(regExp, this));
+    psetting.laserPulseWidth = ui->lineEdit_laserPulseWidth->text().toInt();
 }
 
 void paraDialog::set_laserWaveLength()
 {
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");          //1-3Î»Ğ¡ÊıµÄÕıÊµÊı
+    ui->lineEdit_laserWaveLength->setValidator(new QRegExpValidator(regExp, this));
     psetting.laserWaveLength = ui->lineEdit_laserWaveLength->text().toDouble();
+
+    psetting.objFreqPoints = psetting.velocity_band/(psetting.laserWaveLength*psetting.sampleFreq/nFFT);
 }
 
 void paraDialog::set_AOM_Freq()
 {
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");          //1-3Î»Ğ¡ÊıµÄÕıÊµÊı
+    ui->lineEdit_AOM_Freq->setValidator(new QRegExpValidator(regExp, this));
     psetting.AOM_Freq = ui->lineEdit_AOM_Freq->text().toDouble();
 }
 
 void paraDialog::set_elevationAngle()
 {
+    QRegExp regExp("^([0-8]?[0-9]|90)$");
+    ui->lineEdit_elevationAngle->setValidator(new QRegExpValidator(regExp, this));
     psetting.elevationAngle = ui->lineEdit_elevationAngle->text().toDouble();
 }
 
 void paraDialog::set_start_azAngle()
 {
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");          //1-3Î»Ğ¡ÊıµÄÕıÊµÊı
+    ui->lineEdit_start_azAngle->setValidator(new QRegExpValidator(regExp, this));
     psetting.start_azAngle = ui->lineEdit_start_azAngle->text().toDouble();
 }
 
 void paraDialog::set_step_azAngle()
 {
+    QRegExp regExp("^([0-8]?[0-9]|120)$");
+    ui->lineEdit_step_azAngle->setValidator(new QRegExpValidator(regExp, this));
     psetting.step_azAngle = ui->lineEdit_step_azAngle->text().toDouble();
+    on_comboBox_lasermode_currentIndexChanged(psetting.isPulseMode);
 }
 
-void paraDialog::set_SP_Interval()
-{
-    if(ui->lineEdit_step_azAngle->text().toDouble() == 0)
-    {
-        ui->lineEdit_SP->setEnabled(false);
-        ui->radioButton_anglekey->setChecked(true);
-        ui->radioButton_circlekey->setEnabled(false);
-        ui->radioButton_circlekey->setChecked(false);
-        set_anglekey();
-        ui->lineEdit_DET_TimeLength->setEnabled(false);
-    }
-    else
-    {
-        ui->lineEdit_SP->setEnabled(true);
-        ui->radioButton_circlekey->setEnabled(true);
-        ui->lineEdit_DET_TimeLength->setEnabled(true);
-    }
-}
+//void paraDialog::set_SP_Interval()                 //ĞŞ¸Ä²½½ø½Ç
+//{
+//    if(ui->lineEdit_step_azAngle->text().toInt() == 0)
+//    {
+//        ui->lineEdit_SP->setEnabled(false);
+//        ui->radioButton_anglekey->setChecked(true);
+//        ui->radioButton_circlekey->setEnabled(false);
+//        ui->radioButton_circlekey->setChecked(false);
+////        set_anglekey();
+//        ui->lineEdit_DET_TimeLength->setEnabled(false);
+//    }
+//    else
+//    {
+//        ui->lineEdit_SP->setEnabled(true);
+//        ui->radioButton_circlekey->setEnabled(true);
+//        ui->lineEdit_DET_TimeLength->setEnabled(true);
+//    }
+//}
 
 //ÉèÖÃÔ²ÖÜÊıÊäÈë¿òµÄÏÔÊ¾ÊıÖµ
 void paraDialog::set_circleNum()													//Ô²ÖÜÊı Ó°Ïì·½ÏòÊı,psetting»ñÈ¡±à¼­¿òÖµ
 {
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");          //1-3Î»Ğ¡ÊıµÄÕıÊµÊı
+    ui->lineEdit_circleNum->setValidator(new QRegExpValidator(regExp, this));
+    ui->lineEdit_angleNum->setValidator(new QRegExpValidator(regExp, this));
     if(psetting.circlekey == true)
         psetting.circleNum = ui->lineEdit_circleNum->text().toDouble();
     else
@@ -196,14 +237,17 @@ void paraDialog::set_circleNum()													//Ô²ÖÜÊı Ó°Ïì·½ÏòÊı,psetting»ñÈ¡±à¼
 //ÉèÖÃ·½ÏòÊıÊäÈë¿òµÄÏÔÊ¾ÊıÖµ
 void paraDialog::set_angleNum()														//·½ÏòÊı ¾ö¶¨Ô²ÖÜÊı£¬Ó°Ïì×ÜÊı¾İÁ¿£¨Ë«Í¨µÀ³Ë2£©£¬Ì½²â×ÜÊ±¼ä//psetting»ñÈ¡±à¼­¿òÖµ
 {
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");          //1-3Î»Ğ¡ÊıµÄÕıÊµÊı
+    ui->lineEdit_circleNum->setValidator(new QRegExpValidator(regExp, this));
+    ui->lineEdit_angleNum->setValidator(new QRegExpValidator(regExp, this));
     if(psetting.anglekey == true)
         psetting.angleNum = ui->lineEdit_angleNum->text().toDouble();
     else
     {
         psetting.circleNum = ui->lineEdit_circleNum->text().toDouble();
-        psetting.step_azAngle = ui->lineEdit_step_azAngle->text().toDouble();
-        psetting.angleNum = (psetting.circleNum*360/psetting.step_azAngle);
-        ui->lineEdit_angleNum->setText(QString::number(psetting.angleNum,'f',2));
+        psetting.step_azAngle = ui->lineEdit_step_azAngle->text().toInt();
+        psetting.angleNum = psetting.circleNum*360/psetting.step_azAngle;
+        ui->lineEdit_angleNum->setText(QString::number(psetting.angleNum));
     }
 
 }
@@ -235,56 +279,75 @@ void paraDialog::set_detectMode()
 
 void paraDialog::set_motorSP()														//µç»ú×ªËÙ
 {
-    if(ui->lineEdit_SP->text().toInt() > 90)
-    {
-        QMessageBox::warning(this,QString::fromLocal8Bit("ÌáÊ¾"),QString::fromLocal8Bit("×î¸ß×ªËÙ²»ÄÜ³¬¹ı90¡ã/s"));
-        ui->lineEdit_SP->setText(NULL);
-    }
-    else
-    {
-        psetting.SP = ui->lineEdit_SP->text().toInt();
-    }
+    QRegExp regExp("^([0-8]?[0-9]|90)(/d/d)$");
+    ui->lineEdit_SP->setValidator(new QRegExpValidator(regExp, this));
+    psetting.SP = ui->lineEdit_SP->text().toInt();
 }
 
 void paraDialog::set_time_direct_interval()
 {
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");          //1-3Î»Ğ¡ÊıµÄÕıÊµÊı
+    ui->lineEdit_ITV_TimeLength->setValidator(new QRegExpValidator(regExp, this));
     psetting.IntervalTime = ui->lineEdit_ITV_TimeLength->text().toDouble();
 }
 
 void paraDialog::set_time_circle_interval()
 {
-    psetting.GroupTime = ui->lineEdit_DET_TimeLength->text().toDouble();
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");          //1-3Î»Ğ¡ÊıµÄÕıÊµÊı
+    ui->lineEdit_DET_TimeLength->setValidator(new QRegExpValidator(regExp, this));
+    psetting.GroupTime = ui->lineEdit_DET_TimeLength->text().toFloat();
 }
-
 
 void paraDialog::set_sampleFreq()													//²ÉÑùÆµÂÊ
 {
-    psetting.sampleFreq = ui->comboBox_sampleFreq->currentText().toDouble();
+    psetting.sampleFreq = ui->comboBox_sampleFreq->currentText().toInt();
+    psetting.objFreqPoints = psetting.velocity_band/(psetting.laserWaveLength*psetting.sampleFreq/nFFT);
 }
 
 void paraDialog::set_Trigger_Level()
 {
-    psetting.Trigger_Level = ui->lineEdit_TriggerLevel->text().toDouble();
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");          //1-3Î»Ğ¡ÊıµÄÕıÊµÊı
+    ui->lineEdit_TriggerLevel->setValidator(new QRegExpValidator(regExp, this));
+    psetting.Trigger_Level = ui->lineEdit_TriggerLevel->text().toFloat();
+    double triggerlevel = psetting.Trigger_Level*1.1/pow(2,13);
+    ui->label_trigger_level->setText(QString::number(triggerlevel)+QString("V"));
 }
 
 void paraDialog::set_nRangeBin()
 {
-    psetting.nRangeBin = ui->lineEdit_nRangeBin->text().toInt();
+
+    QRegExp regExp("^([1-9][0-9]|[1,2][0-9][0-9]|300)$");
+    ui->lineEdit_nRangeBin->setValidator(new QRegExpValidator(regExp, this));
+    psetting.nRangeBin = ui->lineEdit_nRangeBin->text().toDouble();
 }
 
 void paraDialog::set_nPointsPerBin()
 {
-    psetting.nPointsPerBin = ui->lineEdit_nPointsPerBin->text().toInt();
+    QRegExp regExp("^([2-4][0-9][0-9]|500)$");
+    ui->lineEdit_nPointsPerBin->setValidator(new QRegExpValidator(regExp, this));
+    psetting.nPointsPerBin = ui->lineEdit_nPointsPerBin->text().toDouble();
 }
 
 void paraDialog::set_plsAccNum()
 {
+    QRegExp regExp("^(20000|[1-9][0-9][0-9][0-9]|[1][0-9][0-9][0-9][0-9])$");
+    ui->lineEdit_plsAccNum->setValidator(new QRegExpValidator(regExp, this));
     psetting.plsAccNum = ui->lineEdit_plsAccNum->text().toInt();
 }
 
 void paraDialog::set_velocity_band()
 {
-    psetting.velocity_band = ui->lineEdit_velocity_band_2 ->text().toDouble();
+    QRegExp regExp("^[0-9]+(.[0-9]{1,3})?$");
+    ui->lineEdit_velocity_band->setValidator(new QRegExpValidator(regExp, this));
+    psetting.velocity_band = ui->lineEdit_velocity_band ->text().toDouble();
+    psetting.objFreqPoints = psetting.velocity_band/(psetting.laserWaveLength*psetting.sampleFreq/nFFT);
+}
+
+void paraDialog::set_nDir_VectorCal()
+{
+    QRegExp regExp("^[0-9]*/d{3}$");
+    ui->lineEdit_nDir_VectorCal->setValidator(new QRegExpValidator(regExp, this));
+    psetting.nDir_VectorCal = ui->lineEdit_nDir_VectorCal->text().toInt();
 }
 
 //Â·¾¶ÏÔÊ¾ÉèÖÃ
@@ -367,19 +430,6 @@ void paraDialog::on_pushButton_pathModify_clicked()
 }
 
 
-//¼ì²é¸üĞÂÎÄ¼ş±àºÅÎ»Êı
-//void paraDialog::check_update_SN()
-//{
-//    int suffix_Num = psetting.dataFileName_Suffix.toInt();				//ºó×ºĞòºÅ
-//    int lenNum = suffix_Num + psetting.angleNum - 1;					//²É¼¯ËùĞè×î´óºó×ºĞòºÅ
-//    lenStr = QString::number(lenNum);									//×î´óĞòºÅStringĞÍ
-//    if(psetting.dataFileName_Suffix.length() < lenStr.length())
-//    {
-//        psetting.dataFileName_Suffix.sprintf("%08d",suffix_Num);
-//        psetting.dataFileName_Suffix = psetting.dataFileName_Suffix.right(lenStr.length());
-//    }
-//}
-
 ACQSETTING paraDialog::get_settings()
 {
     return psetting;
@@ -423,22 +473,9 @@ void paraDialog::on_pushButton_reset_clicked()
 
 void paraDialog::on_pushButton_sure_clicked()
 {
-    //    if(psetting.dataFileName_Suffix.length() < lenStr.length())
-    //    {
-    //        QMessageBox::information(this,QString::fromLocal8Bit("ÌáÊ¾"),
-    //                                 QString::fromLocal8Bit("ÇëÖØĞÂÉèÖÃĞòºÅ£¬×îĞ¡³¤¶ÈÎª") + QString::number(lenStr.length()));
-    //        return;
-    //    }
 
-//    QString Disk_Name = psetting.DatafilePath.left(3);								//Â·¾¶¶ÔÓ¦Ó²ÅÌ·ÖÇøÃû
-//    quint64 freeSpace = getDiskFreeSpace(Disk_Name);								//»ñÈ¡Â·¾¶¶ÔÓ¦Ó²ÅÌ·ÖÇøµÄ¿Õ¼ä´óĞ¡MB
-//    float totalfile_Space = ui->lineEdit_totalsize->text().toFloat();
-//    if(freeSpace > totalfile_Space+100)
     accept();
-//    else
-//        QMessageBox::warning(this,QString::fromLocal8Bit("ÌáÊ¾"),
-//                             Disk_Name.left(1)+QString::fromLocal8Bit("The remaining space of the disk")
-//                             + QString::number(freeSpace) + QString::fromLocal8Bit("MB"));
+
 }
 
 quint64 paraDialog::getDiskFreeSpace(QString driver)
@@ -487,3 +524,75 @@ void paraDialog::on_comboBox_DetetectMode_currentIndexChanged(int index)
         break;
     }
 }
+
+//void paraDialog::show_detect_mode()
+//{
+
+//    if(psetting.isPulseMode) {
+//        if(psetting.step_azAngle == 0) {
+//            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Âö³å¶¨ÏòÌ½²â"));
+//        }
+//        else {
+//            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Âö³åÉ¨ÃèÌ½²â"));
+//        }
+//    }
+//    else {
+//        if(psetting.step_azAngle == 0) {
+//            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Á¬Ğø¶¨ÏòÌ½²â"));
+//        }
+//        else {
+//            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Á¬ĞøÉ¨ÃèÌ½²â"));
+//        }
+//    }
+
+//}
+
+void paraDialog::show_deteRange()
+{
+    deteRange = Factor*psetting.nRangeBin*psetting.nPointsPerBin/psetting.sampleFreq;
+    ui->lineEdit_detRange->setText(QString::number(deteRange));
+}
+
+void paraDialog::show_RangeReso()
+{
+    RangeReso = Factor*psetting.nPointsPerBin/psetting.sampleFreq;
+//    RangeReso = Factor*psetting.laserPulseWidth/1000;
+    ui->lineEdit_RangeReso->setText(QString::number(RangeReso));
+}
+
+void paraDialog::show_filesize()
+{
+    velodatafilesize = psetting.nRangeBin*3;
+    specdatafilesize = psetting.nRangeBin*512;
+    filesize = SIZE_OF_FILE_HEADER*2 + velodatafilesize + specdatafilesize;
+    ui->lineEdit_sglfilesize->setText(QString::number(filesize));
+
+}
+
+
+void paraDialog::on_comboBox_lasermode_currentIndexChanged(int index)
+{
+    psetting.isPulseMode = index;
+    switch(index) {
+    case 0:
+        if(psetting.step_azAngle == 0) {
+            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Âö³å¶¨ÏòÌ½²â"));
+        }
+        else {
+            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Âö³åÉ¨ÃèÌ½²â"));
+        }
+        break;
+    case 1:
+        if(psetting.step_azAngle == 0) {
+            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Á¬Ğø¶¨ÏòÌ½²â"));
+        }
+        else {
+            ui->lineEdit_detectDir->setText(QString::fromLocal8Bit("Á¬ĞøÉ¨ÃèÌ½²â"));
+        }
+        break;
+    default:
+        break;
+
+    }
+}
+
