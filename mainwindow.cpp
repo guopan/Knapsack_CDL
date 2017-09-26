@@ -383,19 +383,9 @@ void MainWindow::On_ControlTimer_TimeOut()
         if(mysetting.step_azAngle != 0)
             Motor.moveRelative(mysetting.step_azAngle);         //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
         readyToCollect = false;
-        //        adq.ConvertData2Spec();//转换功率谱
-
-        qDebug() << "LOS Velocity start cal!";
-        //        qDebug() << mysetting.nRangeBin+2;
-        //        qDebug() << nFFT_half;
-        //        qDebug() << mysetting.laserWaveLength;
-        //        qDebug() << freqAxis;
-        //        qDebug() << mysetting.nRangeBin+2;
-
         LOSVelocityCal(mysetting.nRangeBin+2, nFFT_half,
                        20, mysetting.laserWaveLength,
                        freqAxis, adq.get_PSD_double());     //径向风速计算
-        qDebug() << "LOS Velocity caled!";
         //****矢量风速合成
         //****更新显示
         for(int i = 0;i<mysetting.nRangeBin;i++)
