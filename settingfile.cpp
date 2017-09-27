@@ -266,6 +266,7 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
 
 void SettingFile::setUserIniFilePath(QString userIniFilePath)
 {
+    this->userIniFilePath = userIniFilePath;
     QSettings settings(defaultIniFilePath, QSettings::IniFormat);
     settings.beginGroup("Ini_File_Path");
     settings.setValue("userIniFilePath",userIniFilePath);              //设置文件路径

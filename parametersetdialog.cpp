@@ -617,11 +617,12 @@ void ParameterSetDialog::on_saveSettingsPushButton_clicked()
         userSettingFilePath = QFileDialog::getSaveFileName(this,
                                                            QString::fromLocal8Bit("另存为设置文件"),
                                                            paraSettings.dataFilePath, tr("*.ini"));
-//        qDebug() << userIniFilePath;
+
         if (!userSettingFilePath.isEmpty()) {
             if (!userSettingFilePath.endsWith(".ini", Qt::CaseInsensitive)) {
                 userSettingFilePath.append(".ini");
             }
+            qDebug() << userSettingFilePath;
             paraSettingFile->setUserIniFilePath(userSettingFilePath);
             paraSettingFile->writeSettings(paraSettings);
         }
