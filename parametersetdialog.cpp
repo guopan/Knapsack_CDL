@@ -659,3 +659,28 @@ void ParameterSetDialog::on_loadSettingsPushButton_clicked()
     }
     refreshDisp();
 }
+
+void ParameterSetDialog::on_confirmSetPushButton_clicked()
+{
+    accept();
+}
+
+void ParameterSetDialog::on_cancelSetPushButton_clicked()
+{
+    reject();
+}
+
+void ParameterSetDialog::on_resetSettingsPushButton_clicked()
+{
+    QMessageBox::StandardButton rb;
+    rb = QMessageBox::question(this, QString::fromLocal8Bit("重置为默认设置？"),
+                               QString::fromLocal8Bit("此操作将会重置所有设置信息为默认设置，请三思！！"),
+                               QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+    if (rb == QMessageBox::Yes) {
+        qDebug() << "reset default";
+        paraSettingFile->setUserIniFilePath(paraSettingFile->getDefaultIniFilePath());
+        paraSettings = paraSettingFile->readSettings();
+        refreshDisp();
+        DispSettings disp(paraSettings);
+    }
+}

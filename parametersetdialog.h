@@ -98,6 +98,12 @@ private slots:
 
     void on_loadSettingsPushButton_clicked();
 
+    void on_confirmSetPushButton_clicked();
+
+    void on_cancelSetPushButton_clicked();
+
+    void on_resetSettingsPushButton_clicked();
+
 private:
     Ui::ParameterSetDialog *ui;
     void refreshDisp();
