@@ -8,7 +8,7 @@
 #include "adq214.h"
 #include "global_defines.h"
 #include "settingfile.h"
-#include <paradialog.h>
+#include <parametersetdialog.h>
 
 #include <QDebug>
 #include "display/wind_display.h"
@@ -137,9 +137,8 @@ private:
     bool readyToCollect;        //----指示电机是否已经停止并达到指定位置
 
     //参数配置
-    paraDialog *ParaSetDlg;         // 参数设置对话框
-    ACQSETTING mysetting;
-    settingfile m_setfile;
+    SOFTWARESETTINGS mysetting;
+    SettingFile *m_setfile;
 
     //数据记录
     QDateTime CaptureTime;          // 当前方向的采集时间

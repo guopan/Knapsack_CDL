@@ -27,7 +27,7 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     psd_array = nullptr;
 }
 
-void ADQ214::Transfer_Settings(const ACQSETTING &settings)
+void ADQ214::Transfer_Settings(const SOFTWARESETTINGS &settings)
 {
     mainSettings = settings;
 }
@@ -114,8 +114,8 @@ bool ADQ214::Config_ADQ214()                   // 配置采集卡
 
         // quint16 CMD = 0;
         // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,CMD);                      //命令
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.Trigger_Level);  //触发电平
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.plsAccNum);      //累加脉冲数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.triggerLevel);  //触发电平
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.nPulsesAcc);      //累加脉冲数
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  //距离门点数，需要为偶数
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+3);      //距离门数
         // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,write_data5);              //目标频带下限，保留

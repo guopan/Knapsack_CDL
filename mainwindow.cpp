@@ -17,12 +17,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QDir dirs;
-    QString path = dirs.currentPath()+"/"+"214settings.ini";			// 获取初始默认路径，并添加默认配置文件
-    qDebug() << "initial path = " << path;
-    m_setfile.test_create_file(path);									// 检查settings.ini是否存在，若不存在则创建
-    m_setfile.readFrom_file(path);										// 读取settings.ini文件
-    mysetting = m_setfile.get_settings();								// mysetting获取文件中的参数
+    m_setfile = new SettingFile();
+    mysetting = m_setfile->readSettings();								// mysetting获取文件中的参数
 
     userToolBar = new UserToolBar();
     connect(userToolBar->quitAction, &QAction::triggered, this, &MainWindow::action_quit_triggered);
@@ -40,10 +36,6 @@ MainWindow::MainWindow(QWidget *parent) :
     toolBarControlTimer->setSingleShot(true);
     toolBarControlTimer->setInterval(10000);
     connect(toolBarControlTimer, SIGNAL(timeout()), this, SLOT(toolBarControlTimerOutFcn()));
-    //    mouseEventClassifyTimer = new QTimer(this);
-    //    mouseEventClassifyTimer->setSingleShot(true);
-    //    mouseEventClassifyTimer->setInterval(25);
-    //    connect(mouseEventClassifyTimer, SIGNAL(timeout()), this, SLOT(mouseEventClassifyTimerOutFcn()));
     doubleAltKeyPressedClassifyTimer = new QTimer(this);
     doubleAltKeyPressedClassifyTimer->setSingleShot(true);
     timeOclock = new QTimer(this);
@@ -103,24 +95,21 @@ MainWindow::~MainWindow()
     delete DisplaySpeed;
     delete userToolBar;
     delete adminToolBar;
+    delete m_setfile;
     toolBarControlTimer->stop();
     toolBarControlTimer->deleteLater();
 }
 
 void MainWindow::action_set_triggered()
 {
-    qDebug() << " open setting ";
-    ParaSetDlg = new paraDialog(this);
-    ParaSetDlg->init_setting(mysetting,stopped);					// mysetting传递给设置窗口psetting
-    ParaSetDlg->initial_para();										// 参数显示在设置窗口上，并连接槽
-    ParaSetDlg->on_checkBox_autoCreate_DateDir_clicked();			// 更新文件存储路径
-    if (ParaSetDlg->exec() == QDialog::Accepted)					// 确定键功能
-    {
-        mysetting =	ParaSetDlg->get_settings();						// mysetting获取修改后的参数
+    ParameterSetDialog *parameterSetDialog = new ParameterSetDialog(this);
+    parameterSetDialog->setParaSettings(mysetting);
+    if (parameterSetDialog->exec() == QDialog::Accepted) {
+        mysetting =  parameterSetDialog->getParaSettings();
         DisplaySpeed->set_nLayers(mysetting.nRangeBin);
         UpdateHeightsValue();
     }
-    delete ParaSetDlg;
+    delete parameterSetDialog;
 }
 
 void MainWindow::on_startButton_clicked()
@@ -150,7 +139,7 @@ void MainWindow::checkMotorAngle(const double &s)
             LaserSeed.checkLaser();
             checkReady = false;
             motorPX0 = s;
-            if(motorPX0>360-mysetting.step_azAngle)
+            if(motorPX0>360-mysetting.azAngleStep)
                 motorPX0 = motorPX0-360;
         }
         else
@@ -161,7 +150,7 @@ void MainWindow::checkMotorAngle(const double &s)
     }
     else
     {
-        if((s-motorPX0-mysetting.step_azAngle)<=0.5&&(s-motorPX0-mysetting.step_azAngle)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
+        if((s-motorPX0-mysetting.azAngleStep)<=0.5&&(s-motorPX0-mysetting.azAngleStep)>=-0.5)   //判断是否到达指定位置,误差暂设0.5°
         {
             //adq.Start_Capture();
             readyToCollect=true;
@@ -169,12 +158,12 @@ void MainWindow::checkMotorAngle(const double &s)
             LaserSeed.checkLaser();
             checkReady = false;
             motorPX0 = s;
-            if(motorPX0>360-mysetting.step_azAngle)
+            if(motorPX0>360-mysetting.azAngleStep)
                 motorPX0 = motorPX0-360;
         }
         else
         {
-            Motor.moveRelative(motorPX0+mysetting.step_azAngle-s);
+            Motor.moveRelative(motorPX0+mysetting.azAngleStep-s);
         }
 
     }
@@ -326,7 +315,7 @@ void MainWindow::action_start_Triggered()
         //****判断电机是否在转动，之前的探测是否已经停止，没停止就等，之前的探测没结束（如何能知道？）就等。
 
 
-        if (mysetting.step_azAngle != 0)
+        if (mysetting.azAngleStep != 0)
         {
 
             moveNorth=true;
@@ -362,7 +351,7 @@ void MainWindow::On_ControlTimer_TimeOut()
     //    qDebug() << State;
     switch (State) {
     case waitMotor:    //****查询电机状态，没到位，则直接返回，等下次进入定时器
-        if (mysetting.step_azAngle != 0)
+        if (mysetting.azAngleStep != 0)
         {
             if(readyToCollect)
             {
@@ -380,8 +369,8 @@ void MainWindow::On_ControlTimer_TimeOut()
         adq.Start_Capture();                                //采集
         qDebug() << "aaaaaaaaaaaaaaaaaaaaaaaaaaaa!!!!!!!!!!!!!!";
         CaptureTime = QDateTime::currentDateTimeUtc();      //记录当前时间，将来写入文件
-        if(mysetting.step_azAngle != 0)
-            Motor.moveRelative(mysetting.step_azAngle);         //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
+        if(mysetting.azAngleStep != 0)
+            Motor.moveRelative(mysetting.azAngleStep);         //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
         readyToCollect = false;
         LOSVelocityCal(mysetting.nRangeBin+2, nFFT_half,
                        20, mysetting.laserWaveLength,
@@ -403,15 +392,15 @@ void MainWindow::On_ControlTimer_TimeOut()
         capture_counter++;
         //****判断是否应该结束，更新结束标志stop_now
         switch (mysetting.detectMode) {
-        case 0:                 //持续探测
+        case 1:                 //持续探测
             //判断是否应该关闭文件，建立新文件
-            if(capture_counter == mysetting.nMaxDir_inFile)
+            if(capture_counter == mysetting.nDirsPerFile)
             {
                 SaveSpec_FileHead();        //建立新文件，写入文件头
             }
             State = waitMotor;
             break;
-        case 1:                 //单组探测
+        case 0:                 //单组探测
             //判断探测方向数
             if(capture_counter == mysetting.angleNum)
                 State = Quit;
@@ -421,7 +410,7 @@ void MainWindow::On_ControlTimer_TimeOut()
         case 2:                 //定时探测
             // 判断否达到待机条件
             dt = currentTime.msecsTo(Start_Time);
-            if(dt > qint64(mysetting.GroupTime*60*1000))  // *60s? *1000ms?// 如果达到待机时间
+            if(dt > qint64(mysetting.groupTime*60*1000))  // *60s? *1000ms?// 如果达到待机时间
             {
                 State = Standby;
             }
@@ -441,10 +430,10 @@ void MainWindow::On_ControlTimer_TimeOut()
     case Standby:       //也许之前需要一个停止状态
         currentTime = QDateTime::currentDateTimeUtc();
         dt = currentTime.msecsTo(Start_Time);
-        if(dt > qint64(mysetting.IntervalTime*60*1000))  // *60s? *1000ms?      //如果达到启动时间
+        if(dt > qint64(mysetting.intervalTime*60*1000))  // *60s? *1000ms?      //如果达到启动时间
         {
-            Start_Time = Start_Time.addMSecs(mysetting.IntervalTime*60*1000);   //更新开始时间，为了下次计时
-            if (mysetting.step_azAngle != 0)
+            Start_Time = Start_Time.addMSecs(mysetting.intervalTime*60*1000);   //更新开始时间，为了下次计时
+            if (mysetting.azAngleStep != 0)
             {
                 moveNorth = true;
                 Motor.position();
@@ -549,8 +538,8 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::Create_DataFolder()
 {
     QDir mypath;
-    if(!mypath.exists(mysetting.DatafilePath))		//如果文件夹不存在，创建文件夹
-        mypath.mkpath(mysetting.DatafilePath);
+    if(!mypath.exists(mysetting.dataFilePath))		//如果文件夹不存在，创建文件夹
+        mypath.mkpath(mysetting.dataFilePath);
 }
 
 
@@ -620,7 +609,7 @@ void MainWindow::SaveSpec_FileHead()
 {
     Create_DataFolder();
     SpecFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hh_mm_ss");
-    SpecFileName = mysetting.DatafilePath+"/"+"KnapsackCDL("+").spec";
+    SpecFileName = mysetting.dataFilePath+"/"+"KnapsackCDL("+").spec";
     //    SpecFileName = mysetting.DatafilePath+"/"+"KnapsackCDL("+ SpecFileName +").spec";
     qDebug()<<"SpecFileName = "<<SpecFileName;
     QFile outputSpec(SpecFileName);
@@ -640,7 +629,7 @@ void MainWindow::SaveSpec_FileHead()
 
         //激光参数
         specFile << "LaserMode:        ";
-        if(mysetting.isPulseMode)
+        if(1)
         {
             specFile << "Pulse" << endl;		//脉冲探测（true）or连续探测（false） bool
             specFile << "laserPulseEnergy: " << QString::number(mysetting.laserPulseEnergy) << endl;	//激光能量，单位μJ，连续模式下为0
@@ -648,20 +637,20 @@ void MainWindow::SaveSpec_FileHead()
         else
         {
             specFile << "Continuous" << endl;	//脉冲探测（true）or连续探测（false） bool
-            specFile << "laserPower:       " << QString::number(mysetting.laserPower) << endl;		//激光功率，单位mW，脉冲模式下为0
+            specFile << "laserPower:       " << QString::number(mysetting.laserLocalPower) << endl;		//激光功率，单位mW，脉冲模式下为0
         }
         specFile << "laserRPF:         " << QString::number(mysetting.laserRPF) << endl;			//激光频率
         specFile << "laserPulseWidth:  " << QString::number(mysetting.laserPulseWidth) << endl;	//脉冲宽度
         specFile << "laserWaveLength:  " << QString::number(mysetting.laserWaveLength) << endl;	//激光波长
-        specFile << "AOM_Freq:         " << QString::number(mysetting.AOM_Freq) << endl;			//AOM移频量
+        specFile << "AOM_Freq:         " << QString::number(mysetting.laserAOMFreq) << endl;			//AOM移频量
 
         //扫描参数
         specFile << "detectMode:       " ;      //探测方式：0持续探测1单组探测2定时探测
         switch (mysetting.detectMode) {
-        case 0:                 //持续探测
+        case 1:                 //持续探测
             specFile << "NonStop" << endl;
             break;
-        case 1:                 //单组探测
+        case 0:                 //单组探测
             specFile << "SingleGroup" << endl;
             break;
         case 2:                 //定时探测
@@ -670,19 +659,19 @@ void MainWindow::SaveSpec_FileHead()
         }
 
         specFile << "elevationAngle:   " << QString::number(mysetting.elevationAngle) << endl;	//俯仰角
-        specFile << "start_azAngle:    " << QString::number(mysetting.start_azAngle) << endl;	//起始角
-        specFile << "step_azAngle:     " << QString::number(mysetting.step_azAngle) << endl;	//步进角
+        specFile << "start_azAngle:    " << QString::number(mysetting.azAngleStart) << endl;	//起始角
+        specFile << "step_azAngle:     " << QString::number(mysetting.azAngleStep) << endl;	//步进角
         specFile << "angleNum:         " << QString::number(mysetting.angleNum) << endl;		//方向数
-        specFile << "IntervalTime:     " << QString::number(mysetting.IntervalTime) << endl;	//定时探测间隔，单位：分钟
-        specFile << "GroupTime:        " << QString::number(mysetting.GroupTime) << endl;		//定时探测单组时间，单位：分钟
+        specFile << "IntervalTime:     " << QString::number(mysetting.intervalTime) << endl;	//定时探测间隔，单位：分钟
+        specFile << "GroupTime:        " << QString::number(mysetting.groupTime) << endl;		//定时探测单组时间，单位：分钟
 
         //采样参数
         specFile << "sampleFreq:       " << QString::number(mysetting.sampleFreq) << endl;		//采样频率
-        specFile << "Trigger_Level:    " << QString::number(mysetting.Trigger_Level) << endl;    //触发电平
-        specFile << "PreTrigger:       " << QString::number(mysetting.PreTrigger) << endl;       //预触发点数，保留，暂不提供设置
+        specFile << "Trigger_Level:    " << QString::number(mysetting.triggerLevel) << endl;    //触发电平
+        specFile << "PreTrigger:       " << QString::number(mysetting.nPointsPreTrigger) << endl;       //预触发点数，保留，暂不提供设置
 
         //实时处理参数
-        specFile << "plsAccNum:        " << QString::number(mysetting.plsAccNum) << endl;        //单方向累加脉冲数
+        specFile << "plsAccNum:        " << QString::number(mysetting.nPulsesAcc) << endl;        //单方向累加脉冲数
         specFile << "nRangeBin:        " << QString::number(mysetting.nRangeBin) << endl;        //距离门数
         specFile << "nPointsPerBin:    " << QString::number(mysetting.nPointsPerBin) << endl;    //距离门内点数
 

@@ -37,14 +37,15 @@ SOURCES += \
     usertoolbar.cpp \
     admintoolbar.cpp \
     display\rt_scale.cpp \
-    paradialog.cpp \
     settingfile.cpp \
     laserseed.cpp \
     laserpulse.cpp \
     laserseedthread.cpp \
     laserpulsethread.cpp \
     dswf.cpp \
-    losvelocity.cpp
+    losvelocity.cpp \
+    parametersetdialog.cpp \
+    dispsettings.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -60,18 +61,19 @@ HEADERS += \
     usertoolbar.h \
     admintoolbar.h \
     display\rt_scale.h \
-    paradialog.h \
     settingfile.h \
     laserseed.h \
     laserpulse.h \
     laserseedthread.h \
     laserpulsethread.h \
     dswf.h \
-    losvelocity.h
+    losvelocity.h \
+    parametersetdialog.h \
+    dispsettings.h
 
 FORMS += \
         mainwindow.ui \
-    paradialog.ui
+    parametersetdialog.ui
 win32: LIBS += -L$$quote(C:/Program Files/SP Devices/ADQAPI/) -lADQAPI
 INCLUDEPATH += \
     $$quote(C:/Program Files/SP Devices/ADQAPI/)\

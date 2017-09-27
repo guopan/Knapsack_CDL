@@ -20,7 +20,7 @@ public:
     bool CaptureData2Buffer();      // 采集数据到缓存
     void WriteSpecData2disk();      // 写入采集数据到文件
     void ConvertData2Spec();        // 转换采集数据到功率谱
-    void Transfer_Settings(const ACQSETTING &settings);     //传递进来全局设置
+    void Transfer_Settings(const SOFTWARESETTINGS &settings);     //传递进来全局设置
     void Init_Buffers();
     PSD_DATA *get_PSD_Union();
     double *get_PSD_double();
@@ -32,7 +32,7 @@ private:
     bool isADQ214Connected;
     void *adq_cu;
     setupADQ setupadq;
-    ACQSETTING mainSettings;
+    SOFTWARESETTINGS mainSettings;
     bool success;
     PSD_DATA *psd_res;  // 存储 quint64 格式的功率谱
     double *psd_array;  // 存储 double  格式的功率谱

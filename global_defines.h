@@ -21,51 +21,48 @@ typedef struct
 
 typedef struct
 {
-    //激光参数
-    bool   isPulseMode;         //脉冲探测（true）or连续探测（false）
-    double laserPulseEnergy;    //激光能量，单位μJ，连续模式下为0
-    double laserPower;          //激光功率，单位mW，脉冲模式下为0
-    double laserRPF;			//激光频率，脉冲模式下为0
-    double laserPulseWidth;     //脉冲宽度，单位ns，脉冲模式下为0
+    //Laser Parameters
+    double laserPulseEnergy;    //激光能量，单位μJ
+    double laserLocalPower;     //激光功率，单位mW
+    double laserRPF;            //激光频率
+    double laserPulseWidth;     //脉冲宽度，单位ns
     double laserWaveLength;     //激光波长，单位μm
-    double AOM_Freq;			//AOM移频量，单位MHz
+    double laserAOMFreq;        //AOM移频量，单位MHz
 
-    //扫描参数
-    int     detectMode;			//探测方式：0持续探测1单组探测2定时探测
-    double  elevationAngle;		//俯仰角，单位°
-    double  start_azAngle;		//起始角，单位°
-    double  step_azAngle;		//步进角，单位°
-    double  angleNum;			//方向数
-    double  circleNum;			//圆周数
-    bool    anglekey;			//方向键
-    bool    circlekey;			//圆周键
-    quint16 SP;					//驱动器速度
-    double  IntervalTime;		//定时探测间隔，单位：分钟
-    double  GroupTime;			//定时探测单组时间，单位：分钟
+    //Scan Parameters
+    uint    detectMode;         //探测方式：0单组探测1持续探测2定时探测
+    double  elevationAngle;     //俯仰角，单位°
+    double  azAngleStart;       //起始角，单位°
+    double  azAngleStep;        //步进角，单位°
+    uint    angleNum;           //方向数
+    double  circleNum;          //圆周数
+    bool    isAngleChecked;     //方向键
+    bool    isCircleChecked;    //圆周键
+    double  motorSpeed;         //驱动器速度
+    double  intervalTime;       //定时探测间隔，单位：分钟
+    double  groupTime;          //定时探测单组时间，单位：分钟
 
-    //采样参数
-    double sampleFreq;			//采样频率，单位MHz
-    double detRange;            //采样距离，删除
-    double sampleNum;			//采样点数，删除
-    double Trigger_Level;       //触发电平
-    int    PreTrigger;          //预触发点数，保留，暂不提供设置
+    //Sample Parameters
+    double  sampleFreq;         //采样频率，单位MHz
+    uint    triggerLevel;       //触发电平
+    uint    nPointsPreTrigger;  //预触发点数，保留，暂不提供设置
 
-    //实时处理参数
-    quint16 plsAccNum;			//单方向累加脉冲数
-    quint16 nRangeBin;          //距离门数
-    quint16 nPointsPerBin;      //距离门内点数
+    //Real Time Process
+    uint    nPulsesAcc;         //单方向累加脉冲数
+    uint    nRangeBin;          //距离门数
+    uint    nPointsPerBin;      //距离门内点数
+    uint    nPointsMirrorWidth; //镜面宽度点数
+    double  overlapRatio;       //距离门重叠率，0:0 1:0.5
 
-    //反演参数
-    double velocity_band;       //径向风速范围,±m/s
-    int objFreqPoints;          //径向风速点数范围=Velo/velorseo
-    int nDir_VectorCal;         //计算矢量风速所需的径向风速数量
+    //Vector Velocity Inversion
+    uint    nPointsObjFreq;     //径向风速范围，存储为点数，显示为速度
+    uint    nDirsVectorCal;     //计算矢量风速所需的径向风速数量
 
-    //文件存储
-    QString DatafilePath;		//数据存储路径
-    bool 	autoCreate_DateDir;	//自动创建日期文件夹
-    quint32 nMaxDir_inFile;     //持续模式下，单文件内的方向数
-
-}ACQSETTING;
+    //File Store
+    QString dataFilePath;       //数据存储路径
+    bool    autoCreateDateDir;  //自动创建日期文件夹
+    uint    nDirsPerFile;       //持续模式下，单文件内的方向数
+}SOFTWARESETTINGS;
 
 union PSD_DATA
 {
@@ -109,11 +106,12 @@ static const unsigned short BitReverseIndex[] =
     488,232,360,104,424,168,296,40,456,200,328,72,392,136,264,8 ,
     496,240,368,112,432,176,304,48,464,208,336,80,400,144,272,16,
     480,224,352,96,416,160,288,32,448,192,320,64,384,128,256,0
-    };
+};
 
 const int Max_nLayers = 20;         //最大高度层数 = 20
 const int nFFT = 1024;              //FFT点数数 = 1024
 const int nFFT_half = nFFT/2;       //FFT点数数的一半 = 512
 const int CheckPeriod = 40;         //采集过程中，状态转换定时器的查询间隔（ms）
+const double lightSpeed = 300000000;
 enum Control_State{ waitMotor, Capture, Quit, Standby};     //探测过程控制状态值
 #endif // GLOBAL_DEFINES_H
