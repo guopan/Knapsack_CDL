@@ -113,15 +113,25 @@ bool ADQ214::Config_ADQ214()                   // 配置采集卡
         // 配置ADQ214的内部寄存器
 
         // quint16 CMD = 0;
-        // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,CMD);                      //命令
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.triggerLevel);  //触发电平
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.nPulsesAcc);      //累加脉冲数
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  //距离门点数，需要为偶数
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+3);      //距离门数
-        // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,write_data5);              //目标频带下限，保留
-        // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x36,0,write_data6);              //目标频带上限，保留
-        uint Total_Points_Num = mainSettings.nPointsPerBin * (mainSettings.nRangeBin+3);            // 内部信号，处理总点数
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x37,0,Total_Points_Num);            //单脉冲处理总点数
+        // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,CMD);                      // 命令
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.triggerLevel);   // 触发电平
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.nPulsesAcc);     // 累加脉冲数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  // 距离门点数，需要为偶数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+3);    // 距离门数
+        if (mainSettings.overlapRatio == 0.5)
+        {
+            int Overlap_length = (mainSettings.nRangeBin -0.5)*mainSettings.nPointsPerBin;
+            success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,Overlap_length);          // OverLap计数器长度
+        }
+        else
+        {
+            success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,0);                       // OverLap计数器长度
+        }
+        int Mirror_Start = 500 + mainSettings.nPointsMirrorWidth - mainSettings.nPointsPerBin;
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x36,0,Mirror_Start);                // 镜面所在距离门起始位置点
+
+        int Total_Points_Num = mainSettings.nPointsPerBin * mainSettings.nRangeBin + 500 + mainSettings.nPointsMirrorWidth;     // 内部信号，处理总点数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x37,0,Total_Points_Num);            // 单脉冲处理总点数
     }
     return success;
 }
@@ -144,7 +154,7 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
     while (samples_to_collect > 0)
     {
         nloops ++;
-//        qDebug() << "Loops:" << nloops;
+        //        qDebug() << "Loops:" << nloops;
         if (setupadq.trig_mode == 1)        //If trigger mode is sofware
         {
             ADQ214_SWTrig(adq_cu, adq_num);
@@ -158,18 +168,18 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
         do
         {
             setupadq.collect_result = ADQ214_GetTransferBufferStatus(adq_cu, adq_num, &setupadq.buffers_filled);
-//            qDebug() << ("Filled: ") << setupadq.buffers_filled;
+            //            qDebug() << ("Filled: ") << setupadq.buffers_filled;
         } while ((setupadq.buffers_filled == 0) && (setupadq.collect_result));
 
         setupadq.collect_result = ADQ214_CollectDataNextPage(adq_cu, adq_num);
-//        qDebug() << "setupadq.collect_result = " << setupadq.collect_result;
+        //        qDebug() << "setupadq.collect_result = " << setupadq.collect_result;
 
         int samples_in_buffer = qMin(ADQ214_GetSamplesPerPage(adq_cu, adq_num), samples_to_collect);
-//        qDebug() << "samples_in_buffer = " << samples_in_buffer;
+        //        qDebug() << "samples_in_buffer = " << samples_in_buffer;
 
         if (ADQ214_GetStreamOverflow(adq_cu, adq_num))
         {
-//            qDebug() << ("Warning: Streaming Overflow!");
+            //            qDebug() << ("Warning: Streaming Overflow!");
             setupadq.collect_result = 0;
         }
 
@@ -196,22 +206,22 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
 void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
 {
     // Write to data to file after streaming to RAM, because ASCII output is too slow for realtime.
-//    qDebug() << "Writing streamed Spectrum data in RAM to disk" ;
+    //    qDebug() << "Writing streamed Spectrum data in RAM to disk" ;
     QFile Specfile("data_Spec.txt");
     if(Specfile.open(QFile::WriteOnly))
     {
-//        qDebug() << "File opens";
+        //        qDebug() << "File opens";
         QTextStream out(&Specfile);
-//        qDebug() << "mainSettings.nRangeBin+2 = " << mainSettings.nRangeBin+2;
+        //        qDebug() << "mainSettings.nRangeBin+2 = " << mainSettings.nRangeBin+2;
         for (int k=0; (k<(mainSettings.nRangeBin+2)*nFFT_half); k++)
         {
-//            qDebug() << "k = " << k;
+            //            qDebug() << "k = " << k;
             out <<psd_res[k].data64 << endl;
         }
         Specfile.close();
     }
 
-//    qDebug() << "Write finished";
+    //    qDebug() << "Write finished";
 }
 
 void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
