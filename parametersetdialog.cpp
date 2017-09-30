@@ -184,7 +184,7 @@ SOFTWARESETTINGS ParameterSetDialog::getParaSettings()
     return paraSettings;
 }
 
-void ParameterSetDialog::setParaSettings(SOFTWARESETTINGS settings)
+void ParameterSetDialog::setParaSettings(SOFTWARESETTINGS settings, bool isWorking)
 {
     paraSettings = settings;
     refreshDisp();

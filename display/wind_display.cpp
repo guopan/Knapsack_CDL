@@ -44,10 +44,6 @@ wind_display::~wind_display()
 
 void wind_display::setHSpeed(const double *sp)
 {
-    qDebug() << "nLayers = " << nLayers;
-    for(int i = 0;i<nLayers;i++)
-        qDebug() << sp[i];
-    // 求最大值，确定缩放比例
     int MaxHSpeed = 0;
     for(int i=0;i<nLayers;i++)
         if(MaxHSpeed < *(sp+i))

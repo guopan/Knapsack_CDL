@@ -22,7 +22,7 @@ void motorthread::transaction(const QString &portName, const QString &request)
     this->portName = portName;
     this->waitTimeout = 300;
     this->request = request;
-    qDebug()<<"request="<<request;
+//    qDebug()<<"request="<<request;
     if(!isRunning())
         start();
     else
@@ -71,7 +71,7 @@ void motorthread::run()
                 QByteArray responseData = serial.readAll();
                 while(serial.waitForReadyRead(80))
                     responseData += serial.readAll();
-                qDebug()<<"response="<<responseData;
+//                qDebug()<<"response="<<responseData;
                 QString response(responseData);
                 emit this->response2(response);
             }

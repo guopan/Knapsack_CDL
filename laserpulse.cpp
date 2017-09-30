@@ -7,7 +7,7 @@ laserPulse::laserPulse(QObject *parent) : QObject(parent)
     connect(&Laserpulsethread,SIGNAL(Pulse_PortNotOpen()),this,SLOT(portError()));
     connect(&Laserpulsethread,SIGNAL(timeoutPulse()),this,SLOT(timeout()));
 
-    laserPort="COM4";
+    laserPort="COM7";
     powerSet=true;
     fire=false;
     close=false;
@@ -53,7 +53,7 @@ void laserPulse::receive_response(const QString &temp)
         {
             powerSet=true;
             emit this->laserWorkRight();
-            qDebug()<<"脉冲激光器功率设置成功";
+            qDebug()<<QString::fromLocal8Bit("脉冲激光器功率设置成功");
         }
     }
     else
@@ -65,7 +65,7 @@ void laserPulse::receive_response(const QString &temp)
                 if(temp=="55aac101000000")
                 {
                     setPulsePower(1000); //打开正常
-                    qDebug()<<"脉冲激光器打开成功";
+                    qDebug()<<QString::fromLocal8Bit("脉冲激光器打开成功");
                 }
                 else
                 {
@@ -118,7 +118,7 @@ void laserPulse::receive_response(const QString &temp)
                 }
                 else
                 {
-                   qDebug()<<"脉冲激光器工作正常";
+                   qDebug()<<QString::fromLocal8Bit("脉冲激光器工作正常");
                 }
 
             }

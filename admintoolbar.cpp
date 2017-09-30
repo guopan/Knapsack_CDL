@@ -4,8 +4,8 @@ AdminToolBar::AdminToolBar()
 {
     setIconSize(QSize(48, 48));
 
-    adqParamSetAction = this->addAction(QString::fromLocal8Bit("采集卡"));
-    adqParamSetAction->setIcon(QIcon(":/images/Gear.png"));
+    setAction = this->addAction(QString::fromLocal8Bit("参数设置"));
+    setAction->setIcon(QIcon(":/images/Gear.png"));
 
     setMovable(false);
 }

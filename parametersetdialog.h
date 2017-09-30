@@ -21,7 +21,7 @@ public:
     explicit ParameterSetDialog(QWidget *parent = 0);
     ~ParameterSetDialog();
     SOFTWARESETTINGS getParaSettings();
-    void setParaSettings(SOFTWARESETTINGS settings);
+    void setParaSettings(SOFTWARESETTINGS settings, bool isWorking);
 
 private slots:
 

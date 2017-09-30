@@ -8,7 +8,7 @@ class AdminToolBar : public QToolBar
 {
 public:
     AdminToolBar();
-    QAction *adqParamSetAction;
+    QAction *setAction;
 };
 
 #endif // ADMINTOOLBAR_H

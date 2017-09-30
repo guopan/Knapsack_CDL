@@ -6,7 +6,7 @@ laserSeed::laserSeed(QObject *parent) : QObject(parent)
     connect(&Laserseedthread,SIGNAL(seed_PortNotOpen()),this,SLOT(portError()));
     connect(&Laserseedthread,SIGNAL(timeoutSeed()),this,SLOT(timeout()));
 
-    laserPort="COM3";
+    laserPort="COM8";
     powerSet=true;
     fire=false;
     close=false;
@@ -14,6 +14,7 @@ laserSeed::laserSeed(QObject *parent) : QObject(parent)
 
 void laserSeed::beginSeedLaser()
 {
+    qDebug() << "begin Seed laser";
     StringToHex("AA 55 C1 01 01 01 00",senddata);
     Laserseedthread.transaction(laserPort,senddata);
     fire=true;
@@ -58,7 +59,7 @@ void laserSeed::receive_response(const QString &temp)
                 emit this->seedOpenReady();
                 openPulse=false;
             }
-            qDebug()<<"种子源激光器功率设置成功";
+            qDebug()<<QString::fromLocal8Bit("种子源激光器功率设置成功");
         }
     }
     else
@@ -70,7 +71,7 @@ void laserSeed::receive_response(const QString &temp)
                 if(temp=="55aac101000000")
                 {
                     setSeedPower(1000); //打开正常
-                    qDebug()<<"种子源激光器打开正常";
+                    qDebug()<<QString::fromLocal8Bit("种子源激光器打开正常");
                 }
                 else
                 {
@@ -123,7 +124,7 @@ void laserSeed::receive_response(const QString &temp)
                 }
                 else
                 {
-                    qDebug()<<"种子源激光器工作正常";
+                    qDebug()<<QString::fromLocal8Bit("种子源激光器工作正常");
                 }
             }
         }

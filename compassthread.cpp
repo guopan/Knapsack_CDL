@@ -23,6 +23,7 @@ compassThread::~compassThread()
 
 void compassThread::transaction(const QString &portName, const QByteArray &request)
 {
+    qDebug() << "Compass port name: " << portName;
     QMutexLocker locker(&mutex);
     this->portName = portName;
     this->request = request;

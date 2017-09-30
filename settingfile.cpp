@@ -12,7 +12,7 @@ SettingFile::SettingFile()
 void SettingFile::writeSettings(const SOFTWARESETTINGS &setting)      //写入文件
 {
     fsetting = setting;
-    qDebug() << userIniFilePath;
+//    qDebug() << userIniFilePath;
     QSettings newSettings(userIniFilePath, QSettings::IniFormat);
     newSettings.beginGroup("Laser_Parameters");
     newSettings.setValue("laserPulseEnergy",fsetting.laserPulseEnergy);              //激光能量
@@ -65,7 +65,7 @@ void SettingFile::writeSettings(const SOFTWARESETTINGS &setting)      //写入文件
 
 SOFTWARESETTINGS SettingFile::readSettings()
 {
-    qDebug() << userIniFilePath;
+//    qDebug() << userIniFilePath;
     QSettings settings(userIniFilePath, QSettings::IniFormat);
     settings.beginGroup("Laser_Parameters");
     fsetting.laserPulseEnergy = settings.value("laserPulseEnergy",10.0).toDouble(); //激光能量

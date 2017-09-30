@@ -9,14 +9,12 @@ ADQ214::ADQ214(QObject *parent) : QObject(parent)
     success = true;
 
     int apirev = ADQAPI_GetRevision();     // 获取API版本
-    qDebug() << IS_VALID_DLL_REVISION(apirev);
     connectADQDevice();
 
     num_of_devices = 0;
     num_of_failed = 0;
     num_of_ADQ214 = 0;
 
-    //    setupadq.num_samples_collect = nFFT*2;  // 设置采样点数
     setupadq.stream_ch = ADQ214_STREAM_ENABLED_BOTH;
     setupadq.stream_ch &= 0x7;
     setupadq.num_buffers = 64;
@@ -52,13 +50,12 @@ void ADQ214::connectADQDevice()
     num_of_ADQ214 = ADQControlUnit_NofADQ214(adq_cu);				//返回找到ADQ214设备的数量
     if((num_of_failed > 0)||(num_of_devices == 0))
     {
-        qDebug()<<"采集卡未连接";
+        qDebug()<<QString::fromLocal8Bit("采集卡未连接");
         isADQ214Connected = false;
-        //        QMessageBox::critical(this, QString::("采集卡未连接！！"), QString::fromStdString("采集卡未连接"));
     }
     else if (num_of_ADQ214 != 0)
     {
-        qDebug()<<"采集卡已连接";
+        qDebug()<<QString::fromLocal8Bit("采集卡已连接");
         isADQ214Connected = true;
     }
 }
@@ -77,9 +74,8 @@ void ADQ214::Start_Capture()
         delete setupadq.data_stream_target;
         return;
     }
-    qDebug() << ("Collect finished!");
+    qDebug() << "Collect finished!";
     qDebug() << "Convert start";
-
     ConvertData2Spec();
     WriteSpecData2disk();
     delete setupadq.data_stream_target;
@@ -102,36 +98,19 @@ bool ADQ214::Config_ADQ214()                   // 配置采集卡
     }
     else
     {
-        success = ADQ214_SetDataFormat(adq_cu, adq_num,ADQ214_DATA_FORMAT_UNPACKED_16BIT);          // 设置数据格式，不知有没有用
-        // 设置TransferBuffer大小及数量
+        success = ADQ214_SetDataFormat(adq_cu, adq_num,ADQ214_DATA_FORMAT_UNPACKED_16BIT);
         int num_buffers = 256;
         int size_buffers = 1024;
         success = success && ADQ214_SetTransferBuffers(adq_cu, adq_num, num_buffers, size_buffers);
-        success = success && ADQ214_SetClockSource(adq_cu, adq_num, setupadq.clock_source);          // 设置时钟源
-        success = success && ADQ214_SetPllFreqDivider(adq_cu, adq_num, setupadq.pll_divider);        // 设置PLL分频数
+        success = success && ADQ214_SetClockSource(adq_cu, adq_num, setupadq.clock_source);
+        success = success && ADQ214_SetPllFreqDivider(adq_cu, adq_num, setupadq.pll_divider);
 
-        // 配置ADQ214的内部寄存器
-
-        // quint16 CMD = 0;
-        // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,CMD);                      // 命令
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.triggerLevel);   // 触发电平
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.nPulsesAcc);     // 累加脉冲数
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  // 距离门点数，需要为偶数
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+3);    // 距离门数
-        if (mainSettings.overlapRatio == 0.5)
-        {
-            int Overlap_length = (mainSettings.nRangeBin -0.5)*mainSettings.nPointsPerBin;
-            success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,Overlap_length);          // OverLap计数器长度
-        }
-        else
-        {
-            success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,0);                       // OverLap计数器长度
-        }
-        int Mirror_Start = 500 + mainSettings.nPointsMirrorWidth - mainSettings.nPointsPerBin;
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x36,0,Mirror_Start);                // 镜面所在距离门起始位置点
-
-        int Total_Points_Num = mainSettings.nPointsPerBin * mainSettings.nRangeBin + 500 + mainSettings.nPointsMirrorWidth;     // 内部信号，处理总点数
-        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x37,0,Total_Points_Num);            // 单脉冲处理总点数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.triggerLevel);  //触发电平
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.nPulsesAcc);      //累加脉冲数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  //距离门点数，需要为偶数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+3);      //距离门数
+        uint Total_Points_Num = mainSettings.nPointsPerBin * (mainSettings.nRangeBin+3);            // 内部信号，处理总点数
+        success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x37,0,Total_Points_Num);            //单脉冲处理总点数
     }
     return success;
 }
@@ -154,7 +133,7 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
     while (samples_to_collect > 0)
     {
         nloops ++;
-        //        qDebug() << "Loops:" << nloops;
+//        qDebug() << "Loops:" << nloops;
         if (setupadq.trig_mode == 1)        //If trigger mode is sofware
         {
             ADQ214_SWTrig(adq_cu, adq_num);
@@ -168,18 +147,18 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
         do
         {
             setupadq.collect_result = ADQ214_GetTransferBufferStatus(adq_cu, adq_num, &setupadq.buffers_filled);
-            //            qDebug() << ("Filled: ") << setupadq.buffers_filled;
+//            qDebug() << ("Filled: ") << setupadq.buffers_filled;
         } while ((setupadq.buffers_filled == 0) && (setupadq.collect_result));
 
         setupadq.collect_result = ADQ214_CollectDataNextPage(adq_cu, adq_num);
-        //        qDebug() << "setupadq.collect_result = " << setupadq.collect_result;
+//        qDebug() << "setupadq.collect_result = " << setupadq.collect_result;
 
         int samples_in_buffer = qMin(ADQ214_GetSamplesPerPage(adq_cu, adq_num), samples_to_collect);
-        //        qDebug() << "samples_in_buffer = " << samples_in_buffer;
+//        qDebug() << "samples_in_buffer = " << samples_in_buffer;
 
         if (ADQ214_GetStreamOverflow(adq_cu, adq_num))
         {
-            //            qDebug() << ("Warning: Streaming Overflow!");
+//            qDebug() << ("Warning: Streaming Overflow!");
             setupadq.collect_result = 0;
         }
 
@@ -206,22 +185,22 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
 void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
 {
     // Write to data to file after streaming to RAM, because ASCII output is too slow for realtime.
-    //    qDebug() << "Writing streamed Spectrum data in RAM to disk" ;
+//    qDebug() << "Writing streamed Spectrum data in RAM to disk" ;
     QFile Specfile("data_Spec.txt");
     if(Specfile.open(QFile::WriteOnly))
     {
-        //        qDebug() << "File opens";
+//        qDebug() << "File opens";
         QTextStream out(&Specfile);
-        //        qDebug() << "mainSettings.nRangeBin+2 = " << mainSettings.nRangeBin+2;
+//        qDebug() << "mainSettings.nRangeBin+2 = " << mainSettings.nRangeBin+2;
         for (int k=0; (k<(mainSettings.nRangeBin+2)*nFFT_half); k++)
         {
-            //            qDebug() << "k = " << k;
+//            qDebug() << "k = " << k;
             out <<psd_res[k].data64 << endl;
         }
         Specfile.close();
     }
 
-    //    qDebug() << "Write finished";
+//    qDebug() << "Write finished";
 }
 
 void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
@@ -257,13 +236,6 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 void ADQ214::Init_Buffers()           // 初始化功率谱数据存储缓冲区
 {
     int nPSD = (mainSettings.nRangeBin+2) * nFFT_half;  // PSD功率谱长度
-
-    if (psd_res != nullptr)
-        delete psd_res;
     psd_res = new PSD_DATA[nPSD];       //待优化，不用每次new
-
-    if (psd_array != nullptr)           //待优化，不用每次new
-        delete psd_array;
     psd_array = new double[nPSD];
-    qDebug() << "nPSD = " << nPSD;
 }

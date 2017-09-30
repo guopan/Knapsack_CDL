@@ -12,10 +12,9 @@ motor::motor(QObject *parent) : QObject(parent)
 
 void motor::prepare()
 {
-    portname = "COM8";
+    portname = "COM11";
     Order_str = "VR;";
     thread_port.transaction(portname,Order_str);   //获取版本后依次上电--设置加减速度--设置速度--发送上电完成信号
-
 }
 
 void motor::moveAbsolute(const double &a)
@@ -66,16 +65,16 @@ void motor::receive_response(const QString &s)
     {
         if(s.left(4) == "MO=1")
         {
-            Order_str = "AC=1800;";
+            Order_str = "AC=1310000;";
             thread_port.transaction(portname,Order_str);
-            qDebug()<<"电机打开";
+//            qDebug()<<"电机打开";
         }
         else
             qDebug()<<"电机关闭";
     }
     if(s.left(2) == "AC")
     {
-        Order_str = "DC=1800;";
+        Order_str = "DC=1310000;";
         thread_port.transaction(portname,Order_str);
     }
     if(s.left(2) == "DC")
@@ -88,7 +87,7 @@ void motor::receive_response(const QString &s)
         if(s.left(4)=="MS;0")
         {
             emit this->moveReady();
-            qDebug()<<"moveready";
+//            qDebug()<<"moveready";
         }
         else
         {
@@ -97,8 +96,8 @@ void motor::receive_response(const QString &s)
                 emit this->motorError();
                 qDebug()<<"电机启动异常";
             }
-            else
-            {qDebug()<<"moveon";}
+//            else
+//            {qDebug()<<"moveon";}
         }
     }
     if(s.left(2) == "PA")
@@ -117,7 +116,7 @@ void motor::receive_response(const QString &s)
     {
         QString a=s.split(";").at(1).toLocal8Bit().data();
         double angle=a.toInt()*360/524000;
-        qDebug()<<"PX"<<angle;
+//        qDebug()<<"PX"<<angle;
 
         if(angle<0)
         {

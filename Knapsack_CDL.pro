@@ -45,7 +45,8 @@ SOURCES += \
     dswf.cpp \
     losvelocity.cpp \
     parametersetdialog.cpp \
-    dispsettings.cpp
+    dispsettings.cpp \
+    devicescontrol.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -69,7 +70,8 @@ HEADERS += \
     dswf.h \
     losvelocity.h \
     parametersetdialog.h \
-    dispsettings.h
+    dispsettings.h \
+    devicescontrol.h
 
 FORMS += \
         mainwindow.ui \
