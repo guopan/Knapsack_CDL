@@ -40,21 +40,17 @@ double* ADQ214::get_PSD_double()
     return psd_array;
 }
 
-
-
 void ADQ214::connectADQDevice()
 {
     int num_of_devices,num_of_failed,num_of_ADQ214;
     num_of_devices = ADQControlUnit_FindDevices(adq_cu);			//找到所有与电脑连接的ADQ，并创建一个指针列表，返回找到设备的总数
     num_of_failed = ADQControlUnit_GetFailedDeviceCount(adq_cu);
     num_of_ADQ214 = ADQControlUnit_NofADQ214(adq_cu);				//返回找到ADQ214设备的数量
-    if((num_of_failed > 0)||(num_of_devices == 0))
-    {
+    if((num_of_failed > 0)||(num_of_devices == 0)) {
         qDebug()<<QString::fromLocal8Bit("采集卡未连接");
         isADQ214Connected = false;
     }
-    else if (num_of_ADQ214 != 0)
-    {
+    else if (num_of_ADQ214 != 0) {
         qDebug()<<QString::fromLocal8Bit("采集卡已连接");
         isADQ214Connected = true;
     }
@@ -68,20 +64,17 @@ void ADQ214::Start_Capture()
     setupadq.data_stream_target = new quint16[(mainSettings.nRangeBin + 2) * nFFT_half * 4];
     memset(setupadq.data_stream_target, 0, (mainSettings.nRangeBin + 2) * nFFT_half * 8);
 
-    if(!CaptureData2Buffer())
-    {
+    if(!CaptureData2Buffer()) {
         qDebug() << ("Collect failed!");
         delete setupadq.data_stream_target;
         return;
     }
     qDebug() << "Collect finished!";
-    qDebug() << "Convert start";
     ConvertData2Spec();
     WriteSpecData2disk();
     delete setupadq.data_stream_target;
 
-    if(success == 0)
-    {
+    if(success == 0) {
         qDebug() << "Error!";
         DeleteADQControlUnit(adq_cu);
     }
@@ -91,13 +84,11 @@ void ADQ214::Start_Capture()
 bool ADQ214::Config_ADQ214()                   // 配置采集卡
 {
     success = false;
-    if (!isADQ214Connected)
-    {
+    if (!isADQ214Connected) {
         QMessageBox::critical(NULL, QString::fromStdString("采集卡未连接！！"), QString::fromStdString("采集卡未连接"),
                               QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     }
-    else
-    {
+    else {
         success = ADQ214_SetDataFormat(adq_cu, adq_num,ADQ214_DATA_FORMAT_UNPACKED_16BIT);
         int num_buffers = 256;
         int size_buffers = 1024;
@@ -133,44 +124,31 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
     while (samples_to_collect > 0)
     {
         nloops ++;
-//        qDebug() << "Loops:" << nloops;
-        if (setupadq.trig_mode == 1)        //If trigger mode is sofware
-        {
+        if (setupadq.trig_mode == 1) {
             ADQ214_SWTrig(adq_cu, adq_num);
         }
-
-        //            ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,write_data0&0xFF7F);   // bit[7]置0
-        //            ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,write_data0|0x0080);   // bit[7]置1
         ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,0xFFFE);   // bit[0]置0
         ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,0x0001);   // bit[0]置1
 
-        do
-        {
+        do {
             setupadq.collect_result = ADQ214_GetTransferBufferStatus(adq_cu, adq_num, &setupadq.buffers_filled);
-//            qDebug() << ("Filled: ") << setupadq.buffers_filled;
         } while ((setupadq.buffers_filled == 0) && (setupadq.collect_result));
 
         setupadq.collect_result = ADQ214_CollectDataNextPage(adq_cu, adq_num);
-//        qDebug() << "setupadq.collect_result = " << setupadq.collect_result;
 
         int samples_in_buffer = qMin(ADQ214_GetSamplesPerPage(adq_cu, adq_num), samples_to_collect);
-//        qDebug() << "samples_in_buffer = " << samples_in_buffer;
 
-        if (ADQ214_GetStreamOverflow(adq_cu, adq_num))
-        {
-//            qDebug() << ("Warning: Streaming Overflow!");
+        if (ADQ214_GetStreamOverflow(adq_cu, adq_num)) {
             setupadq.collect_result = 0;
         }
 
-        if (setupadq.collect_result)
-        {
+        if (setupadq.collect_result) {
             memcpy((void*)&setupadq.data_stream_target[total_sample_points - samples_to_collect],
                     ADQ214_GetPtrStream(adq_cu, adq_num), samples_in_buffer* sizeof(quint16));
             samples_to_collect -= samples_in_buffer;
             qDebug() << "samples_to_collect = "<<samples_to_collect;
         }
-        else
-        {
+        else {
             qDebug() << ("Collect next data page failed!");
             samples_to_collect = 0;
         }
@@ -184,23 +162,14 @@ bool ADQ214::CaptureData2Buffer()         // 采集数据到缓存
 
 void ADQ214::WriteSpecData2disk()         // 将数据转换成功率谱，写入到文件
 {
-    // Write to data to file after streaming to RAM, because ASCII output is too slow for realtime.
-//    qDebug() << "Writing streamed Spectrum data in RAM to disk" ;
     QFile Specfile("data_Spec.txt");
-    if(Specfile.open(QFile::WriteOnly))
-    {
-//        qDebug() << "File opens";
+    if(Specfile.open(QFile::WriteOnly)) {
         QTextStream out(&Specfile);
-//        qDebug() << "mainSettings.nRangeBin+2 = " << mainSettings.nRangeBin+2;
-        for (int k=0; (k<(mainSettings.nRangeBin+2)*nFFT_half); k++)
-        {
-//            qDebug() << "k = " << k;
+        for (int k=0; (k<(mainSettings.nRangeBin+2)*nFFT_half); k++) {
             out <<psd_res[k].data64 << endl;
         }
         Specfile.close();
     }
-
-//    qDebug() << "Write finished";
 }
 
 void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
@@ -210,9 +179,7 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 
     int i = 0, k = 0, l = 0;
     for (l=0;l<(mainSettings.nRangeBin + 2);l++) {
-        qDebug() << "l = " << l;
-        for (k=0,i=0; (k<nFFT_half); k++,k++)
-        {
+        for (k=0,i=0; (k<nFFT_half); k++,k++) {
             psd_res[nFFT_half*l + nFFT_half-1 - k].pos[3] = setupadq.data_stream_target[nFFT*2*l + i];
             psd_res[nFFT_half*l + nFFT_half-1 - k].pos[2] = setupadq.data_stream_target[nFFT*2*l + i+1];
             psd_res[nFFT_half*l + nFFT_half-1 - k].pos[1] = setupadq.data_stream_target[nFFT*2*l + i+4];
@@ -226,8 +193,7 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
         }
     }
 
-    for (k=0; k<nPSD; k++)
-    {
+    for (k=0; k<nPSD; k++) {
         psd_array[k] = double(psd_res[k].data64);
     }
     qDebug() << "Covert finished!!!";

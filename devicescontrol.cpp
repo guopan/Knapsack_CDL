@@ -28,8 +28,8 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
 void DevicesControl::startAction(SOFTWARESETTINGS settings)
 {
     qDebug() << "start action";
-    Compass.read();
     this->mysetting = settings;
+    Compass.read();
 }
 
 void DevicesControl::stopAction()
@@ -466,10 +466,6 @@ void DevicesControl::SaveSpec_AddData()
         specFile << CaptureTime.toMSecsSinceEpoch();
         specFile << currentMotorAngle;
         specFile.writeRawData((char*)adq.get_PSD_Union(), mysetting.nRangeBin * nFFT_half*8);      // 8为Uint64所占字节数
-
-        //		int ret;
-        //		ret = specFile.writeRawData((char*)data_a,mysetting.sampleNum*mysetting.plsAccNum*2);//返回值为写入的数据的字节数
-        //采样数据的写入
         outputSpec.close();
         qDebug() << "Specfile 1 Dir added!";
     }
