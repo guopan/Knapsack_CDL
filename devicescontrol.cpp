@@ -14,7 +14,7 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
     connect(&Motor, &motor::beginMove, this, &DevicesControl::timeStart);
     connect(timeOclock,&QTimer::timeout,this, &DevicesControl::checkMove);
     connect(&Motor, &motor::moveReady,this, &DevicesControl::getPosition);
-//    connect(&adq, &ADQ214::collectFinish, this, &DevicesControl::getPosition);
+    //    connect(&adq, &ADQ214::collectFinish, this, &DevicesControl::getPosition);
     connect(&LaserPulse,&laserPulse::pulseCloseReady, &LaserSeed,&laserSeed::closeSeedLaser);
     connect(&Motor, &motor::motorError, this, &DevicesControl::errorSolve);
     connect(&LaserSeed,&laserSeed::laserSeedError, this,&DevicesControl::laserErrorHint);
@@ -64,7 +64,7 @@ void DevicesControl::checkMotorAngle(const double &s)
         }
         else
         {
-//            qDebug()<<"moveNorth gap="<<headAngle-s;
+            //            qDebug()<<"moveNorth gap="<<headAngle-s;
             Motor.moveRelative(headAngle-s);
         }
     }
@@ -90,7 +90,7 @@ void DevicesControl::checkMotorAngle(const double &s)
             qDebug() << "azAngleStep = " << mysetting.azAngleStep;
             qDebug() << "s = " << s;
             Motor.moveRelative(motorPX0+mysetting.azAngleStep-s);
-//            qDebug()<< "PX0=" << motorPX0;
+            //            qDebug()<< "PX0=" << motorPX0;
         }
 
     }
@@ -200,23 +200,22 @@ void DevicesControl::pulse_laser_opened_fcn()
     stopped = false;
     Init_Buffers();
     Generate_freqAxis();
+    azimuthAngle = VectorXd::Zero(mysetting.nDirsVectorCal);
+    losVelocityMat = MatrixXd::Zero(mysetting.nRangeBin, mysetting.nDirsVectorCal);
 }
 
 void DevicesControl::On_ControlTimer_TimeOut()
 {
     QDateTime currentTime;
     qint64 dt;
-    if (stop_now)
-    {
+    if (stop_now) {
         State = Quit;
         stop_now = false;
     }
     switch (State) {
     case waitMotor:    //****查询电机状态，没到位，则直接返回，等下次进入定时器
-        if (mysetting.azAngleStep != 0)
-        {
-            if(readyToCollect)
-            {
+        if (mysetting.azAngleStep != 0) {
+            if(readyToCollect) {
                 State = Capture;
             }
         }
@@ -224,7 +223,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
             State = Capture;
         break;
 
-    case Capture:
+    case Capture: {
         qDebug() << "capture start!!!";
 
         adq.Start_Capture();
@@ -236,11 +235,26 @@ void DevicesControl::On_ControlTimer_TimeOut()
                        20, mysetting.laserWaveLength,
                        freqAxis, adq.get_PSD_double());     //径向风速计算
         //****矢量风速合成
+        VectorXd tempAzAngle = azimuthAngle.tail(mysetting.nDirsVectorCal-1);
+        azimuthAngle.head(mysetting.nDirsVectorCal-1) = tempAzAngle;
+        azimuthAngle(mysetting.nDirsVectorCal-1) = currentMotorAngle;
+        MatrixXd tempLOSVelocity = losVelocityMat.block(0,1,mysetting.nRangeBin-1, mysetting.nDirsVectorCal-1);
+        losVelocityMat.block(0,0,mysetting.nRangeBin-1, mysetting.nDirsVectorCal-2) = tempLOSVelocity;
+        for (int i=0; i<mysetting.nRangeBin; i++) {
+            losVelocityMat(i,mysetting.nDirsVectorCal-1) = losVelocity[i];
+        }
+        DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,mysetting.nRangeBin,losVelocityMat);
+        hVelocity = dswf.getHVelocity();
+        hAngle = dswf.getHAngle();
+        vVelocity = dswf.getVVelocity();
 
         //****更新显示
-        emit vectorVelocityReady(losVelocity);
+        emit hVelocityReady(hVelocity);
+        emit hAngleReady(hAngle);
+        emit vVelocityReady(vVelocity);
 
-        SaveSpec_AddData();        //存储功率谱到文件
+        //存储功率谱到文件
+        SaveSpec_AddData();
 
         //****存储风速到文件
 
@@ -274,6 +288,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
             break;
         }
         break;
+    }
 
     case Quit:
         ControlTimer->stop();
@@ -443,8 +458,8 @@ void DevicesControl::SaveSpec_FileHead()
 
         specFile << "Height Axis:      ";
         str = "";
-//        for(int i=0;i<mysetting.nRangeBin;i++)
-//            str = str + QString::number(Height_values[i],'f', 2) + " ";
+        //        for(int i=0;i<mysetting.nRangeBin;i++)
+        //            str = str + QString::number(Height_values[i],'f', 2) + " ";
         specFile << str << endl;
 
         specFile << "Spectrum Point Size: "<< sizeof(quint64) <<  " Bytes int" << endl;

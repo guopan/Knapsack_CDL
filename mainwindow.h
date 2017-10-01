@@ -58,7 +58,9 @@ private slots:
     void toolBarControlTimerOutFcn();
     void UpdateHeightsValue();
 
-    void updateVectorVelocityDisp(double *vectorVelocity);
+    void updateHVelocityDisp(double *hVelocity);
+    void updateHAngleDisp(double *hAngle);
+    void updateVVelocityDisp(double *vVelocity);
 
 private:
     Ui::MainWindow *ui;

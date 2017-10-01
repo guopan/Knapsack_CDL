@@ -51,7 +51,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
 //    qDebug() << "aaaaaaaaaaaaaaa";
     devicesControl = new DevicesControl();
-    connect(devicesControl, &DevicesControl::vectorVelocityReady, this, &MainWindow::updateVectorVelocityDisp);
+    connect(devicesControl, &DevicesControl::hVelocityReady, this, &MainWindow::updateHVelocityDisp);
+    connect(devicesControl, &DevicesControl::hAngleReady, this, &MainWindow::updateHAngleDisp);
+    connect(devicesControl, &DevicesControl::vVelocityReady, this, &MainWindow::updateVVelocityDisp);
+
     workThread = new QThread;
     devicesControl->moveToThread(workThread);
     workThread->start();
@@ -176,9 +179,18 @@ void MainWindow::UpdateHeightsValue()
     DisplaySpeed->setHeights(Height_values);
 }
 
-void MainWindow::updateVectorVelocityDisp(double *vectorVelocity)
+void MainWindow::updateHVelocityDisp(double *hVelocity)
 {
-    for (int i=0; i<mysetting.nRangeBin; i++) {
-        qDebug() << vectorVelocity[i];
-    }
+    DisplaySpeed->setHSpeed(hVelocity);
 }
+
+void MainWindow::updateHAngleDisp(double *hAngle)
+{
+    DisplaySpeed->setHDirection(hAngle);
+}
+
+void MainWindow::updateVVelocityDisp(double *vVelocity)
+{
+    DisplaySpeed->setVSpeed(vVelocity);
+}
+

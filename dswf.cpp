@@ -1,7 +1,7 @@
 #include "dswf.h"
 #include <QtMath>
 
-DSWF::DSWF(double elevationAngle, MatrixXd azimuthAngle, int losNum,int heightNum, MatrixXd losVelocity)
+DSWF::DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNum, MatrixXd losVelocity)
 {
     this->heightNum = heightNum;
     vectorVelocity = MatrixXd::Zero(heightNum,3);

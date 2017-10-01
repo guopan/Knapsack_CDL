@@ -19,6 +19,10 @@
 #include <QDataStream>
 #include <QDateTime>
 #include <dispsettings.h>
+#include <eigen/Eigen>
+#include <Eigen/Dense>
+#include <dswf.h>
+using namespace Eigen;
 
 class DevicesControl : public QObject
 {
@@ -29,7 +33,9 @@ public:
     void stopAction();
 
 signals:
-    void vectorVelocityReady(double *vectorVelocity);
+    void hVelocityReady(double *hVelocity);
+    void hAngleReady(double *hAngle);
+    void vVelocityReady(double *vVelocity);
 
 public slots:
 
@@ -81,6 +87,12 @@ private:
     double *losVelocity;            // 径向风速值
     double *aomSpec;
     double *specArray;
+
+    VectorXd azimuthAngle;
+    MatrixXd losVelocityMat;
+    double *hVelocity;
+    double *hAngle;
+    double *vVelocity;
 
     QDateTime CaptureTime;          // 当前方向的采集时间
     QString SpecFileName;

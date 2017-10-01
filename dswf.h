@@ -13,7 +13,7 @@ using namespace std;
 class DSWF
 {
 public:
-    DSWF(double elevationAngle, double *azAngle, int losNum, int heightNum, double *losVelocityMat);
+    DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNum, MatrixXd losVelocity);
     double *getHVelocity();
     double *getHAngle();
     double *getVVelocity();
