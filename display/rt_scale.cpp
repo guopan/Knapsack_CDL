@@ -56,7 +56,7 @@ void rt_scale::paintEvent(QPaintEvent *event)
     rectF.setHeight(200);
     painter.setPen(Qt::NoPen);
     painter.setBrush(bgColor);
-    painter.drawRect(rectF);
+//    painter.drawRect(rectF);
 
     // 设置绘图字体
     QFont font = painter.font();
@@ -70,12 +70,12 @@ void rt_scale::paintEvent(QPaintEvent *event)
 
     // 绘制矩形背景
     painter.translate(1100, 0);    // 平移坐标系原点，右移到...
-    rectF.setX(0);
-    rectF.setY(-100);
-    rectF.setWidth(bar_width);
-    rectF.setHeight(200);
-    painter.setBrush(Color_HSpeed);
-    painter.drawRect(rectF);
+//    rectF.setX(0);
+//    rectF.setY(-100);
+//    rectF.setWidth(bar_width);
+//    rectF.setHeight(200);
+//    painter.setBrush(Color_HSpeed);
+//    painter.drawRect(rectF);
 
     // 绘制水平刻度线
     rectF.setX(0);

@@ -66,6 +66,7 @@ void wind_display::setHSpeed(const double *sp)
     {
         HSpeedScale = New_HSpeedScale;
         my_scale->setH_speed_scale(HSpeedScale);
+        my_title->setHSpeed_Scale(HSpeedScale);
     }
     //    qDebug()<<"=============";
 }

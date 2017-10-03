@@ -65,7 +65,7 @@ void rt_display::paintEvent(QPaintEvent *event)
     rectF.setHeight(200);
     painter.setPen(Qt::NoPen);
     painter.setBrush(QColor(255,250,240));
-    painter.drawRect(rectF);
+//    painter.drawRect(rectF);
 
     // 设置绘图字体
     QFont font = painter.font();
@@ -103,7 +103,7 @@ void rt_display::paintEvent(QPaintEvent *event)
     // 绘制矩形背景
     painter.save();
     painter.setPen(Qt::NoPen);
-    painter.setBrush(Color_HSpeed);
+    painter.setBrush(Color_HSpeed.darker(100+(H_speed_scale-1)*40*(H_speed_scale-1)));
     painter.drawRect(0, -80, 380, 160);
     painter.restore();
     // 绘制圆形背景
@@ -161,12 +161,12 @@ void rt_display::paintEvent(QPaintEvent *event)
     painter.setPen(Qt::white);
     painter.drawText(rectF, Qt::AlignCenter, QString::number(H_speed, 'f', 2));
 
-
     painter.translate(400, 0);    // 平移坐标系原点，右移到风速条起始点
     // 绘制水平风速矩形条
     painter.save();
     painter.setPen(Qt::NoPen);
-    painter.setBrush(Color_HSpeed);
+    //H_speed_scale = qCeil((qreal)(H_speed) / 10);     // 调试用
+    painter.setBrush(Color_HSpeed.darker(100+(H_speed_scale-1)*40*(H_speed_scale-1)));
     painter.drawRect(0, -80, H_speed/H_speed_scale*(w*200/baseSize-1480)/10, 160);
     painter.restore();
 
@@ -184,23 +184,38 @@ void rt_display::paintEvent(QPaintEvent *event)
     };
 
     painter.save();
-    painter.translate(H_speed/H_speed_scale*(w*200/baseSize-1480)/10, 0);
+    painter.translate(H_speed/H_speed_scale*(w*200/baseSize-1480)/10+5, 0);
+//    painter.translate((w*200/baseSize - 1400), 0);
     painter.setPen(Qt::NoPen);
 
     if(V_speed>=0)
     {
         painter.setBrush(Qt::red);
-        VS_Triangle_P[1].setX(qRound(V_speed*8/16*80/3));
-        VS_Triangle_P[1].setY(qRound(V_speed*80/1.5-80));
-        VS_Triangle_P[2].setY(qRound(V_speed*80/1.5-80));
+        int VT_num = qFloor(V_speed/3);
+        double V_length = V_speed - 3 * VT_num;
+        for(int i=0;i<VT_num;i++)
+        {
+            painter.drawConvexPolygon(VS_Triangle_P, 3);
+            painter.translate(80,0);
+        }
+        VS_Triangle_P[1].setX(qRound(V_length*8/16*80/3));
+        VS_Triangle_P[1].setY(qRound(V_length*80/1.5-80));
+        VS_Triangle_P[2].setY(qRound(V_length*80/1.5-80));
         painter.drawConvexPolygon(VS_Triangle_P, 3);
     }
     else
     {
         painter.setBrush(QColor(0,176,0));
-        VS_Triangle_N[1].setX(qRound(V_speed*(-8)/16*80/3));
-        VS_Triangle_N[1].setY(qRound(V_speed*80/1.5+80));
-        VS_Triangle_N[2].setY(qRound(V_speed*80/1.5+80));
+        int VT_num = qFloor(V_speed/(-3));
+        double V_length = V_speed + 3 * VT_num;
+        for(int i=0;i<VT_num;i++)
+        {
+            painter.drawConvexPolygon(VS_Triangle_N, 3);
+            painter.translate(80,0);
+        }
+        VS_Triangle_N[1].setX(qRound(V_length*(-8)/16*80/3));
+        VS_Triangle_N[1].setY(qRound(V_length*80/1.5+80));
+        VS_Triangle_N[2].setY(qRound(V_length*80/1.5+80));
         painter.drawConvexPolygon(VS_Triangle_N, 3);
     }
     painter.restore();

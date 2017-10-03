@@ -8,6 +8,8 @@
 rt_title::rt_title(QWidget *parent) : QWidget(parent)
 {
     margin = 10;
+    H_speed_scale = 1;
+    connect(this, SIGNAL(H_Scale_changed()), this, SLOT(update()));
 }
 
 void rt_title::paintEvent(QPaintEvent *event)
@@ -82,7 +84,7 @@ void rt_title::paintEvent(QPaintEvent *event)
     rectF.setHeight(160);
     str = QString::fromLocal8Bit("水平风速");
     painter.setPen(Qt::NoPen);
-    painter.setBrush(Color_HSpeed);
+    painter.setBrush(Color_HSpeed.darker(100+(H_speed_scale-1)*40*(H_speed_scale-1)));
     painter.drawRect(rectF);
 
     painter.setPen(Qt::white);
@@ -168,4 +170,13 @@ void rt_title::paintEvent(QPaintEvent *event)
 void rt_title::setHSizeHint(int hhh)
 {
     HSizeHint = hhh;
+}
+
+void rt_title::setHSpeed_Scale(const int scale)
+{
+    if(H_speed_scale != scale)
+    {
+        H_speed_scale = scale;
+        emit H_Scale_changed();
+    }
 }
