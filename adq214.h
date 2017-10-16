@@ -15,7 +15,7 @@ class ADQ214 : public QObject
 public:
     explicit ADQ214(QObject *parent = nullptr);
     void connectADQDevice();
-    void Start_Capture();
+    bool Start_Capture();
     bool Config_ADQ214();           // 配置采集卡
     bool CaptureData2Buffer();      // 采集数据到缓存
     void WriteSpecData2disk();      // 写入采集数据到文件
@@ -37,6 +37,7 @@ private:
     PSD_DATA *psd_res;  // 存储 quint64 格式的功率谱
     double *psd_array;  // 存储 double  格式的功率谱
 
+    int nPSD;
     int num_of_devices;
     int num_of_failed;
     int num_of_ADQ214;

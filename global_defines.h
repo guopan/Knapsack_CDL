@@ -49,7 +49,7 @@ typedef struct
 
     //Real Time Process
     uint    nPulsesAcc;         //单方向累加脉冲数
-    uint    nRangeBin;          //距离门数
+    uint    nRangeBin;          //距离门数，不包括镜面和噪声距离门（及其间隔）
     uint    nPointsPerBin;      //距离门内点数
     uint    nPointsMirrorWidth; //镜面宽度点数
     double  overlapRatio;       //距离门重叠率，0:0 1:0.5

@@ -62,6 +62,8 @@ private slots:
     void updateHAngleDisp(double *hAngle);
     void updateVVelocityDisp(double *vVelocity);
 
+    void on_pushButton_3_clicked();
+
 private:
     Ui::MainWindow *ui;
 

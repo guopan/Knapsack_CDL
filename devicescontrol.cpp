@@ -14,7 +14,6 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
     connect(&Motor, &motor::beginMove, this, &DevicesControl::timeStart);
     connect(timeOclock,&QTimer::timeout,this, &DevicesControl::checkMove);
     connect(&Motor, &motor::moveReady,this, &DevicesControl::getPosition);
-    //    connect(&adq, &ADQ214::collectFinish, this, &DevicesControl::getPosition);
     connect(&LaserPulse,&laserPulse::pulseCloseReady, &LaserSeed,&laserSeed::closeSeedLaser);
     connect(&Motor, &motor::motorError, this, &DevicesControl::errorSolve);
     connect(&LaserSeed,&laserSeed::laserSeedError, this,&DevicesControl::laserErrorHint);
@@ -30,10 +29,13 @@ void DevicesControl::startAction(SOFTWARESETTINGS settings)
     qDebug() << "start action";
     this->mysetting = settings;
     Compass.read();
+
 }
 
 void DevicesControl::stopAction()
 {
+    //待完善
+
     stop_now = true;
 }
 
@@ -64,7 +66,6 @@ void DevicesControl::checkMotorAngle(const double &s)
         }
         else
         {
-            //            qDebug()<<"moveNorth gap="<<headAngle-s;
             Motor.moveRelative(headAngle-s);
         }
     }
@@ -80,20 +81,26 @@ void DevicesControl::checkMotorAngle(const double &s)
             motorPX0 = s;
             if(motorPX0>360-mysetting.azAngleStep)
                 motorPX0 = motorPX0-360;
-            qDebug() << "Motor on the right position!!!!";
-            qDebug() << "Current position = " << motorPX0;
         }
         else
         {
-            qDebug() << "Motor on the wrong position!!!!";
-            qDebug() << "motorPX0 = " << motorPX0;
-            qDebug() << "azAngleStep = " << mysetting.azAngleStep;
-            qDebug() << "s = " << s;
             Motor.moveRelative(motorPX0+mysetting.azAngleStep-s);
-            //            qDebug()<< "PX0=" << motorPX0;
         }
 
     }
+   /* if(moveNorth)
+    {
+        adq.Transfer_Settings(mysetting);
+        LaserSeed.beginSeedLaser();
+        moveNorth=false;
+        readyToCollect=true;
+    }
+   else
+    {
+        readyToCollect=true;
+        LaserPulse.checkLaser();
+        LaserSeed.checkLaser();
+    }*/
 }
 
 void DevicesControl::getPosition()
@@ -109,7 +116,7 @@ void DevicesControl::getPosition()
 void DevicesControl::checkMotor()
 {
     QSerialPort my_serial;
-    my_serial.setPortName("COM11");
+    my_serial.setPortName("COM8");
     if(!my_serial.open(QIODevice::ReadWrite))
     {
         qDebug()<<"motor not open";
@@ -226,7 +233,12 @@ void DevicesControl::On_ControlTimer_TimeOut()
     case Capture: {
         qDebug() << "capture start!!!";
 
-        adq.Start_Capture();
+        bool status = adq.Start_Capture();
+        if(status == false) {
+            qDebug() << "ADQ failed";
+            ControlTimer->stop();
+            return;
+        }
         CaptureTime = QDateTime::currentDateTimeUtc();      //记录当前时间，将来写入文件
         if(mysetting.azAngleStep != 0)
             Motor.moveRelative(mysetting.azAngleStep);         //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
@@ -234,24 +246,38 @@ void DevicesControl::On_ControlTimer_TimeOut()
         LOSVelocityCal(mysetting.nRangeBin+2, nFFT_half,
                        20, mysetting.laserWaveLength,
                        freqAxis, adq.get_PSD_double());     //径向风速计算
+
         //****矢量风速合成
+        qDebug() << "start vector velocity";
         VectorXd tempAzAngle = azimuthAngle.tail(mysetting.nDirsVectorCal-1);
         azimuthAngle.head(mysetting.nDirsVectorCal-1) = tempAzAngle;
         azimuthAngle(mysetting.nDirsVectorCal-1) = currentMotorAngle;
-        MatrixXd tempLOSVelocity = losVelocityMat.block(0,1,mysetting.nRangeBin-1, mysetting.nDirsVectorCal-1);
-        losVelocityMat.block(0,0,mysetting.nRangeBin-1, mysetting.nDirsVectorCal-2) = tempLOSVelocity;
+
+        for (int i=0; i<mysetting.nRangeBin; i++) {
+            for (int j=1; j<mysetting.nDirsVectorCal; j++) {
+                losVelocityMat(i,j-1) = losVelocityMat(i,j);
+            }
+        }
         for (int i=0; i<mysetting.nRangeBin; i++) {
             losVelocityMat(i,mysetting.nDirsVectorCal-1) = losVelocity[i];
         }
-        DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,mysetting.nRangeBin,losVelocityMat);
-        hVelocity = dswf.getHVelocity();
-        hAngle = dswf.getHAngle();
-        vVelocity = dswf.getVVelocity();
 
-        //****更新显示
-        emit hVelocityReady(hVelocity);
-        emit hAngleReady(hAngle);
-        emit vVelocityReady(vVelocity);
+        if (capture_counter > mysetting.nDirsVectorCal) {
+            qDebug() << "Starting vector velocity cal!!!!";
+            std::cout << "azimuthAngle = " << azimuthAngle << std::endl;
+            DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,mysetting.nRangeBin,losVelocityMat);
+            qDebug() << "End vector velocity cal";
+            hVelocity = dswf.getHVelocity();
+            hAngle = dswf.getHAngle();
+            vVelocity = dswf.getVVelocity();
+
+            //****更新显示
+            emit hVelocityReady(hVelocity);
+            emit hAngleReady(hAngle);
+            emit vVelocityReady(vVelocity);
+            qDebug() << "update show signal emited";
+        }
+        qDebug() << "stop vector velocity";
 
         //存储功率谱到文件
         SaveSpec_AddData();
@@ -259,6 +285,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
         //****存储风速到文件
 
         capture_counter++;
+        qDebug() << "capture_counter = " << capture_counter;
         //****判断是否应该结束，更新结束标志stop_now
         switch (mysetting.detectMode) {
         case 1:                 //持续探测
@@ -328,7 +355,7 @@ void DevicesControl::Generate_freqAxis()
 {
     for (int i = 0; i < nFFT_half; i++)  {
         freqAxis[i] = mysetting.sampleFreq/2.0*(i+1)/nFFT_half;
-        qDebug() << freqAxis[i];
+        //        qDebug() << freqAxis[i];
     }
 }
 
@@ -367,7 +394,7 @@ void DevicesControl::LOSVelocityCal(const int heightNum, const int totalSpecPoin
     memset(losVelocity, 0, sizeof(double)*(heightNum-2));
     for(int i=0; i<heightNum-2; i++) {
         losVelocity[i] = (freqAxis[losVelocityIndex[i]] - freqAxis[aomIndex])*lambda/2;
-        qDebug() << "losVelocity" << losVelocity[i];
+        //        qDebug() << "losVelocity" << losVelocity[i];
     }
 }
 
@@ -386,7 +413,7 @@ void DevicesControl::SaveSpec_FileHead()
     SpecFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hh_mm_ss");
     SpecFileName = mysetting.dataFilePath+"/"+"KnapsackCDL("+").spec";
     //    SpecFileName = mysetting.DatafilePath+"/"+"KnapsackCDL("+ SpecFileName +").spec";
-    qDebug()<<"SpecFileName = "<<SpecFileName;
+    //    qDebug()<<"SpecFileName = "<<SpecFileName;
     QFile outputSpec(SpecFileName);
 
     if(outputSpec.open(QFile::WriteOnly | QIODevice::Truncate|QIODevice::Text))//QIODevice::Truncate表示将原文件内容清空
@@ -399,7 +426,7 @@ void DevicesControl::SaveSpec_FileHead()
         specFile << "Global Definitions:" << endl;
 
         QDateTime zero = QDateTime::fromSecsSinceEpoch(0,Qt::UTC);
-        qDebug()<< zero.toString("yyyy-MM-dd hh:mm:ss");
+        //        qDebug()<< zero.toString("yyyy-MM-dd hh:mm:ss");
         specFile << "Base Time:        " << zero.toString("yyyy-MM-dd hh:mm:ss") << endl;          //1970-01-01 00:00:00
 
         //激光参数
@@ -468,7 +495,7 @@ void DevicesControl::SaveSpec_FileHead()
             specFile << "=";                    // =分隔符
         specFile << endl;
         outputSpec.close();
-        qDebug() << "Specfile Header added!";
+        //        qDebug() << "Specfile Header added!";
     }
 }
 
@@ -482,7 +509,7 @@ void DevicesControl::SaveSpec_AddData()
         specFile << currentMotorAngle;
         specFile.writeRawData((char*)adq.get_PSD_Union(), mysetting.nRangeBin * nFFT_half*8);      // 8为Uint64所占字节数
         outputSpec.close();
-        qDebug() << "Specfile 1 Dir added!";
+        //        qDebug() << "Specfile 1 Dir added!";
     }
 }
 

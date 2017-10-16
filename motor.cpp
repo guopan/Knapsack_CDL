@@ -12,7 +12,7 @@ motor::motor(QObject *parent) : QObject(parent)
 
 void motor::prepare()
 {
-    portname = "COM11";
+    portname = "COM8";
     Order_str = "VR;";
     thread_port.transaction(portname,Order_str);   //获取版本后依次上电--设置加减速度--设置速度--发送上电完成信号
 }
@@ -138,7 +138,7 @@ void motor::receive_response(const QString &s)
         thread_port.transaction(portname,Order_str);
     }
     if(s.left(1) == ";")
-    {
+    {qDebug() << "return ;;;;;;;;;;;;;;;;;;;;;;;;;;";
         Order_str = "MO=1;";
         thread_port.transaction(portname,Order_str);
     }

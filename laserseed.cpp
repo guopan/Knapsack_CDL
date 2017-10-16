@@ -6,7 +6,7 @@ laserSeed::laserSeed(QObject *parent) : QObject(parent)
     connect(&Laserseedthread,SIGNAL(seed_PortNotOpen()),this,SLOT(portError()));
     connect(&Laserseedthread,SIGNAL(timeoutSeed()),this,SLOT(timeout()));
 
-    laserPort="COM8";
+    laserPort="COM1";
     powerSet=true;
     fire=false;
     close=false;

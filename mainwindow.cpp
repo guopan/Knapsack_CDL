@@ -182,15 +182,26 @@ void MainWindow::UpdateHeightsValue()
 void MainWindow::updateHVelocityDisp(double *hVelocity)
 {
     DisplaySpeed->setHSpeed(hVelocity);
+    qDebug() << "HSpeed update show";
 }
 
 void MainWindow::updateHAngleDisp(double *hAngle)
 {
     DisplaySpeed->setHDirection(hAngle);
+    qDebug() << "HANgle update show";
 }
 
 void MainWindow::updateVVelocityDisp(double *vVelocity)
 {
     DisplaySpeed->setVSpeed(vVelocity);
+    qDebug() << "VSpeed update show";
 }
 
+
+void MainWindow::on_pushButton_3_clicked()
+{
+ADQ214 adq;
+        adq.Transfer_Settings(mysetting);
+        adq.Init_Buffers();
+adq.Start_Capture();
+}

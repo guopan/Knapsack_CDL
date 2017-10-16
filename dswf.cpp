@@ -4,6 +4,8 @@
 DSWF::DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNum, MatrixXd losVelocity)
 {
     this->heightNum = heightNum;
+    qDebug() << losVelocity.rows();
+    qDebug() << losVelocity.cols();
     vectorVelocity = MatrixXd::Zero(heightNum,3);
 
     Eigen::Matrix3d SiSum;
@@ -16,7 +18,10 @@ DSWF::DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNu
     }
     SiSum = SiSum + Si*Si.transpose();
 
+    qDebug() << "SiSum";
+
     for(int m=0;m<heightNum;m++) {
+        qDebug() << "Height num = " << heightNum;
         Eigen::Vector3d SiVri(0,0,0);
         Eigen::Vector3d temp(0,0,0);
         for(int n=0;n<losNum;n++) {
@@ -30,8 +35,8 @@ double *DSWF::getHVelocity()
 {
     double *HVelocity = new double[heightNum];
     for (int i = 0; i < heightNum; i++) {
-        HVelocity[i] = qSqrt(vectorVelocity(i,2)*vectorVelocity(i,2) +
-                             vectorVelocity(i,3)*vectorVelocity(i,3));
+        HVelocity[i] = qSqrt(vectorVelocity(i,1)*vectorVelocity(i,1) +
+                             vectorVelocity(i,2)*vectorVelocity(i,2));
     }
     return HVelocity;
 }
@@ -40,7 +45,7 @@ double *DSWF::getHAngle()
 {
     double *HAngle = new double[heightNum];
     for (int i = 0; i < heightNum; i++) {
-        HAngle[i] = qAtan2(vectorVelocity(i,3), vectorVelocity(i,2));
+        HAngle[i] = qAtan2(vectorVelocity(i,2), vectorVelocity(i,1));
     }
     return HAngle;
 }
@@ -49,7 +54,7 @@ double *DSWF::getVVelocity()
 {
     double *VVelocity = new double[heightNum];
     for (int i = 0; i < heightNum; i++) {
-        VVelocity[i] = vectorVelocity(i,1);
+        VVelocity[i] = vectorVelocity(i,0);
     }
     return VVelocity;
 }

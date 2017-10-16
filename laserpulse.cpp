@@ -7,7 +7,7 @@ laserPulse::laserPulse(QObject *parent) : QObject(parent)
     connect(&Laserpulsethread,SIGNAL(Pulse_PortNotOpen()),this,SLOT(portError()));
     connect(&Laserpulsethread,SIGNAL(timeoutPulse()),this,SLOT(timeout()));
 
-    laserPort="COM7";
+    laserPort="COM2";
     powerSet=true;
     fire=false;
     close=false;
