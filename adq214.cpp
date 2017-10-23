@@ -107,30 +107,30 @@ bool ADQ214::Config_ADQ214()                   // 配置采集卡
         // quint16 CMD = 0;
         // success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x30,0,CMD);                      // 命令
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x31,0,mainSettings.triggerLevel);   // 触发电平
-//        qDebug()<<"0x31,0,TriggerLevel  " << mainSettings.triggerLevel;
+        //        qDebug()<<"0x31,0,TriggerLevel  " << mainSettings.triggerLevel;
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x32,0,mainSettings.nPulsesAcc);     // 累加脉冲数
-//        qDebug()<<"0x32,0,nPulsesAcc    " << mainSettings.nPulsesAcc;
+        //        qDebug()<<"0x32,0,nPulsesAcc    " << mainSettings.nPulsesAcc;
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x33,0,mainSettings.nPointsPerBin);  // 距离门点数，需要为偶数
-//        qDebug()<<"0x33,0,nPointsPerBin    " << mainSettings.nPointsPerBin;
+        //        qDebug()<<"0x33,0,nPointsPerBin    " << mainSettings.nPointsPerBin;
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x34,0,mainSettings.nRangeBin+3);    // 距离门数
-//        qDebug()<<"0x34,0,nRangeBin        " << mainSettings.nRangeBin+3;
+        //        qDebug()<<"0x34,0,nRangeBin        " << mainSettings.nRangeBin+3;
         if (mainSettings.overlapRatio == 0.5)
         {
             int Overlap_length = (mainSettings.nRangeBin -0.5)*mainSettings.nPointsPerBin;
             success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,Overlap_length);          // OverLap计数器长度
-//            qDebug()<<"0x35,0,Overlap_length    " << Overlap_length;
+            //            qDebug()<<"0x35,0,Overlap_length    " << Overlap_length;
         }
         else
         {
             success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x35,0,0);                       // OverLap计数器长度
-//            qDebug()<<"0x35,0,Overlap_length    " << 0;
+            //            qDebug()<<"0x35,0,Overlap_length    " << 0;
         }
         int Mirror_Start = 500 + mainSettings.nPointsMirrorWidth - mainSettings.nPointsPerBin;
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x36,0,Mirror_Start);                // 镜面所在距离门起始位置点
-//        qDebug()<<"0x36,0,Mirror_Start    " << Mirror_Start;
+        //        qDebug()<<"0x36,0,Mirror_Start    " << Mirror_Start;
         int Total_Points_Num = mainSettings.nPointsPerBin * mainSettings.nRangeBin + 500 + mainSettings.nPointsMirrorWidth;     // 内部信号，处理总点数
         success = success && ADQ214_WriteAlgoRegister(adq_cu,1,0x37,0,Total_Points_Num);            // 单脉冲处理结束位置点
-//        qDebug()<<"0x37,0,Total_Points_Num    " << Total_Points_Num;
+        //        qDebug()<<"0x37,0,Total_Points_Num    " << Total_Points_Num;
     }
     return success;
 }
@@ -223,7 +223,7 @@ void ADQ214::ConvertData2Spec()           // 将数据转换成功率谱
 
             i = i + 8;
         }
-//        qDebug() << "l" << l;
+        //        qDebug() << "l" << l;
     }
 
     for (k=0; k<nPSD; k++) {

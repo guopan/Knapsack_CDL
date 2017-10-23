@@ -1,3 +1,4 @@
+#include "global_defines.h"
 #include "laserPulse.h"
 #include <Qdebug.h>
 
@@ -7,7 +8,7 @@ laserPulse::laserPulse(QObject *parent) : QObject(parent)
     connect(&Laserpulsethread,SIGNAL(Pulse_PortNotOpen()),this,SLOT(portError()));
     connect(&Laserpulsethread,SIGNAL(timeoutPulse()),this,SLOT(timeout()));
 
-    laserPort="COM2";
+//    laserPort="COM2";
     powerSet=true;
     fire=false;
     close=false;
@@ -16,7 +17,7 @@ laserPulse::laserPulse(QObject *parent) : QObject(parent)
 void laserPulse::beginPulseLaser()
 {
     StringToHex("AA 55 C1 01 01 01 00",senddata);
-    Laserpulsethread.transaction(laserPort,senddata);
+    Laserpulsethread.transaction(PulseLaserComPort,senddata);
     fire=true;
 }
 
@@ -28,14 +29,14 @@ void laserPulse::setPulsePower(const int &s)
     QString key2 =QString("%1").arg(aa,4,16,QLatin1Char('0')).toUpper();
     QString power="AA 55 C3 02 "+key.right(2)+" "+key.left(2)+" "+key2.right(2)+" "+key2.left(2);
     StringToHex(power,senddata);
-    Laserpulsethread.transaction(laserPort,senddata);
+    Laserpulsethread.transaction(PulseLaserComPort,senddata);
     powerSet=false;
 }
 
 void laserPulse::closePulseLaser()
 {
     StringToHex("AA 55 C1 01 00 00 00",senddata);
-    Laserpulsethread.transaction(laserPort,senddata);
+    Laserpulsethread.transaction(PulseLaserComPort,senddata);
     close=true;
 }
 
@@ -79,7 +80,7 @@ void laserPulse::receive_response(const QString &temp)
                 if(temp=="55aac101000000")
                 {
                    emit this->pulseCloseReady();
-                    qDebug()<<"脉冲激光器关闭正常";
+                    qDebug()<<"pulse close right;";
                 }
                 else
                 {
@@ -129,7 +130,7 @@ void laserPulse::receive_response(const QString &temp)
 void laserPulse::checkLaser()
 {
     StringToHex("AA 55 D3 00 00 00",senddata);
-    Laserpulsethread.transaction(laserPort,senddata);
+    Laserpulsethread.transaction(PulseLaserComPort,senddata);
 }
 
 char laserPulse::ConvertHexChar(char ch)

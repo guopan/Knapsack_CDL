@@ -39,6 +39,7 @@ private:
     void StringToHex(QString str, QByteArray &senddata);
     bool powerSet,fire,close;
     laserpulsethread Laserpulsethread;
+    double PulsePoewr;
 };
 
 #endif // laserPulse_H
