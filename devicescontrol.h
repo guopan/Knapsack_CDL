@@ -31,6 +31,7 @@ public:
     explicit DevicesControl(QObject *parent = nullptr);
     void startAction(SOFTWARESETTINGS settings);
     void stopAction();
+    void Create_DataFolder();       // 数据存储文件夹的创建
 
 signals:
     void hVelocityReady(double *hVelocity);
@@ -39,6 +40,8 @@ signals:
 
 public slots:
 
+    void SaveVelo_AddData();
+    void SaveVelo_FileHead();
 private slots:
     void showCompassAngle(const double &s);
     void checkMotorAngle(const double &s);
@@ -96,7 +99,7 @@ private:
 
     QDateTime CaptureTime;          // 当前方向的采集时间
     QString SpecFileName;
-    void Create_DataFolder();       // 数据存储文件夹的创建
+    QString VeloFileName;
 };
 
 #endif // DEVICESCONTROL_H

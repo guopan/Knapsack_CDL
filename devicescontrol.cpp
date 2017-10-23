@@ -2,7 +2,6 @@
 
 DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
 {
-    qDebug() << "device control";
     timeOclock = new QTimer(this);
     ControlTimer = new QTimer(this);
     connect(&Compass, &compass::compassAngle, this, &DevicesControl::showCompassAngle);
@@ -35,26 +34,25 @@ void DevicesControl::startAction(SOFTWARESETTINGS settings)
 void DevicesControl::stopAction()
 {
     //待完善
-
+    qDebug() << "stop action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
     stop_now = true;
+    State = Quit;
 }
 
 
 void DevicesControl::showCompassAngle(const double &s)
 {
-    qDebug() << "Angle" << s;
     headAngle = s;
     Motor.prepare();
 }
 
 void DevicesControl::checkMotorAngle(const double &s)
 {
-    qDebug()<<"check motor angle = " << s;
+    currentMotorAngle=s;
     if(moveNorth)
     {
         if(headAngle-s>=-0.5&&headAngle-s<=0.5)
         {
-            qDebug()<<"success ";
             moveNorth = false;
             readyToCollect=true;
             checkReady = false;
@@ -62,7 +60,7 @@ void DevicesControl::checkMotorAngle(const double &s)
             if(motorPX0>360-mysetting.azAngleStep)
                 motorPX0 = motorPX0-360;
             adq.Transfer_Settings(mysetting);
-            LaserSeed.beginSeedLaser();
+            LaserSeed.beginSeedLaser(mysetting.laserLocalPower);
         }
         else
         {
@@ -73,7 +71,6 @@ void DevicesControl::checkMotorAngle(const double &s)
     {
         if((s-motorPX0-mysetting.azAngleStep)<=0.01&&(s-motorPX0-mysetting.azAngleStep)>=-0.01)   //判断是否到达指定位置,误差暂设0.5°
         {
-            //adq.Start_Capture();
             readyToCollect=true;
             LaserPulse.checkLaser();
             LaserSeed.checkLaser();
@@ -88,19 +85,6 @@ void DevicesControl::checkMotorAngle(const double &s)
         }
 
     }
-   /* if(moveNorth)
-    {
-        adq.Transfer_Settings(mysetting);
-        LaserSeed.beginSeedLaser();
-        moveNorth=false;
-        readyToCollect=true;
-    }
-   else
-    {
-        readyToCollect=true;
-        LaserPulse.checkLaser();
-        LaserSeed.checkLaser();
-    }*/
 }
 
 void DevicesControl::getPosition()
@@ -168,7 +152,6 @@ void DevicesControl::laserErrorHint(const QString &s)
 
 void DevicesControl::readyToMove()
 {
-    qDebug()<< "motor prepare right";
     if(stopped) {
         if(mysetting.azAngleStep != 0) {
             moveNorth = true;
@@ -179,7 +162,7 @@ void DevicesControl::readyToMove()
 
 void DevicesControl::openLaser()
 {
-    LaserSeed.beginSeedLaser();
+    LaserSeed.beginSeedLaser(mysetting.laserLocalPower);
 }
 
 void DevicesControl::closeLaser()
@@ -203,12 +186,15 @@ void DevicesControl::pulse_laser_opened_fcn()
         Start_Time = QDateTime::currentDateTimeUtc();
     }
     State = waitMotor;
-    ControlTimer->start(CheckPeriod);
+    Generate_freqAxis();
+    SaveSpec_FileHead();        //建立新文件，写入文件头
+    SaveVelo_FileHead();        //建立新文件，写入文件头
+
     stopped = false;
     Init_Buffers();
-    Generate_freqAxis();
     azimuthAngle = VectorXd::Zero(mysetting.nDirsVectorCal);
     losVelocityMat = MatrixXd::Zero(mysetting.nRangeBin, mysetting.nDirsVectorCal);
+    ControlTimer->start(CheckPeriod);
 }
 
 void DevicesControl::On_ControlTimer_TimeOut()
@@ -263,31 +249,34 @@ void DevicesControl::On_ControlTimer_TimeOut()
         }
 
         if (capture_counter > mysetting.nDirsVectorCal) {
-            qDebug() << "Starting vector velocity cal!!!!";
             std::cout << "azimuthAngle = " << azimuthAngle << std::endl;
             DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,mysetting.nRangeBin,losVelocityMat);
-            qDebug() << "End vector velocity cal";
             hVelocity = dswf.getHVelocity();
             hAngle = dswf.getHAngle();
             vVelocity = dswf.getVVelocity();
 
+            //****存储风速到文件
+            SaveVelo_AddData();
             //****更新显示
             emit hVelocityReady(hVelocity);
             emit hAngleReady(hAngle);
             emit vVelocityReady(vVelocity);
-            qDebug() << "update show signal emited";
         }
-        qDebug() << "stop vector velocity";
 
         //存储功率谱到文件
         SaveSpec_AddData();
-
-        //****存储风速到文件
 
         capture_counter++;
         qDebug() << "capture_counter = " << capture_counter;
         //****判断是否应该结束，更新结束标志stop_now
         switch (mysetting.detectMode) {
+        case 0:                 //单组探测
+            //判断探测方向数
+            if(capture_counter == mysetting.angleNum)
+                State = Quit;
+            else
+                State = waitMotor;
+            break;
         case 1:                 //持续探测
             //判断是否应该关闭文件，建立新文件
             if(capture_counter == mysetting.nDirsPerFile)
@@ -296,13 +285,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
             }
             State = waitMotor;
             break;
-        case 0:                 //单组探测
-            //判断探测方向数
-            if(capture_counter == mysetting.angleNum)
-                State = Quit;
-            else
-                State = waitMotor;
-            break;
+
         case 2:                 //定时探测
             // 判断否达到待机条件
             dt = currentTime.msecsTo(Start_Time);
@@ -320,6 +303,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
     case Quit:
         ControlTimer->stop();
         LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
+        Motor.motorQuit();
         stopped = true;
         break;
 
@@ -394,7 +378,6 @@ void DevicesControl::LOSVelocityCal(const int heightNum, const int totalSpecPoin
     memset(losVelocity, 0, sizeof(double)*(heightNum-2));
     for(int i=0; i<heightNum-2; i++) {
         losVelocity[i] = (freqAxis[losVelocityIndex[i]] - freqAxis[aomIndex])*lambda/2;
-        //        qDebug() << "losVelocity" << losVelocity[i];
     }
 }
 
@@ -407,12 +390,99 @@ void DevicesControl::Init_Buffers()
     adq.Init_Buffers();
 }
 
+void DevicesControl::SaveVelo_FileHead()
+{
+    Create_DataFolder();
+    VeloFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hh_mm_ss");
+    //    VeloFileName = mysetting.dataFilePath+"/"+"KnapsackCDL("+").Velo";
+    VeloFileName = mysetting.dataFilePath+"/"+"KnapsackCDL("+ VeloFileName +").Velo";
+    //    qDebug()<<"VeloFileName = "<<VeloFileName;
+    QFile outputVelo(VeloFileName);
+
+    if(outputVelo.open(QFile::WriteOnly | QIODevice::Truncate|QIODevice::Text))//QIODevice::Truncate表示将原文件内容清空
+    {
+        QTextStream VeloFile(&outputVelo);
+        VeloFile << "Knapsack Coherent Doppler Lidar Velocity Vector" << endl;
+        for(int i=0;i<60;i++)
+            VeloFile << "=";                                // =分隔符
+        VeloFile << endl<< "Data File Version: 1.0" << endl;          // 文件类型版本
+        VeloFile << "Global Definitions:" << endl;
+
+        QDateTime zero = QDateTime::fromSecsSinceEpoch(0,Qt::UTC);
+        //        qDebug()<< zero.toString("yyyy-MM-dd hh:mm:ss");
+        VeloFile << "Base Time:        " << zero.toString("yyyy-MM-dd hh:mm:ss") << endl;          //1970-01-01 00:00:00
+
+        //激光参数
+        VeloFile << "LaserMode:        ";
+        if(1)
+        {
+            VeloFile << "Pulse" << endl;		//脉冲探测（true）or连续探测（false） bool
+            VeloFile << "laserPulseEnergy: " << QString::number(mysetting.laserPulseEnergy) << endl;	//激光能量，单位μJ，连续模式下为0
+        }
+        else
+        {
+            VeloFile << "Continuous" << endl;	//脉冲探测（true）or连续探测（false） bool
+            VeloFile << "laserPower:       " << QString::number(mysetting.laserLocalPower) << endl;		//激光功率，单位mW，脉冲模式下为0
+        }
+        VeloFile << "laserRPF:         " << QString::number(mysetting.laserRPF) << endl;			//激光频率
+        VeloFile << "laserPulseWidth:  " << QString::number(mysetting.laserPulseWidth) << endl;	//脉冲宽度
+        VeloFile << "laserWaveLength:  " << QString::number(mysetting.laserWaveLength) << endl;	//激光波长
+        VeloFile << "AOM_Freq:         " << QString::number(mysetting.laserAOMFreq) << endl;			//AOM移频量
+
+        //扫描参数
+        VeloFile << "detectMode:       " ;      //探测方式：0持续探测1单组探测2定时探测
+        switch (mysetting.detectMode) {
+        case 1:                 //持续探测
+            VeloFile << "NonStop" << endl;
+            break;
+        case 0:                 //单组探测
+            VeloFile << "SingleGroup" << endl;
+            break;
+        case 2:                 //定时探测
+            VeloFile << "scheduled" << endl;
+            break;
+        }
+
+        VeloFile << "elevationAngle:   " << QString::number(mysetting.elevationAngle) << endl;	//俯仰角
+        VeloFile << "start_azAngle:    " << QString::number(mysetting.azAngleStart) << endl;	//起始角
+        VeloFile << "step_azAngle:     " << QString::number(mysetting.azAngleStep) << endl;	//步进角
+        VeloFile << "angleNum:         " << QString::number(mysetting.angleNum) << endl;		//方向数
+        VeloFile << "IntervalTime:     " << QString::number(mysetting.intervalTime) << endl;	//定时探测间隔，单位：分钟
+        VeloFile << "GroupTime:        " << QString::number(mysetting.groupTime) << endl;		//定时探测单组时间，单位：分钟
+
+        //采样参数
+        VeloFile << "sampleFreq:       " << QString::number(mysetting.sampleFreq) << endl;		//采样频率
+        VeloFile << "Trigger_Level:    " << QString::number(mysetting.triggerLevel) << endl;    //触发电平
+        VeloFile << "PreTrigger:       " << QString::number(mysetting.nPointsPreTrigger) << endl;       //预触发点数，保留，暂不提供设置
+
+        //实时处理参数
+        VeloFile << "plsAccNum:        " << QString::number(mysetting.nPulsesAcc) << endl;        //单方向累加脉冲数
+        VeloFile << "nRangeBin:        " << QString::number(mysetting.nRangeBin) << endl;        //距离门数
+        VeloFile << "nPointsPerBin:    " << QString::number(mysetting.nPointsPerBin) << endl;    //距离门内点数
+
+        VeloFile << "Height Axis:      ";
+        QString str;
+        str = "";
+//        for(int i=0;i<mysetting.nRangeBin;i++)
+//            str = str + QString::number(Height_values[i],'f', 2) + " ";
+        VeloFile << str << endl;
+
+
+
+        for(int i=0;i<60;i++)
+            VeloFile << "=";                    // =分隔符
+        VeloFile << endl;
+        outputVelo.close();
+        //        qDebug() << "Velofile Header added!";
+    }
+}
+
 void DevicesControl::SaveSpec_FileHead()
 {
     Create_DataFolder();
     SpecFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hh_mm_ss");
-    SpecFileName = mysetting.dataFilePath+"/"+"KnapsackCDL("+").spec";
-    //    SpecFileName = mysetting.DatafilePath+"/"+"KnapsackCDL("+ SpecFileName +").spec";
+    //    SpecFileName = mysetting.dataFilePath+"/"+"KnapsackCDL("+").spec";
+    SpecFileName = mysetting.dataFilePath+"/"+"KnapsackCDL("+ SpecFileName +").spec";
     //    qDebug()<<"SpecFileName = "<<SpecFileName;
     QFile outputSpec(SpecFileName);
 
@@ -505,17 +575,36 @@ void DevicesControl::SaveSpec_AddData()
     if(outputSpec.open(QFile::WriteOnly|QIODevice::Append))       //追加
     {
         QDataStream specFile(&outputSpec);
-        specFile << CaptureTime.toMSecsSinceEpoch();
-        specFile << currentMotorAngle;
-        specFile.writeRawData((char*)adq.get_PSD_Union(), mysetting.nRangeBin * nFFT_half*8);      // 8为Uint64所占字节数
+        quint64 CTms = CaptureTime.toMSecsSinceEpoch();
+        specFile.writeRawData((char*)&CTms,sizeof(quint64));
+        specFile.writeRawData((char*)&currentMotorAngle,sizeof(double));
+        specFile.writeRawData((char*)adq.get_PSD_Union(), (mysetting.nRangeBin+2) * nFFT_half*sizeof(quint64));
         outputSpec.close();
         //        qDebug() << "Specfile 1 Dir added!";
     }
 }
 
+void DevicesControl::SaveVelo_AddData()
+{
+    QFile outputVelo(VeloFileName);
+    if(outputVelo.open(QFile::WriteOnly|QIODevice::Append))       //追加
+    {
+        QDataStream veloFile(&outputVelo);
+        quint64 CTms = CaptureTime.toMSecsSinceEpoch();
+        veloFile.writeRawData((char*)&CTms,sizeof(quint64));
+        veloFile.writeRawData((char*)&currentMotorAngle,sizeof(double));
+
+        veloFile.writeRawData((char*)hVelocity, mysetting.nRangeBin * sizeof(double));
+        veloFile.writeRawData((char*)hAngle, mysetting.nRangeBin * sizeof(double));
+        veloFile.writeRawData((char*)vVelocity, mysetting.nRangeBin * sizeof(double));
+        outputVelo.close();
+        //        qDebug() << "Velofile 1 Dir added!";
+    }
+}
 void DevicesControl::Create_DataFolder()
 {
     QDir mypath;
+    qDebug()<<"mysetting.dataFilePath==============="<<mysetting.dataFilePath;
     if(!mypath.exists(mysetting.dataFilePath))		//如果文件夹不存在，创建文件夹
         mypath.mkpath(mysetting.dataFilePath);
 }
