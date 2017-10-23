@@ -43,7 +43,6 @@ SOURCES += \
     laserseedthread.cpp \
     laserpulsethread.cpp \
     dswf.cpp \
-    losvelocity.cpp \
     parametersetdialog.cpp \
     dispsettings.cpp \
     devicescontrol.cpp
@@ -68,7 +67,6 @@ HEADERS += \
     laserseedthread.h \
     laserpulsethread.h \
     dswf.h \
-    losvelocity.h \
     parametersetdialog.h \
     dispsettings.h \
     devicescontrol.h
