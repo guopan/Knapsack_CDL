@@ -10,20 +10,22 @@ DSWF::DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNu
 
     Eigen::Matrix3d SiSum;
     SiSum << 0,0,0,0,0,0,0,0,0;
-    Eigen::MatrixXd Si = MatrixXd::Zero(3,losNum);
+    Eigen::Vector3d Si;
     for(int i=0;i<losNum;i++){
-        Si(0,i) = qSin(qDegreesToRadians(elevationAngle));
-        Si(1,i) = qCos(qDegreesToRadians(elevationAngle))*qCos(qDegreesToRadians(azimuthAngle(i)));
-        Si(2,i) = qCos(qDegreesToRadians(elevationAngle))*qSin(qDegreesToRadians(azimuthAngle(i)));
+        Si(0) = qSin(qDegreesToRadians(elevationAngle));
+        Si(1) = qCos(qDegreesToRadians(elevationAngle))*qCos(qDegreesToRadians(azimuthAngle(i)));
+        Si(2) = qCos(qDegreesToRadians(elevationAngle))*qSin(qDegreesToRadians(azimuthAngle(i)));
         SiSum = SiSum + Si*Si.transpose();
     }
 
+    std::cout << "SiSum = " << SiSum << "\n";
     for(int m=0;m<heightNum;m++) {
         Eigen::Vector3d SiVri(0,0,0);
         Eigen::Vector3d temp(0,0,0);
         for(int n=0;n<losNum;n++) {
-            SiVri = SiVri + losVelocity(m,n)*Si.col(n);
+            SiVri = SiVri + losVelocity(m,n)*Si;
         }
+        std::cout << "SiVri = " << SiVri << "\n";
         temp = SiSum.inverse()*SiVri;
         vectorVelocity.row(m) = temp;
     }
