@@ -15,20 +15,17 @@ DSWF::DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNu
         Si(0,i) = qSin(qDegreesToRadians(elevationAngle));
         Si(1,i) = qCos(qDegreesToRadians(elevationAngle))*qCos(qDegreesToRadians(azimuthAngle(i)));
         Si(2,i) = qCos(qDegreesToRadians(elevationAngle))*qSin(qDegreesToRadians(azimuthAngle(i)));
+        SiSum = SiSum + Si*Si.transpose();
     }
-    SiSum = SiSum + Si*Si.transpose();
-
-    qDebug() << "SiSum";
 
     for(int m=0;m<heightNum;m++) {
-        qDebug() << "Height num = " << heightNum;
         Eigen::Vector3d SiVri(0,0,0);
         Eigen::Vector3d temp(0,0,0);
         for(int n=0;n<losNum;n++) {
             SiVri = SiVri + losVelocity(m,n)*Si.col(n);
-            temp = SiSum.inverse()*SiVri;
-            vectorVelocity.row(m) = temp;
         }
+        temp = SiSum.inverse()*SiVri;
+        vectorVelocity.row(m) = temp;
     }
 }
 double *DSWF::getHVelocity()
@@ -45,7 +42,7 @@ double *DSWF::getHAngle()
 {
     double *HAngle = new double[heightNum];
     for (int i = 0; i < heightNum; i++) {
-        HAngle[i] = qAtan2(vectorVelocity(i,2), vectorVelocity(i,1));
+        HAngle[i] = 0.0-qRadiansToDegrees(qAtan2(vectorVelocity(i,2), vectorVelocity(i,1)));
     }
     return HAngle;
 }
