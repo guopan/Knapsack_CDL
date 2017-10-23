@@ -1,3 +1,4 @@
+#include "global_defines.h"
 #include "compass.h"
 #include <QDebug>
 
@@ -13,7 +14,7 @@ void compass::read()
     //Òª·¢ËÍµÄÃüÁî
     QString str = "6804000408";
     StringToHex(str,senddata);
-    workthread.transaction("COM4",senddata);
+    workthread.transaction(CompassComPort,senddata);
 }
 
 void compass::StringToHex(QString str, QByteArray &senddata)
@@ -94,5 +95,3 @@ void compass::processError(const QString &s)
 {
     qDebug()<<"compass error:"<<s;
 }
-
-
