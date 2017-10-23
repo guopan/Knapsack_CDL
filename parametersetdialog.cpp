@@ -285,16 +285,17 @@ void ParameterSetDialog::refreshDisp()
     ui->objFreqPointsDispLabel->setText(objFreqPointsDispStr);
     ui->nDirsVectorCalLineEdit->setText(QString::number(paraSettings.nDirsVectorCal));
 
-    QString dataStorePath;
-    if (paraSettings.autoCreateDateDir) {
-        QString currentDate = QDate::currentDate().toString("yyyyMMdd");
-        dataStorePath = paraSettings.dataFilePath+"/"+currentDate;
-    }
-    else {
-        dataStorePath = paraSettings.dataFilePath;
-    }
-    ui->dataFilePathLineEdit->setText(dataStorePath);
-    QDir currentDir(dataStorePath);
+//    QString dataStorePath;
+//    if (paraSettings.autoCreateDateDir) {
+//        QString currentDate = QDate::currentDate().toString("yyyyMMdd");
+//        dataStorePath = paraSettings.dataFilePath+"/"+currentDate;
+//    }
+//    else {
+//        dataStorePath = paraSettings.dataFilePath;
+//    }
+    checkDataFilePath();
+    ui->dataFilePathLineEdit->setText(paraSettings.dataFilePath);
+    QDir currentDir(paraSettings.dataFilePath);
     if (!currentDir.exists()) {
         ui->dataFilePathLineEdit->setStyleSheet("color:red");
     }
@@ -684,4 +685,57 @@ void ParameterSetDialog::on_resetSettingsPushButton_clicked()
         refreshDisp();
         DispSettings disp(paraSettings);
     }
+}
+
+void ParameterSetDialog::checkDataFilePath()
+{
+    QString str = paraSettings.dataFilePath;
+
+    QDir mypath(str);
+    QString dirname = mypath.dirName();
+    QDateTime time = QDateTime::currentDateTime();
+
+    int num = dirname.toInt();
+    int len = dirname.length();
+    if(paraSettings.autoCreateDateDir)
+    {
+        QString today_str = time.toString("yyyyMMdd");
+        int today_int = today_str.toInt();
+        if(len == 8 && (num != today_int) && qAbs(num - today_int)<10000)
+        {
+            str = mypath.absolutePath();
+            int str_len = str.length();
+            str.resize(str_len - 8);
+            str += today_str;
+        }
+
+        else if( dirname != time.toString("yyyyMMdd"))
+        {
+            str = mypath.absolutePath();
+            str += QString("/");
+            str += time.toString("yyyyMMdd");			//设置显示格式
+            qDebug()<<"Dir not Match";
+        }
+        qDebug()<<str<<endl;
+    }
+    else												//选择不生成日期路径时，如果当前日期路径存在，则删除。
+    {
+        if( dirname == time.toString("yyyyMMdd"))
+        {
+            if (!mypath.exists())
+            {
+                str = mypath.absolutePath();
+                int str_len = str.length();
+                str.resize(str_len - 9);				//减去/20xxxxxx
+            }
+            qDebug()<<"Dir Match"<<str<<endl;
+        }
+    }
+
+    qDebug()<<"mysetting.dataFilePath==============="<<paraSettings.dataFilePath;
+    qDebug()<<"New.dataFilePath==============="<<str;
+    paraSettings.dataFilePath = str;
+
+    //    if(!mypath.exists(mysetting.dataFilePath))		//如果文件夹不存在，创建文件夹
+    //        mypath.mkpath(mysetting.dataFilePath);
 }

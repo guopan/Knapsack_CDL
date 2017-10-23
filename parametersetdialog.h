@@ -104,6 +104,7 @@ private slots:
 
     void on_resetSettingsPushButton_clicked();
 
+    void checkDataFilePath();
 private:
     Ui::ParameterSetDialog *ui;
     void refreshDisp();

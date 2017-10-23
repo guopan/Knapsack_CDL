@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_setfile = new SettingFile();
     mysetting = m_setfile->readSettings();
     qDebug() << "Settings already readed";
+    qDebug() << "Settings_PathName"<<mysetting.dataFilePath;
+    checkDataFilePath();
 
     //主界面添加工具栏，分为用户工具栏和管理员工具栏
     userToolBar = new UserToolBar();
@@ -49,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->gridLayout->addWidget(DisplaySpeed);
 
     connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
-//    qDebug() << "aaaaaaaaaaaaaaa";
+    //    qDebug() << "aaaaaaaaaaaaaaa";
     devicesControl = new DevicesControl();
     connect(devicesControl, &DevicesControl::hVelocityReady, this, &MainWindow::updateHVelocityDisp);
     connect(devicesControl, &DevicesControl::hAngleReady, this, &MainWindow::updateHAngleDisp);
@@ -57,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     workThread = new QThread;
     devicesControl->moveToThread(workThread);
+    connect(workThread, &QThread::finished, devicesControl, &QObject::deleteLater);
     workThread->start();
     isWorking = false;
 }
@@ -85,9 +88,6 @@ void MainWindow::setActionTriggered()
     delete parameterSetDialog;
 }
 
-
-
-
 void MainWindow::quitActionTriggered()
 {
     //待完善
@@ -99,6 +99,8 @@ void MainWindow::startActionTriggered()
     if (isWorking) {
         isWorking = false;
         devicesControl->stopAction();
+//        workThread->quit();
+//        workThread->wait();
     }
     else {
         isWorking = true;
@@ -200,8 +202,60 @@ void MainWindow::updateVVelocityDisp(double *vVelocity)
 
 void MainWindow::on_pushButton_3_clicked()
 {
-ADQ214 adq;
-        adq.Transfer_Settings(mysetting);
-        adq.Init_Buffers();
-adq.Start_Capture();
+    devicesControl->Create_DataFolder();
+//    ADQ214 adq;
+//    adq.Transfer_Settings(mysetting);
+//    adq.Init_Buffers();
+//    adq.Start_Capture();
+}
+
+void MainWindow::checkDataFilePath()
+{
+    QString str = mysetting.dataFilePath + "/20170108";
+
+    QDir mypath(str);
+    QString dirname = mypath.dirName();
+    QDateTime time = QDateTime::currentDateTime();
+
+    int num = dirname.toInt();
+    int len = dirname.length();
+    if(mysetting.autoCreateDateDir)
+    {
+        QString today_str = time.toString("yyyyMMdd");
+        int today_int = today_str.toInt();
+        if(len == 8 && (num != today_int) && qAbs(num - today_int)<10000)
+        {
+            str = mypath.absolutePath();
+            int str_len = str.length();
+            str.resize(str_len - 8);
+            str += today_str;
+        }
+
+        else if( dirname != time.toString("yyyyMMdd"))
+        {
+            str = mypath.absolutePath();
+            str += QString("/");
+            str += time.toString("yyyyMMdd");			//设置显示格式
+            qDebug()<<"Dir not Match";
+        }
+        qDebug()<<str<<endl;
+    }
+    else												//选择不生成日期路径时，如果当前日期路径存在，则删除。
+    {
+        if( dirname == time.toString("yyyyMMdd"))
+        {
+            if (!mypath.exists())
+            {
+                str = mypath.absolutePath();
+                int str_len = str.length();
+                str.resize(str_len - 9);				//减去/20xxxxxx
+            }
+            qDebug()<<"Dir Match"<<str<<endl;
+        }
+    }
+
+    qDebug()<<"mysetting.dataFilePath==============="<<mysetting.dataFilePath;
+    qDebug()<<"New.dataFilePath==============="<<str;
+    mysetting.dataFilePath = str;
+
 }
