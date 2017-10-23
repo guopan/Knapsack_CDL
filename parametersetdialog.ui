@@ -275,7 +275,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -284,9 +284,9 @@
     <widget class="QWidget" name="horizontalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>20</y>
-       <width>311</width>
+       <x>30</x>
+       <y>40</y>
+       <width>359</width>
        <height>271</height>
       </rect>
      </property>
@@ -492,15 +492,18 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="laserLocalPowerLineEdit">
-          <property name="font">
-           <font>
-            <family>微软雅黑</family>
-            <pointsize>12</pointsize>
-           </font>
+         <widget class="QDoubleSpinBox" name="laserLocalPowerdoubleSpinBox">
+          <property name="decimals">
+           <number>3</number>
           </property>
-          <property name="layoutDirection">
-           <enum>Qt::RightToLeft</enum>
+          <property name="minimum">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>4.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
           </property>
          </widget>
         </item>
@@ -518,15 +521,18 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="laserPulseEnergyLineEdit">
-          <property name="font">
-           <font>
-            <family>微软雅黑</family>
-            <pointsize>12</pointsize>
-           </font>
+         <widget class="QDoubleSpinBox" name="laserPulseEnergydoubleSpinBox">
+          <property name="decimals">
+           <number>3</number>
           </property>
-          <property name="layoutDirection">
-           <enum>Qt::RightToLeft</enum>
+          <property name="minimum">
+           <double>10.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>100.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>10.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -544,15 +550,21 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="laserRPFLineEdit">
-          <property name="font">
-           <font>
-            <family>微软雅黑</family>
-            <pointsize>12</pointsize>
-           </font>
+         <widget class="QDoubleSpinBox" name="laserRPFdoubleSpinBox">
+          <property name="decimals">
+           <number>3</number>
           </property>
-          <property name="layoutDirection">
-           <enum>Qt::RightToLeft</enum>
+          <property name="minimum">
+           <double>0.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000000000.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>10.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>10000.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -570,7 +582,23 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="laserPulseWidthLineEdit"/>
+         <widget class="QDoubleSpinBox" name="laserPulseWidthdoubleSpinBox">
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>0.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>1000000.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>10.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>400.000000000000000</double>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_10">
@@ -586,7 +614,20 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="laserWaveLengthLineEdit"/>
+         <widget class="QDoubleSpinBox" name="laserWaveLengthdoubleSpinBox">
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="maximum">
+           <double>10.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.001000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.545000000000000</double>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_11">
@@ -602,7 +643,17 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="laserAOMFreqLineEdit"/>
+         <widget class="QDoubleSpinBox" name="laserAOMdoubleSpinBox">
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="maximum">
+           <double>500.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>120.000000000000000</double>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_12">
@@ -780,7 +831,7 @@
       <rect>
        <x>10</x>
        <y>7</y>
-       <width>401</width>
+       <width>408</width>
        <height>382</height>
       </rect>
      </property>
@@ -1079,7 +1130,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="triggerLevelLineEdit"/>
+         <widget class="QSpinBox" name="triggerLevelSpinBox">
+          <property name="maximum">
+           <number>8192</number>
+          </property>
+          <property name="value">
+           <number>1500</number>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_26">
@@ -1095,7 +1153,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="nPointsPretriggerLineEdit"/>
+         <widget class="QSpinBox" name="nPointsPretriggerSpinBox">
+          <property name="maximum">
+           <number>1024</number>
+          </property>
+          <property name="value">
+           <number>500</number>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_29">
@@ -1111,7 +1176,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="nPointsMirrorWidthLineEdit"/>
+         <widget class="QSpinBox" name="nPointsMirrorWidthSpinBox">
+          <property name="maximum">
+           <number>1024</number>
+          </property>
+          <property name="value">
+           <number>500</number>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_32">
@@ -1127,7 +1199,20 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="nPointsPerBinLineEdit"/>
+         <widget class="QSpinBox" name="nPointsPerBinSpinBox">
+          <property name="minimum">
+           <number>100</number>
+          </property>
+          <property name="maximum">
+           <number>500</number>
+          </property>
+          <property name="singleStep">
+           <number>2</number>
+          </property>
+          <property name="value">
+           <number>250</number>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_40">
@@ -1173,7 +1258,17 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="nRangeBinLineEdit"/>
+         <widget class="QSpinBox" name="nRangeBinSpinBox">
+          <property name="minimum">
+           <number>10</number>
+          </property>
+          <property name="maximum">
+           <number>20</number>
+          </property>
+          <property name="value">
+           <number>14</number>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_42">
@@ -1189,7 +1284,14 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="nPulsesAccLineEdit"/>
+         <widget class="QSpinBox" name="nPulsesAccSpinBox">
+          <property name="maximum">
+           <number>1000000000</number>
+          </property>
+          <property name="value">
+           <number>10000</number>
+          </property>
+         </widget>
         </item>
         <item>
          <spacer name="verticalSpacer_43">
@@ -1205,9 +1307,21 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="nPointsObjFreqLineEdit">
-          <property name="text">
-           <string/>
+         <widget class="QDoubleSpinBox" name="nPointsObjFreqdoubleSpinBox">
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="minimum">
+           <double>5.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>30.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>20.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -1225,7 +1339,17 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLineEdit" name="nDirsVectorCalLineEdit"/>
+         <widget class="QSpinBox" name="nDirsVectorCalSpinBox">
+          <property name="minimum">
+           <number>3</number>
+          </property>
+          <property name="maximum">
+           <number>24</number>
+          </property>
+          <property name="value">
+           <number>4</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -1430,9 +1554,9 @@
     <widget class="QGroupBox" name="groupBox_6">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>30</x>
        <y>40</y>
-       <width>391</width>
+       <width>381</width>
        <height>161</height>
       </rect>
      </property>
@@ -1461,7 +1585,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="angleNumLineEdit"/>
+            <widget class="QSpinBox" name="angleNumSpinBox">
+             <property name="maximum">
+              <number>1000000</number>
+             </property>
+             <property name="value">
+              <number>80</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -1475,9 +1606,18 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="circleNumLineEdit">
-             <property name="enabled">
-              <bool>true</bool>
+            <widget class="QDoubleSpinBox" name="circleNumdoubleSpinBox">
+             <property name="decimals">
+              <number>2</number>
+             </property>
+             <property name="maximum">
+              <double>100000.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>20.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -1496,6 +1636,25 @@
             </widget>
            </item>
            <item>
+            <widget class="QDoubleSpinBox" name="motorSpeeddoubleSpinBox">
+             <property name="decimals">
+              <number>2</number>
+             </property>
+             <property name="minimum">
+              <double>30.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>90.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>5.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>30.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="horizontalSpacer_3">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1507,9 +1666,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="motorSpeedLineEdit"/>
            </item>
           </layout>
          </item>
@@ -1563,24 +1719,20 @@
      <widget class="QWidget" name="gridLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>186</x>
         <y>30</y>
-        <width>181</width>
+        <width>201</width>
         <height>121</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="azAngleStartLineEdit"/>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="azAngleStepLineEdit"/>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="elevationAngleLineEdit"/>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_33">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>方位起始角：</string>
          </property>
@@ -1591,6 +1743,11 @@
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_26">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>俯仰角：</string>
          </property>
@@ -1601,6 +1758,11 @@
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_31">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>方位步进角：</string>
          </property>
@@ -1627,6 +1789,51 @@
         <widget class="QLabel" name="label_25">
          <property name="text">
           <string> °</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QDoubleSpinBox" name="azAngleStartdoubleSpinBox">
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="maximum">
+          <double>120.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>5.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="azAngleStepdoubleSpinBox">
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="maximum">
+          <double>120.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>5.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>45.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QDoubleSpinBox" name="elevationAngledoubleSpinBox">
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="maximum">
+          <double>90.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>5.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>70.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -1663,7 +1870,17 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="intervalTimeLineEdit"/>
+        <widget class="QDoubleSpinBox" name="intervalTimedoubleSpinBox">
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="maximum">
+          <double>1000000.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>15.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_28">
@@ -1711,7 +1928,20 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="groupTimeLineEdit"/>
+        <widget class="QDoubleSpinBox" name="groupTimedoubleSpinBox">
+         <property name="decimals">
+          <number>2</number>
+         </property>
+         <property name="maximum">
+          <double>1000000.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>3.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_30">
@@ -1810,7 +2040,17 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="nDirsPerFileLineEdit"/>
+         <widget class="QSpinBox" name="nDirsPerFileSpinBox">
+          <property name="minimum">
+           <number>100</number>
+          </property>
+          <property name="maximum">
+           <number>2000</number>
+          </property>
+          <property name="value">
+           <number>1000</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="label_52">

@@ -25,72 +25,19 @@ public:
 
 private slots:
 
-    void on_laserLocalPowerLineEdit_textChanged(const QString &arg1);
-
-    void on_laserPulseEnergyLineEdit_textChanged(const QString &arg1);
-
-    void on_laserRPFLineEdit_textChanged(const QString &arg1);
-
-    void on_laserPulseWidthLineEdit_textChanged(const QString &arg1);
-
-    void on_laserWaveLengthLineEdit_textChanged(const QString &arg1);
-
-    void on_laserAOMFreqLineEdit_textChanged(const QString &arg1);
-
     void on_sampleFreqComboBox_activated(const QString &arg1);
 
-    void on_triggerLevelLineEdit_textChanged(const QString &arg1);
-
-    void on_nPointsPretriggerLineEdit_textChanged(const QString &arg1);
-
-    void on_nPointsMirrorWidthLineEdit_textChanged(const QString &arg1);
-
-    void on_nPointsPerBinLineEdit_textChanged(const QString &arg1);
-
     void on_overlapRatioComboBox_activated(const QString &arg1);
-
-    void on_nRangeBinLineEdit_textChanged(const QString &arg1);
-
-    void on_nPulsesAccLineEdit_textChanged(const QString &arg1);
-
-    void on_nPointsObjFreqLineEdit_textChanged(const QString &arg1);
-
-    void on_nDirsVectorCalLineEdit_textChanged(const QString &arg1);
 
     void on_detectModeComboBox_activated(int index);
 
     void on_anglekeyRadioButton_clicked(bool checked);
 
-
-//    void on_angleNumLineEdit_editingFinished();
-
     void on_circlekeyRadioButton_clicked(bool checked);
-
-//    void on_circleNumLineEdit_editingFinished();
-
-    void on_azAngleStartLineEdit_textChanged(const QString &arg1);
-
-    void on_azAngleStepLineEdit_textChanged(const QString &arg1);
-
-    void on_motorSpeedLineEdit_textChanged(const QString &arg1);
-
-    void on_elevationAngleLineEdit_textChanged(const QString &arg1);
-
-    void on_intervalTimeLineEdit_textChanged(const QString &arg1);
-
-    void on_groupTimeLineEdit_textChanged(const QString &arg1);
-
-    void on_nDirsPerFileLineEdit_textChanged(const QString &arg1);
 
     void on_autoCreateDateDirCheckBox_clicked(bool checked);
 
     void on_pathModifyPushButton_clicked();
-
-    void on_angleNumLineEdit_textChanged(const QString &arg1);
-
-    void on_circleNumLineEdit_textChanged(const QString &arg1);
-
-    void on_nPointsObjFreqLineEdit_editingFinished();
 
     void on_saveSettingsPushButton_clicked();
 
@@ -103,6 +50,54 @@ private slots:
     void on_cancelSetPushButton_clicked();
 
     void on_resetSettingsPushButton_clicked();
+
+    void on_laserLocalPowerdoubleSpinBox_valueChanged(double arg1);
+
+    void on_laserPulseEnergydoubleSpinBox_valueChanged(double arg1);
+
+    void on_laserRPFdoubleSpinBox_valueChanged(double arg1);
+
+    void on_laserPulseWidthdoubleSpinBox_valueChanged(double arg1);
+
+    void on_laserWaveLengthdoubleSpinBox_valueChanged(double arg1);
+
+    void on_laserAOMdoubleSpinBox_valueChanged(double arg1);
+
+    void on_triggerLevelSpinBox_valueChanged(int arg1);
+
+    void on_nPointsPretriggerSpinBox_valueChanged(int arg1);
+
+    void on_nPointsMirrorWidthSpinBox_valueChanged(int arg1);
+
+    void on_nPointsPerBinSpinBox_valueChanged(int arg1);
+
+    void on_nPulsesAccSpinBox_valueChanged(int arg1);
+
+    void on_nRangeBinSpinBox_valueChanged(int arg1);
+
+    void on_nPointsObjFreqdoubleSpinBox_valueChanged(double arg1);
+
+    void on_nPointsObjFreqdoubleSpinBox_editingFinished();
+
+    void on_nDirsVectorCalSpinBox_valueChanged(int arg1);
+
+    void on_azAngleStartdoubleSpinBox_valueChanged(double arg1);
+
+    void on_azAngleStepdoubleSpinBox_valueChanged(double arg1);
+
+    void on_motorSpeeddoubleSpinBox_valueChanged(double arg1);
+
+    void on_elevationAngledoubleSpinBox_valueChanged(double arg1);
+
+    void on_intervalTimedoubleSpinBox_valueChanged(double arg1);
+
+    void on_groupTimedoubleSpinBox_valueChanged(double arg1);
+
+    void on_nDirsPerFileSpinBox_valueChanged(int arg1);
+
+    void on_angleNumSpinBox_valueChanged(int arg1);
+
+    void on_circleNumdoubleSpinBox_valueChanged(double arg1);
 
     void checkDataFilePath();
 private:
@@ -119,36 +114,6 @@ private:
     SettingFile *paraSettingFile;
 
     void mouseDoubleClickEvent(QMouseEvent *event);
-
-    //laser Parameters
-    QRegExpValidator *laserPulseEnergyRegExpV;
-    QRegExpValidator *laserLocalPowerRegExpV;
-    QRegExpValidator *laserRPFRegExpV;
-    QRegExpValidator *laserPulseWidthRegExpV;
-    QRegExpValidator *laserWaveLengthRegExpV;
-    QRegExpValidator *laserAOMFreqRegExpV;
-    //Scan Parameters
-    QRegExpValidator *elevationAngleRegExpV;
-    QRegExpValidator *azAngleStartRegExpV;
-    QRegExpValidator *azAngleStepRegExpV;
-    QRegExpValidator *angleNumRegExpV;
-    QRegExpValidator *circleNumRegExpV;
-    QRegExpValidator *motorSpeedRegExpV;
-    QRegExpValidator *intervalTimeRegExpV;
-    QRegExpValidator *groupTimeRegExpV;
-    //Sample Parameters
-    QRegExpValidator *triggerLevelRegExpV;
-    QRegExpValidator *nPointsPreTriggerRegExpV;
-    //Real Time Process
-    QRegExpValidator *nPulsesAccRegExpV;
-    QRegExpValidator *nRangeBinRegExpV;
-    QRegExpValidator *nPointsPerBinRegExpV;
-    QRegExpValidator *nPointsMirrorWidthRegExpV;
-    //Vector Velocity Inversion
-    QRegExpValidator *nPointsObjFreqRegExpV;
-    QRegExpValidator *nDirsVectorCalRegExpV;
-    //File Store
-    QRegExpValidator *nDirsPerFileRegExpV;
 };
 
 #endif // PARADIALOG_H

@@ -211,7 +211,7 @@ void MainWindow::on_pushButton_3_clicked()
 
 void MainWindow::checkDataFilePath()
 {
-    QString str = mysetting.dataFilePath + "/20170108";
+    QString str = mysetting.dataFilePath;
 
     QDir mypath(str);
     QString dirname = mypath.dirName();
