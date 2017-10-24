@@ -72,7 +72,7 @@ SOFTWARESETTINGS SettingFile::readSettings()
     fsetting.laserLocalPower = settings.value("laserLocalPower",1.0).toDouble();    //激光功率
     fsetting.laserRPF = settings.value("laserRPF",10.0).toDouble();                 //激光重频
     fsetting.laserPulseWidth = settings.value("laserPulseWidth",400.0).toInt();     //激光脉宽
-    fsetting.laserWaveLength = settings.value("laserWaveLength",1.545).toDouble();  //激光波长
+    fsetting.laserWaveLength = settings.value("laserWaveLength",1.550).toDouble();  //激光波长
     fsetting.laserAOMFreq = settings.value("laserAOMFreq",120.0).toDouble();        //AOM移频量
     settings.endGroup();
 
@@ -147,29 +147,29 @@ void SettingFile::testSettings()
         settings.beginGroup("Scan_Parameters");
         settings.setValue("detectMode",0);                      //探测模式：0持续探测1单组探测2定时探测
         settings.setValue("elevationAngle",70.0);               //俯仰角
-        settings.setValue("azAngleStart",0.0);                 //起始角
-        settings.setValue("azAngleStep",45.0);                 //步进角
+        settings.setValue("azAngleStart",0.0);                  //起始角
+        settings.setValue("azAngleStep",45.0);                  //步进角
         settings.setValue("angleNum",80);                       //方向数
         settings.setValue("circleNum",10.0);                    //圆周数
-        settings.setValue("isAngleChecked",true);                     //方向键
-        settings.setValue("isCircleChecked",false);                   //圆周键
-        settings.setValue("motorSpeed",90.0);                             //扫描速度
-        settings.setValue("motorSpeed",15.0);                 //分组间隔
+        settings.setValue("isAngleChecked",true);               //方向键
+        settings.setValue("isCircleChecked",false);             //圆周键
+        settings.setValue("motorSpeed",90.0);                   //扫描速度
+        settings.setValue("motorSpeed",15.0);                   //分组间隔
         settings.setValue("groupTime",3.0);                     //每组探测时间
         settings.endGroup();
 
         settings.beginGroup("Sample_Parameters");
         settings.setValue("sampleFreq",400.0);                  //采样频率
-        settings.setValue("triggerLevel",1500);                //触发电平
-        settings.setValue("nPointsPreTrigger",500);                    //预触发点数，保留，暂不提供设置
+        settings.setValue("triggerLevel",1500);                 //触发电平
+        settings.setValue("nPointsPreTrigger",500);             //预触发点数，保留，暂不提供设置
         settings.endGroup();
 
         settings.beginGroup("Realtime_Process");
         settings.setValue("nPulsesAcc",10000);                   //单方向累加脉冲数
-        settings.setValue("nRangeBin",14);                      //距离门数
-        settings.setValue("nPointsPerBin",250);                 //距离门内点数
-        settings.setValue("overlapRatio",0);                    //距离门重叠率
-        settings.setValue("nPointsPerBin",250);             //径向风速范围
+        settings.setValue("nRangeBin",14);                       //距离门数
+        settings.setValue("nPointsPerBin",250);                  //距离门内点数
+        settings.setValue("overlapRatio",0);                     //距离门重叠率
+        settings.setValue("nPointsPerBin",250);                  //径向风速范围
         settings.endGroup();
 
         settings.beginGroup("Vector_Velocity_Inversion");
@@ -197,7 +197,7 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
     SOFTWARESETTINGS dlgsetting = setting;
     if(fsetting.laserPulseEnergy != dlgsetting.laserPulseEnergy)    //激光能量
         return true;
-    if(fsetting.laserLocalPower != dlgsetting.laserLocalPower)                //激光功率
+    if(fsetting.laserLocalPower != dlgsetting.laserLocalPower)      //激光功率
         return true;
     if(fsetting.laserRPF != dlgsetting.laserRPF)					//激光重频
         return true;
@@ -205,7 +205,7 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
         return true;
     if(fsetting.laserWaveLength != dlgsetting.laserWaveLength)		//激光波长
         return true;
-    if(fsetting.laserAOMFreq != dlgsetting.laserAOMFreq)					//AOM移频量
+    if(fsetting.laserAOMFreq != dlgsetting.laserAOMFreq)			//AOM移频量
         return true;
 
     if(fsetting.detectMode != dlgsetting.detectMode)
@@ -214,7 +214,7 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
         return true;
     if(fsetting.azAngleStart != dlgsetting.azAngleStart)			//起始角
         return true;
-    if(fsetting.azAngleStep != dlgsetting.azAngleStep)			//步进角
+    if(fsetting.azAngleStep != dlgsetting.azAngleStep)		       	//步进角
         return true;
     if(fsetting.angleNum != dlgsetting.angleNum)					//方向数
         return true;
@@ -224,7 +224,7 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
         return true;
     if(fsetting.isCircleChecked != dlgsetting.isCircleChecked)
         return true;
-    if(fsetting.motorSpeed != dlgsetting.motorSpeed)								//电机速度
+    if(fsetting.motorSpeed != dlgsetting.motorSpeed)			    //电机速度
         return true;
     if(fsetting.intervalTime != dlgsetting.intervalTime)
         return true;
@@ -233,12 +233,12 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
 
     if(fsetting.sampleFreq != dlgsetting.sampleFreq)				//采样频率
         return true;
-    if(fsetting.triggerLevel != dlgsetting.triggerLevel)          //触发电平
+    if(fsetting.triggerLevel != dlgsetting.triggerLevel)            //触发电平
         return true;
-    if(fsetting.nPointsPreTrigger !=dlgsetting.nPointsPreTrigger)                 //预触发点数
+    if(fsetting.nPointsPreTrigger !=dlgsetting.nPointsPreTrigger)   //预触发点数
         return true;
 
-    if(fsetting.nPulsesAcc != dlgsetting.nPulsesAcc)                  //单方向累加脉冲数
+    if(fsetting.nPulsesAcc != dlgsetting.nPulsesAcc)                //单方向累加脉冲数
         return true;
     if(fsetting.nRangeBin !=dlgsetting.nRangeBin)                   //距离门数
         return true;
@@ -256,9 +256,9 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
 
     if(fsetting.dataFilePath != dlgsetting.dataFilePath)			  //文件保存路径
         return true;
-    if(fsetting.autoCreateDateDir != dlgsetting.autoCreateDateDir)  //自动创建日期文件夹
+    if(fsetting.autoCreateDateDir != dlgsetting.autoCreateDateDir)    //自动创建日期文件夹
         return true;
-    if(fsetting.nDirsPerFile != dlgsetting.nDirsPerFile)          //单文件方向数
+    if(fsetting.nDirsPerFile != dlgsetting.nDirsPerFile)              //单文件方向数
         return true;
 
     return false;
