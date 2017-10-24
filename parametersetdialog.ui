@@ -26,7 +26,7 @@
      <x>530</x>
      <y>20</y>
      <width>281</width>
-     <height>271</height>
+     <height>281</height>
     </rect>
    </property>
    <property name="font">
@@ -38,211 +38,254 @@
    <property name="title">
     <string>参考信息</string>
    </property>
-   <widget class="QWidget" name="verticalLayoutWidget_3">
+   <widget class="QWidget" name="horizontalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>40</y>
-      <width>241</width>
-      <height>216</height>
+      <x>10</x>
+      <y>30</y>
+      <width>261</width>
+      <height>231</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_9">
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <layout class="QVBoxLayout" name="verticalLayout_16">
        <item>
-        <widget class="QLabel" name="label_2">
+        <spacer name="verticalSpacer_39">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_34">
          <property name="font">
           <font>
            <family>微软雅黑</family>
            <pointsize>12</pointsize>
-           <weight>50</weight>
-           <bold>false</bold>
           </font>
          </property>
          <property name="text">
-          <string>探测方式：</string>
+          <string>起始探测距离：</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="detectModeDispLineEdit">
-         <property name="enabled">
-          <bool>false</bool>
+        <spacer name="verticalSpacer_50">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-          </font>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="contextMenuPolicy">
-          <enum>Qt::DefaultContextMenu</enum>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="frame">
-          <bool>true</bool>
-         </property>
-        </widget>
+        </spacer>
        </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_18">
        <item>
-        <widget class="QLabel" name="label_6">
+        <widget class="QLabel" name="label_35">
          <property name="font">
           <font>
            <family>微软雅黑</family>
            <pointsize>12</pointsize>
-           <weight>50</weight>
-           <bold>false</bold>
           </font>
          </property>
          <property name="text">
-          <string>探测距离：</string>
+          <string>最大探测距离：</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="detectRangeDispLineEdit">
-         <property name="enabled">
-          <bool>false</bool>
+        <spacer name="verticalSpacer_51">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-          </font>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <property name="focusPolicy">
-          <enum>Qt::StrongFocus</enum>
-         </property>
-         <property name="contextMenuPolicy">
-          <enum>Qt::DefaultContextMenu</enum>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="frame">
-          <bool>true</bool>
-         </property>
-        </widget>
+        </spacer>
        </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_14">
        <item>
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="label_36">
          <property name="font">
           <font>
            <family>微软雅黑</family>
            <pointsize>12</pointsize>
-           <weight>50</weight>
-           <bold>false</bold>
           </font>
          </property>
          <property name="text">
-          <string>所需时间：</string>
+          <string>距离分辨率：</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="totalTimeDispLineEdit">
-         <property name="enabled">
-          <bool>false</bool>
+        <spacer name="verticalSpacer_52">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="text">
-          <string/>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-        </widget>
+        </spacer>
        </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_15">
        <item>
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="label_40">
          <property name="font">
           <font>
            <family>微软雅黑</family>
            <pointsize>12</pointsize>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>单数据量：</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="singleFileSizeDispLineEdit">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="contextMenuPolicy">
-          <enum>Qt::PreventContextMenu</enum>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_16">
-       <item>
-        <widget class="QLabel" name="label_5">
-         <property name="font">
-          <font>
-           <family>微软雅黑</family>
-           <pointsize>12</pointsize>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>总数据量：</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="totalFileSizeDispLineEdit">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_19">
-       <item>
-        <widget class="QLabel" name="label_21">
-         <property name="font">
-          <font>
-           <family>微软雅黑</family>
-           <pointsize>12</pointsize>
-           <weight>50</weight>
-           <bold>false</bold>
           </font>
          </property>
          <property name="text">
           <string>设置文件：</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_54">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_17">
+       <item>
+        <spacer name="verticalSpacer_56">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="startDetectRangeDispLineEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::DefaultContextMenu</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="frame">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_57">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="maxDetectRangeDispLineEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::DefaultContextMenu</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="frame">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_58">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="rangeResoDispLineEdit">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_59">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <widget class="QLineEdit" name="settingFilePathDispLineEdit">
@@ -253,6 +296,19 @@
           <string/>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_60">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
@@ -284,9 +340,9 @@
     <widget class="QWidget" name="horizontalLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>40</y>
-       <width>359</width>
+       <x>70</x>
+       <y>70</y>
+       <width>341</width>
        <height>271</height>
       </rect>
      </property>
@@ -556,7 +612,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="laserRPFdoubleSpinBox">
+         <widget class="QDoubleSpinBox" name="laserRPFSpinBox">
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
@@ -567,13 +623,13 @@
            <double>0.000000000000000</double>
           </property>
           <property name="maximum">
-           <double>1000000000.000000000000000</double>
+           <double>1000000.000000000000000</double>
           </property>
           <property name="singleStep">
            <double>10.000000000000000</double>
           </property>
           <property name="value">
-           <double>10000.000000000000000</double>
+           <double>10.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -591,24 +647,15 @@
          </spacer>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="laserPulseWidthdoubleSpinBox">
+         <widget class="QSpinBox" name="laserPulseWidthSpinBox">
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="minimum">
-           <double>0.000000000000000</double>
-          </property>
           <property name="maximum">
-           <double>1000000.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>10.000000000000000</double>
+           <number>1000000</number>
           </property>
           <property name="value">
-           <double>400.000000000000000</double>
+           <number>400</number>
           </property>
          </widget>
         </item>
@@ -752,7 +799,7 @@
            </font>
           </property>
           <property name="text">
-           <string> Hz</string>
+           <string> KHz</string>
           </property>
          </widget>
         </item>
@@ -1365,7 +1412,7 @@
            <number>24</number>
           </property>
           <property name="value">
-           <number>4</number>
+           <number>8</number>
           </property>
          </widget>
         </item>
@@ -1434,9 +1481,9 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="minDetectRangeDispLabel">
+         <widget class="QLabel" name="mirrorWidthTimeDispLabel">
           <property name="text">
-           <string>=►XXXXm</string>
+           <string>=►XXXXns</string>
           </property>
          </widget>
         </item>
@@ -1454,14 +1501,33 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="rangeResolDispLabel">
-          <property name="text">
-           <string>=►XXXXXXXXX m</string>
+         <spacer name="verticalSpacer_45">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-         </widget>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
-         <spacer name="verticalSpacer_45">
+         <spacer name="verticalSpacer_53">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_61">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -1494,14 +1560,20 @@
          </spacer>
         </item>
         <item>
-         <widget class="QLabel" name="maxDetectRangeDispLabel">
-          <property name="text">
-           <string>=►XXXXXXXXX m</string>
+         <spacer name="verticalSpacer_47">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-         </widget>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
-         <spacer name="verticalSpacer_47">
+         <spacer name="verticalSpacer_55">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
@@ -1581,7 +1653,7 @@
      <property name="title">
       <string>扫描参数</string>
      </property>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -1946,12 +2018,12 @@
      <property name="title">
       <string>定时设置</string>
      </property>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>10</x>
         <y>30</y>
-        <width>421</width>
+        <width>479</width>
         <height>32</height>
        </rect>
       </property>
@@ -2088,7 +2160,7 @@
     <widget class="QWidget" name="verticalLayoutWidget_6">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>50</x>
        <y>30</y>
        <width>361</width>
        <height>34</height>
@@ -2137,7 +2209,7 @@
     <widget class="QGroupBox" name="groupBox_5">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>40</x>
        <y>90</y>
        <width>371</width>
        <height>101</height>
@@ -2208,6 +2280,8 @@
       </layout>
      </widget>
     </widget>
+    <zorder>groupBox_5</zorder>
+    <zorder>verticalLayoutWidget_6</zorder>
    </widget>
   </widget>
   <widget class="QWidget" name="verticalLayoutWidget_4">

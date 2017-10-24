@@ -22,8 +22,8 @@ SOFTWARESETTINGS ParameterSetDialog::getParaSettings()
     paraSettings.laserPulseEnergy = ui->laserPulseEnergydoubleSpinBox->value();
     paraSettings.laserLocalPower = ui->laserLocalPowerdoubleSpinBox->value();
     paraSettings.laserAOMFreq = ui->laserAOMdoubleSpinBox->value();
-    paraSettings.laserPulseWidth = ui->laserPulseWidthdoubleSpinBox->value();
-    paraSettings.laserRPF = ui->laserRPFdoubleSpinBox->value();
+    paraSettings.laserPulseWidth = ui->laserPulseWidthSpinBox->value();
+    paraSettings.laserRPF = ui->laserRPFSpinBox->value();
     paraSettings.laserWaveLength = ui->laserWaveLengthdoubleSpinBox->value();
 
     paraSettings.detectMode = ui->detectModeComboBox->currentIndex();
@@ -69,8 +69,8 @@ void ParameterSetDialog::refreshDisp()
     ui->laserPulseEnergydoubleSpinBox->setValue(QString::number(paraSettings.laserPulseEnergy).toDouble());
     ui->laserLocalPowerdoubleSpinBox->setValue(QString::number(paraSettings.laserLocalPower).toDouble());
     ui->laserAOMdoubleSpinBox->setValue(QString::number(paraSettings.laserAOMFreq).toDouble());
-    ui->laserPulseWidthdoubleSpinBox->setValue(QString::number(paraSettings.laserPulseWidth).toDouble());
-    ui->laserRPFdoubleSpinBox->setValue(QString::number(paraSettings.laserRPF).toDouble());
+    ui->laserPulseWidthSpinBox->setValue(QString::number(paraSettings.laserPulseWidth).toInt());
+    ui->laserRPFSpinBox->setValue(QString::number(paraSettings.laserRPF).toDouble());
     ui->laserWaveLengthdoubleSpinBox->setValue(QString::number(paraSettings.laserWaveLength).toDouble());
 
     // scan parameter refresh display on text changed, classified by detect mode
@@ -136,21 +136,14 @@ void ParameterSetDialog::refreshDisp()
     QString preTriggerWidthTimeStr = "=" + QString::number(getPreTriggerTimeLength(), 'f', 3) + "ns";
     ui->preTriggerInTimeDispLabel->setText(preTriggerWidthTimeStr);
     ui->nPointsMirrorWidthSpinBox->setValue(QString::number(paraSettings.nPointsMirrorWidth).toInt());
-    double minDetectRange = getMinDetectRange();
-    QString minDetectRangeDispStr = "=" + QString::number(minDetectRange, 'f', 2) + "m" + "/" +
-            QString::number(minDetectRange*qSin(qDegreesToRadians(paraSettings.elevationAngle)), 'f', 2) + "m";
-    ui->minDetectRangeDispLabel->setText(minDetectRangeDispStr);
+    QString mirrorWidthTimeStr = "=" + QString::number(getMirrorWidthTime(), 'f', 3) + "ns";
+    ui->mirrorWidthTimeDispLabel->setText(mirrorWidthTimeStr);
     ui->nPointsPerBinSpinBox->setValue(QString::number(paraSettings.nPointsPerBin).toInt());
-    double rangeResol = getRangeResolution();
-    QString rangeResolDispStr = "=" + QString::number(rangeResol, 'f', 2) + "m" + "/" +
-            QString::number(rangeResol*qSin(qDegreesToRadians(paraSettings.elevationAngle)), 'f', 2) + "m";
-    ui->rangeResolDispLabel->setText(rangeResolDispStr);
+
     ui->overlapRatioComboBox->setCurrentText(QString::number(paraSettings.overlapRatio));
+
     ui->nRangeBinSpinBox->setValue(QString::number(paraSettings.nRangeBin).toInt());
-    double maxDetctRange = getMaxDetectRange();
-    QString maxDetctRangeDispStr = "=" + QString::number(maxDetctRange, 'f', 2) + "m" + "/" +
-            QString::number(maxDetctRange*qSin(qDegreesToRadians(paraSettings.elevationAngle)), 'f', 2) + "m";
-    ui->maxDetectRangeDispLabel->setText(maxDetctRangeDispStr);
+
     ui->nPulsesAccSpinBox->setValue(QString::number(paraSettings.nPulsesAcc).toInt());
 
     double objVelocity = getObjVelocity();
@@ -172,6 +165,24 @@ void ParameterSetDialog::refreshDisp()
     ui->nDirsPerFileSpinBox->setValue(QString::number(paraSettings.nDirsPerFile).toInt());
 
     //ÓÒ²à×´Ì¬À¸ÐÅÏ¢
+    //×îÐ¡Ì½²â¾àÀë
+    double minDetectRange = getMinDetectRange();
+    QString minDetectRangeDispStr = QString::number(minDetectRange, 'f', 2) + "m" + "/" +
+            QString::number(minDetectRange*qSin(qDegreesToRadians(paraSettings.elevationAngle)), 'f', 2) + "m";
+    ui->startDetectRangeDispLineEdit->setText(minDetectRangeDispStr);
+
+    //×î´óÌ½²â¾àÀë
+    double maxDetctRange = getMaxDetectRange();
+    QString maxDetctRangeDispStr = QString::number(maxDetctRange, 'f', 2) + "m" + "/" +
+            QString::number(maxDetctRange*qSin(qDegreesToRadians(paraSettings.elevationAngle)), 'f', 2) + "m";
+    ui->maxDetectRangeDispLineEdit->setText(maxDetctRangeDispStr);
+
+    //¾àÀë·Ö±æÂÊ
+    double rangeResol = getRangeResolution();
+    QString rangeResolDispStr = QString::number(rangeResol, 'f', 2) + "m" + "/" +
+            QString::number(rangeResol*qSin(qDegreesToRadians(paraSettings.elevationAngle)), 'f', 2) + "m";
+    ui->rangeResoDispLineEdit->setText(rangeResolDispStr);
+
     QFileInfo userIniFileInfo(paraSettingFile->getUserIniFilePath());
     ui->settingFilePathDispLineEdit->setText(userIniFileInfo.fileName());
     if (!userIniFileInfo.exists()) {
@@ -215,6 +226,14 @@ double ParameterSetDialog::getPreTriggerTimeLength()
     return widthInTime;
 }
 
+double ParameterSetDialog::getMirrorWidthTime()
+{
+    double sampleFreq = paraSettings.sampleFreq;
+    int mirrorWidthPoints = paraSettings.nPointsMirrorWidth;
+    double mirrorWidthTime = mirrorWidthPoints/sampleFreq*1000;
+    return mirrorWidthTime;
+}
+
 double ParameterSetDialog::getRangeResolution()
 {
     double overlapRatio = paraSettings.overlapRatio;
@@ -237,14 +256,13 @@ double ParameterSetDialog::getMinDetectRange()
 
 double ParameterSetDialog::getMaxDetectRange()
 {
-    double overlapRatio = paraSettings.overlapRatio;
     int pointsPerBin = paraSettings.nPointsPerBin;
     int mirrorWidthPoints = paraSettings.nPointsMirrorWidth;
     int nRangeBin = paraSettings.nRangeBin;
     double sampleFreq = paraSettings.sampleFreq;
     double resol = lightSpeed/sampleFreq/1000000/2;
     double maxDetectRange = resol*(mirrorWidthPoints+pointsPerBin+
-                                   pointsPerBin*(nRangeBin-1)*(1-overlapRatio)-pointsPerBin/2);
+                                   pointsPerBin*(nRangeBin-1)-pointsPerBin/2);
     return maxDetectRange;
 }
 

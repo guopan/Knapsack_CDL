@@ -70,8 +70,8 @@ SOFTWARESETTINGS SettingFile::readSettings()
     settings.beginGroup("Laser_Parameters");
     fsetting.laserPulseEnergy = settings.value("laserPulseEnergy",10.0).toDouble(); //激光能量
     fsetting.laserLocalPower = settings.value("laserLocalPower",1.0).toDouble();    //激光功率
-    fsetting.laserRPF = settings.value("laserRPF",10000.0).toDouble();              //激光重频
-    fsetting.laserPulseWidth = settings.value("laserPulseWidth",400.0).toDouble();  //激光脉宽
+    fsetting.laserRPF = settings.value("laserRPF",10.0).toDouble();                 //激光重频
+    fsetting.laserPulseWidth = settings.value("laserPulseWidth",400.0).toInt();     //激光脉宽
     fsetting.laserWaveLength = settings.value("laserWaveLength",1.545).toDouble();  //激光波长
     fsetting.laserAOMFreq = settings.value("laserAOMFreq",120.0).toDouble();        //AOM移频量
     settings.endGroup();
@@ -114,8 +114,8 @@ SOFTWARESETTINGS SettingFile::readSettings()
 
     settings.beginGroup("File_Store");
     fsetting.dataFilePath = settings.value("dataFilePath",dataStorePath).toString();          //文件保存路径
-    fsetting.autoCreateDateDir = settings.value("autoCreateDateDir",true).toBool();  //自动创建最小文件夹
-    fsetting.nDirsPerFile = settings.value("nDirsPerFile",1000).toUInt();         //单文件方向数
+    fsetting.autoCreateDateDir = settings.value("autoCreateDateDir",true).toBool();           //自动创建最小文件夹
+    fsetting.nDirsPerFile = settings.value("nDirsPerFile",1000).toUInt();                     //单文件方向数
     settings.endGroup();
 
     return fsetting;
@@ -138,7 +138,7 @@ void SettingFile::testSettings()
         settings.beginGroup("Laser_Parameters");
         settings.setValue("laserPulseEnergy",10.0);             //激光能量
         settings.setValue("laserLocalPower",1.0);               //激光功率
-        settings.setValue("laserRPF",10000.0);                  //激光重频
+        settings.setValue("laserRPF",10.0);                     //激光重频
         settings.setValue("laserPulseWidth",400.0);             //激光脉宽
         settings.setValue("laserWaveLength",1.545);             //激光波长
         settings.setValue("laserAOMFreq",120.0);                //AOM移频量

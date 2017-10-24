@@ -108,6 +108,7 @@ private:
     double getObjVelocity();
     double getVoltageTriggerLevel();
     double getPreTriggerTimeLength();
+    double getMirrorWidthTime();
     double getRangeResolution();
     double getMinDetectRange();
     double getMaxDetectRange();
