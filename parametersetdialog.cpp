@@ -346,7 +346,7 @@ void ParameterSetDialog::on_saveasSettingsPushButton_clicked()
         paraSettingFile->setUserIniFilePath(userIniFileName);
         paraSettingFile->writeSettings(paraSettings);
     }
-    refreshDisp();
+//    refreshDisp();
 }
 
 void ParameterSetDialog::on_loadSettingsPushButton_clicked()
@@ -358,8 +358,8 @@ void ParameterSetDialog::on_loadSettingsPushButton_clicked()
         qDebug() << userIniFileName;
         paraSettingFile->setUserIniFilePath(userIniFileName);
         paraSettings = paraSettingFile->readSettings();
+        refreshDisp();
     }
-    refreshDisp();
 }
 
 void ParameterSetDialog::on_confirmSetPushButton_clicked()
