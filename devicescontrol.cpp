@@ -60,7 +60,7 @@ void DevicesControl::checkMotorAngle(const double &s)
             if(motorPX0>360-mysetting.azAngleStep)
                 motorPX0 = motorPX0-360;
             adq.Transfer_Settings(mysetting);
-            LaserSeed.beginSeedLaser(mysetting.laserLocalPower);
+            LaserSeed.beginSeedLaser(mysetting.laserLocalPower,mysetting.laserPulseEnergy);
         }
         else
         {
@@ -162,7 +162,7 @@ void DevicesControl::readyToMove()
 
 void DevicesControl::openLaser()
 {
-    LaserSeed.beginSeedLaser(mysetting.laserLocalPower);
+    LaserSeed.beginSeedLaser(mysetting.laserLocalPower,mysetting.laserPulseEnergy);
 }
 
 void DevicesControl::closeLaser()

@@ -14,7 +14,7 @@ class laserSeed : public QObject
     Q_OBJECT
 public:
     explicit laserSeed(QObject *parent = nullptr);
-    void beginSeedLaser(const double &temp);
+    void beginSeedLaser(const double &SeedPower,const double &PulsePower);
     void setSeedPower(const int &s);
     void closeSeedLaser();
     void checkLaser();
@@ -27,7 +27,7 @@ private slots:
 signals:
 //    void powerReady();
     void laserSeedError(QString &s);
-    void seedOpenReady();
+    void seedOpenReady(const double &SeedPower);
     void laserColseRight();
 private:
     QByteArray senddata;
@@ -36,7 +36,7 @@ private:
     void StringToHex(QString str, QByteArray &senddata);
     bool powerSet, fire, close, openPulse;
     laserseedthread Laserseedthread;
-    double LocalPower;
+    double seedPower,pulsePower;
 };
 
 #endif // LASERSEED_H

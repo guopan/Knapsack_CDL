@@ -14,8 +14,9 @@ laserPulse::laserPulse(QObject *parent) : QObject(parent)
     close=false;
 }
 
-void laserPulse::beginPulseLaser()
+void laserPulse::beginPulseLaser(const double &s)
 {
+    pulsePower=s;
     StringToHex("AA 55 C1 01 01 01 00",senddata);
     Laserpulsethread.transaction(PulseLaserComPort,senddata);
     fire=true;
@@ -65,7 +66,7 @@ void laserPulse::receive_response(const QString &temp)
             {
                 if(temp=="55aac101000000")
                 {
-                    setPulsePower(1000); //打开正常
+                    setPulsePower((int)(pulsePower*100)); //打开正常
                     qDebug()<<QString::fromLocal8Bit("脉冲激光器打开成功");
                 }
                 else

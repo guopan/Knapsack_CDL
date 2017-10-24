@@ -19,7 +19,7 @@ public:
     void checkLaser();
 
 public slots:
-    void beginPulseLaser();
+    void beginPulseLaser(const double &s);
 
 private slots:
     void receive_response(const QString &temp);
@@ -39,7 +39,7 @@ private:
     void StringToHex(QString str, QByteArray &senddata);
     bool powerSet,fire,close;
     laserpulsethread Laserpulsethread;
-    double PulsePoewr;
+    double pulsePower;
 };
 
 #endif // laserPulse_H

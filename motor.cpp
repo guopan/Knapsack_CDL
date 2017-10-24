@@ -116,9 +116,14 @@ void motor::receive_response(const QString &s)
     }
     if(s.left(2) == "PX")
     {
-        QString a=s.split(";").at(1).toLocal8Bit().data();
-        double angle=(double)a.toInt()*360.0/524288.0;
-        qDebug()<<"PX"<<angle << "s="<<s<<"a="<<a <<"a.toint" <<a.toInt();
+//        QString a=s.split(";").at(1).toLocal8Bit().data();
+//        double angle=(double)a.toInt()*360.0/524288.0;
+//        qDebug()<<"PX"<<angle << "s="<<s<<"a="<<a <<"a.toint" <<a.toInt();
+
+        QString ret = s.split(";").at(1);	//PXֵ
+        int retVal = ret.toInt();
+        int temp = retVal & 0x7ffff;
+        double angle = (double) temp/524288*360.0;
 
         while(angle<0)
             angle = angle + 360;
