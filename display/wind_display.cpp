@@ -140,4 +140,11 @@ void wind_display::set_nLayers(int n)
         Vlayout->addWidget(my_scale);
         Vlayout->setStretch(nLayers+1, 1);
     }
+    setSubSize();
+}
+
+void wind_display::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    setSubSize();
 }

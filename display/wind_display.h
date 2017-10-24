@@ -43,8 +43,8 @@ private:
     double Heithe_high;
     int HSpeedScale;
     int nLayers;
-
-//    void resizeEvent(QResizeEvent * event);
+protected:
+    virtual void resizeEvent(QResizeEvent * event);
 
 };
 
