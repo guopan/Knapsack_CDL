@@ -1,4 +1,5 @@
 #include "devicescontrol.h"
+#include <QtMath>
 
 DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
 {
@@ -19,7 +20,7 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
     connect(&LaserPulse,&laserPulse::laserPulseError, this,&DevicesControl::laserErrorHint);
 
     stopped = true;
-    readyToCollect=false;
+    readyToCollect = false;
     isPulseLaserOpened = false;
 }
 
@@ -27,6 +28,10 @@ void DevicesControl::startAction(SOFTWARESETTINGS settings)
 {
     qDebug() << "start action";
     this->mysetting = settings;
+    if(mysetting.overlapRatio>0)
+        nRB_ovlp = mysetting.nRangeBin*2-1;
+    else
+        nRB_ovlp = mysetting.nRangeBin;
     Compass.read();
 
 }
@@ -193,7 +198,7 @@ void DevicesControl::pulse_laser_opened_fcn()
     stopped = false;
     Init_Buffers();
     azimuthAngle = VectorXd::Zero(mysetting.nDirsVectorCal);
-    losVelocityMat = MatrixXd::Zero(mysetting.nRangeBin, mysetting.nDirsVectorCal);
+    losVelocityMat = MatrixXd::Zero(nRB_ovlp, mysetting.nDirsVectorCal);
     ControlTimer->start(CheckPeriod);
 }
 
@@ -227,9 +232,9 @@ void DevicesControl::On_ControlTimer_TimeOut()
         }
         CaptureTime = QDateTime::currentDateTimeUtc();      //记录当前时间，将来写入文件
         if(mysetting.azAngleStep != 0)
-            Motor.moveRelative(mysetting.azAngleStep);         //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
+            Motor.moveRelative(mysetting.azAngleStep);      //-------相对转动电机（step_azAngle为0也可以调用函数，不转就可以了）
         readyToCollect = false;
-        LOSVelocityCal(mysetting.nRangeBin+2, nFFT_half,
+        LOSVelocityCal(nRB_ovlp+2, nFFT_half,
                        20, mysetting.laserWaveLength,
                        freqAxis, adq.get_PSD_double());     //径向风速计算
 
@@ -239,25 +244,25 @@ void DevicesControl::On_ControlTimer_TimeOut()
         azimuthAngle.head(mysetting.nDirsVectorCal-1) = tempAzAngle;
         azimuthAngle(mysetting.nDirsVectorCal-1) = currentMotorAngle;
 
-        for (int i=0; i<mysetting.nRangeBin; i++) {
-            for (int j=1; j<mysetting.nDirsVectorCal; j++) {
+        for (int i=0; i<nRB_ovlp; i++) {
+            for (uint j=1; j<mysetting.nDirsVectorCal; j++) {
                 losVelocityMat(i,j-1) = losVelocityMat(i,j);
             }
         }
-        for (int i=0; i<mysetting.nRangeBin; i++) {
+        for (int i=0; i<nRB_ovlp; i++) {
             losVelocityMat(i,mysetting.nDirsVectorCal-1) = losVelocity[i];
         }
 
         if (capture_counter > mysetting.nDirsVectorCal) {
             std::cout << "azimuthAngle = " << azimuthAngle << std::endl;
-            DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,mysetting.nRangeBin,losVelocityMat);
+            DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,nRB_ovlp,losVelocityMat);
             hVelocity = dswf.getHVelocity();
             hAngle = dswf.getHAngle();
             vVelocity = dswf.getVVelocity();
 
-            //****存储风速到文件
+            //存储风速到文件
             SaveVelo_AddData();
-            //****更新显示
+            //更新显示
             emit hVelocityReady(hVelocity);
             emit hAngleReady(hAngle);
             emit vVelocityReady(vVelocity);
@@ -383,9 +388,9 @@ void DevicesControl::LOSVelocityCal(const int heightNum, const int totalSpecPoin
 
 void DevicesControl::Init_Buffers()
 {
-    losVelocity = new double[mysetting.nRangeBin];
+    losVelocity = new double[nRB_ovlp];
     aomSpec = new double[nFFT_half];
-    specArray = new double[mysetting.nRangeBin * nFFT_half];
+    specArray = new double[nRB_ovlp * nFFT_half];
 
     adq.Init_Buffers();
 }
@@ -457,14 +462,15 @@ void DevicesControl::SaveVelo_FileHead()
 
         //实时处理参数
         VeloFile << "plsAccNum:        " << QString::number(mysetting.nPulsesAcc) << endl;        //单方向累加脉冲数
-        VeloFile << "nRangeBin:        " << QString::number(mysetting.nRangeBin) << endl;        //距离门数
+        VeloFile << "nRangeBin:        " << QString::number(nRB_ovlp) << endl;        //距离门数
         VeloFile << "nPointsPerBin:    " << QString::number(mysetting.nPointsPerBin) << endl;    //距离门内点数
 
         VeloFile << "Height Axis:      ";
         QString str;
+        CalHeightsValues();
         str = "";
-//        for(int i=0;i<mysetting.nRangeBin;i++)
-//            str = str + QString::number(Height_values[i],'f', 2) + " ";
+        for(int i=0;i<nRB_ovlp;i++)
+            str = str + QString::number(Height_values[i],'f', 2) + " ";
         VeloFile << str << endl;
 
 
@@ -519,11 +525,11 @@ void DevicesControl::SaveSpec_FileHead()
         //扫描参数
         specFile << "detectMode:       " ;      //探测方式：0持续探测1单组探测2定时探测
         switch (mysetting.detectMode) {
-        case 1:                 //持续探测
-            specFile << "NonStop" << endl;
-            break;
         case 0:                 //单组探测
             specFile << "SingleGroup" << endl;
+            break;
+        case 1:                 //持续探测
+            specFile << "NonStop" << endl;
             break;
         case 2:                 //定时探测
             specFile << "scheduled" << endl;
@@ -532,20 +538,20 @@ void DevicesControl::SaveSpec_FileHead()
 
         specFile << "elevationAngle:   " << QString::number(mysetting.elevationAngle) << endl;	//俯仰角
         specFile << "start_azAngle:    " << QString::number(mysetting.azAngleStart) << endl;	//起始角
-        specFile << "step_azAngle:     " << QString::number(mysetting.azAngleStep) << endl;	//步进角
+        specFile << "step_azAngle:     " << QString::number(mysetting.azAngleStep) << endl;     //步进角
         specFile << "angleNum:         " << QString::number(mysetting.angleNum) << endl;		//方向数
         specFile << "IntervalTime:     " << QString::number(mysetting.intervalTime) << endl;	//定时探测间隔，单位：分钟
         specFile << "GroupTime:        " << QString::number(mysetting.groupTime) << endl;		//定时探测单组时间，单位：分钟
 
         //采样参数
-        specFile << "sampleFreq:       " << QString::number(mysetting.sampleFreq) << endl;		//采样频率
-        specFile << "Trigger_Level:    " << QString::number(mysetting.triggerLevel) << endl;    //触发电平
-        specFile << "PreTrigger:       " << QString::number(mysetting.nPointsPreTrigger) << endl;       //预触发点数，保留，暂不提供设置
+        specFile << "sampleFreq:       " << QString::number(mysetting.sampleFreq) << endl;          //采样频率
+        specFile << "Trigger_Level:    " << QString::number(mysetting.triggerLevel) << endl;        //触发电平
+        specFile << "PreTrigger:       " << QString::number(mysetting.nPointsPreTrigger) << endl;   //预触发点数，保留，暂不提供设置
 
         //实时处理参数
-        specFile << "plsAccNum:        " << QString::number(mysetting.nPulsesAcc) << endl;        //单方向累加脉冲数
-        specFile << "nRangeBin:        " << QString::number(mysetting.nRangeBin) << endl;        //距离门数
-        specFile << "nPointsPerBin:    " << QString::number(mysetting.nPointsPerBin) << endl;    //距离门内点数
+        specFile << "plsAccNum:        " << QString::number(mysetting.nPulsesAcc) << endl;          //单方向累加脉冲数
+        specFile << "nRangeBin:        " << QString::number(nRB_ovlp) << endl;                      //距离门数
+        specFile << "nPointsPerBin:    " << QString::number(mysetting.nPointsPerBin) << endl;       //距离门内点数
 
         specFile << "Frequency Axis:   ";
         QString str = "";
@@ -554,9 +560,10 @@ void DevicesControl::SaveSpec_FileHead()
         specFile << str << endl;
 
         specFile << "Height Axis:      ";
+        CalHeightsValues();
         str = "";
-        //        for(int i=0;i<mysetting.nRangeBin;i++)
-        //            str = str + QString::number(Height_values[i],'f', 2) + " ";
+        for(int i=0;i<nRB_ovlp;i++)
+            str = str + QString::number(Height_values[i],'f', 2) + " ";
         specFile << str << endl;
 
         specFile << "Spectrum Point Size: "<< sizeof(quint64) <<  " Bytes int" << endl;
@@ -578,9 +585,8 @@ void DevicesControl::SaveSpec_AddData()
         quint64 CTms = CaptureTime.toMSecsSinceEpoch();
         specFile.writeRawData((char*)&CTms,sizeof(quint64));
         specFile.writeRawData((char*)&currentMotorAngle,sizeof(double));
-        specFile.writeRawData((char*)adq.get_PSD_Union(), (mysetting.nRangeBin+2) * nFFT_half*sizeof(quint64));
+        specFile.writeRawData((char*)adq.get_PSD_Union(), (nRB_ovlp+2) * nFFT_half*sizeof(quint64));
         outputSpec.close();
-        //        qDebug() << "Specfile 1 Dir added!";
     }
 }
 
@@ -594,17 +600,29 @@ void DevicesControl::SaveVelo_AddData()
         veloFile.writeRawData((char*)&CTms,sizeof(quint64));
         veloFile.writeRawData((char*)&currentMotorAngle,sizeof(double));
 
-        veloFile.writeRawData((char*)hVelocity, mysetting.nRangeBin * sizeof(double));
-        veloFile.writeRawData((char*)hAngle, mysetting.nRangeBin * sizeof(double));
-        veloFile.writeRawData((char*)vVelocity, mysetting.nRangeBin * sizeof(double));
+        veloFile.writeRawData((char*)hVelocity, nRB_ovlp * sizeof(double));
+        veloFile.writeRawData((char*)hAngle, nRB_ovlp * sizeof(double));
+        veloFile.writeRawData((char*)vVelocity, nRB_ovlp * sizeof(double));
         outputVelo.close();
-        //        qDebug() << "Velofile 1 Dir added!";
     }
 }
 void DevicesControl::Create_DataFolder()
 {
     QDir mypath;
-    qDebug()<<"mysetting.dataFilePath==============="<<mysetting.dataFilePath;
     if(!mypath.exists(mysetting.dataFilePath))		//如果文件夹不存在，创建文件夹
         mypath.mkpath(mysetting.dataFilePath);
+}
+
+void DevicesControl::CalHeightsValues()
+{
+    //垂直向 最小探测距离
+    double resol = lightSpeed/mysetting.sampleFreq/1000000/2;        //单采样点的径向分辨率
+    double minDetectRange = resol*(mysetting.nPointsMirrorWidth+mysetting.nPointsPerBin/2);
+    minDetectRange = minDetectRange*qSin(qDegreesToRadians(mysetting.elevationAngle));
+    //垂直向 距离分辨率
+    double rangeResol = resol*(mysetting.nPointsPerBin*(1-mysetting.overlapRatio));
+    rangeResol = rangeResol*qSin(qDegreesToRadians(mysetting.elevationAngle));
+
+    for(int i=0;i<nRB_ovlp;i++)
+        Height_values[i] = minDetectRange + i*rangeResol;
 }

@@ -46,12 +46,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //显示部分
     DisplaySpeed = new wind_display(this);
-    DisplaySpeed->set_nLayers(mysetting.nRangeBin);
     UpdateHeightsValue();
     ui->gridLayout->addWidget(DisplaySpeed);
 
     connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
-    //    qDebug() << "aaaaaaaaaaaaaaa";
     devicesControl = new DevicesControl();
     connect(devicesControl, &DevicesControl::hVelocityReady, this, &MainWindow::updateHVelocityDisp);
     connect(devicesControl, &DevicesControl::hAngleReady, this, &MainWindow::updateHAngleDisp);
@@ -82,8 +80,7 @@ void MainWindow::setActionTriggered()
     parameterSetDialog->setParaSettings(mysetting, isWorking);
     if (parameterSetDialog->exec() == QDialog::Accepted) {
         mysetting =  parameterSetDialog->getParaSettings();
-        DisplaySpeed->set_nLayers(mysetting.nRangeBin);
-        UpdateHeightsValue();
+        UpdateHeightsValue();       //刷新显示
     }
     delete parameterSetDialog;
 }
@@ -99,8 +96,8 @@ void MainWindow::startActionTriggered()
     if (isWorking) {
         isWorking = false;
         devicesControl->stopAction();
-//        workThread->quit();
-//        workThread->wait();
+        //        workThread->quit();
+        //        workThread->wait();
     }
     else {
         isWorking = true;
@@ -174,10 +171,27 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 
 void MainWindow::UpdateHeightsValue()
 {
-    double range_resolution = 300/mysetting.sampleFreq/2*mysetting.nPointsPerBin;
-    for(int i=0;i<mysetting.nRangeBin;i++) {
-        Height_values[i] = (i+1.5)*range_resolution;
+
+    //垂直向 最小探测距离
+    double resol = lightSpeed/mysetting.sampleFreq/1000000/2;        //单采样点的径向分辨率
+    double minDetectRange = resol*(mysetting.nPointsMirrorWidth+mysetting.nPointsPerBin/2);
+    minDetectRange = minDetectRange*qSin(qDegreesToRadians(mysetting.elevationAngle));
+    //垂直向 距离分辨率
+    double rangeResol = resol*(mysetting.nPointsPerBin*(1-mysetting.overlapRatio));
+    rangeResol = rangeResol*qSin(qDegreesToRadians(mysetting.elevationAngle));
+
+    //重叠后距离门数（0或0.5）
+    int nRB_ovlp;
+    if( mysetting.overlapRatio > 0)
+        nRB_ovlp = mysetting.nRangeBin*2 - 1;
+    else
+        nRB_ovlp = mysetting.nRangeBin;
+
+    for(int i=0;i<nRB_ovlp;i++)
+    {
+        Height_values[i] = minDetectRange + i*rangeResol;
     }
+    DisplaySpeed->set_nLayers(nRB_ovlp);
     DisplaySpeed->setHeights(Height_values);
 }
 
@@ -190,23 +204,13 @@ void MainWindow::updateHVelocityDisp(double *hVelocity)
 void MainWindow::updateHAngleDisp(double *hAngle)
 {
     DisplaySpeed->setHDirection(hAngle);
-    qDebug() << "HANgle update show";
+    qDebug() << "HAngle update show";
 }
 
 void MainWindow::updateVVelocityDisp(double *vVelocity)
 {
     DisplaySpeed->setVSpeed(vVelocity);
     qDebug() << "VSpeed update show";
-}
-
-
-void MainWindow::on_pushButton_3_clicked()
-{
-    devicesControl->Create_DataFolder();
-//    ADQ214 adq;
-//    adq.Transfer_Settings(mysetting);
-//    adq.Init_Buffers();
-//    adq.Start_Capture();
 }
 
 void MainWindow::checkDataFilePath()
@@ -230,7 +234,6 @@ void MainWindow::checkDataFilePath()
             str.resize(str_len - 8);
             str += today_str;
         }
-
         else if( dirname != time.toString("yyyyMMdd"))
         {
             str = mypath.absolutePath();
@@ -253,9 +256,5 @@ void MainWindow::checkDataFilePath()
             qDebug()<<"Dir Match"<<str<<endl;
         }
     }
-
-    qDebug()<<"mysetting.dataFilePath==============="<<mysetting.dataFilePath;
-    qDebug()<<"New.dataFilePath==============="<<str;
     mysetting.dataFilePath = str;
-
 }

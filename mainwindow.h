@@ -62,8 +62,6 @@ private slots:
     void updateHAngleDisp(double *hAngle);
     void updateVVelocityDisp(double *vVelocity);
 
-    void on_pushButton_3_clicked();
-
     void checkDataFilePath();
 private:
     Ui::MainWindow *ui;
@@ -83,7 +81,6 @@ private:
 
     QThread *workThread;
     DevicesControl *devicesControl;
-
 
     // Êý¾ÝÏÔÊ¾
     wind_display *DisplaySpeed;
