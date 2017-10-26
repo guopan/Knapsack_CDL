@@ -15,50 +15,50 @@ void SettingFile::writeSettings(const SOFTWARESETTINGS &setting)      //写入文件
 //    qDebug() << userIniFilePath;
     QSettings newSettings(userIniFilePath, QSettings::IniFormat);
     newSettings.beginGroup("Laser_Parameters");
-    newSettings.setValue("laserPulseEnergy",fsetting.laserPulseEnergy);              //激光能量
-    newSettings.setValue("laserLocalPower",fsetting.laserLocalPower);                //激光功率
-    newSettings.setValue("laserRPF",fsetting.laserRPF);                                //激光重频
-    newSettings.setValue("laserPulseWidth",fsetting.laserPulseWidth);                //激光脉宽
-    newSettings.setValue("laserWaveLength",fsetting.laserWaveLength);                 //激光波长
-    newSettings.setValue("laserAOMFreq",fsetting.laserAOMFreq);           //AOM移频量
+    newSettings.setValue("laserPulseEnergy",fsetting.laserPulseEnergy);     //激光能量
+    newSettings.setValue("laserLocalPower",fsetting.laserLocalPower);       //激光功率
+    newSettings.setValue("laserRPF",fsetting.laserRPF);                     //激光重频
+    newSettings.setValue("laserPulseWidth",fsetting.laserPulseWidth);       //激光脉宽
+    newSettings.setValue("laserWaveLength",fsetting.laserWaveLength);       //激光波长
+    newSettings.setValue("laserAOMFreq",fsetting.laserAOMFreq);             //AOM移频量
     newSettings.endGroup();
 
     newSettings.beginGroup("Scan_Parameters");
-    newSettings.setValue("detectMode",fsetting.detectMode);                        //探测模式：0持续探测1单组探测2定时探测
-    newSettings.setValue("elevationAngle",fsetting.elevationAngle);        //俯仰角
-    newSettings.setValue("azAngleStart",fsetting.azAngleStart);          //起始角
-    newSettings.setValue("azAngleStep",fsetting.azAngleStep);            //步进角
-    newSettings.setValue("angleNum",fsetting.angleNum);                    //方向数
-    newSettings.setValue("circleNum",fsetting.circleNum);             //圆周数
-    newSettings.setValue("isAngleChecked",fsetting.isAngleChecked);                  //方向键
-    newSettings.setValue("isCircleChecked",fsetting.isCircleChecked);                //圆周键
-    newSettings.setValue("motorSpeed",fsetting.motorSpeed);                           //扫描速度
+    newSettings.setValue("detectMode",fsetting.detectMode);                 //探测模式：0持续探测1单组探测2定时探测
+    newSettings.setValue("elevationAngle",fsetting.elevationAngle);         //俯仰角
+    newSettings.setValue("azAngleStart",fsetting.azAngleStart);             //起始角
+    newSettings.setValue("azAngleStep",fsetting.azAngleStep);               //步进角
+    newSettings.setValue("angleNum",fsetting.angleNum);                     //方向数
+    newSettings.setValue("circleNum",fsetting.circleNum);                   //圆周数
+    newSettings.setValue("isAngleChecked",fsetting.isAngleChecked);         //方向键
+    newSettings.setValue("isCircleChecked",fsetting.isCircleChecked);       //圆周键
+    newSettings.setValue("motorSpeed",fsetting.motorSpeed);                 //扫描速度
     newSettings.setValue("intervalTime",fsetting.intervalTime);             //分组间隔
     newSettings.setValue("groupTime",fsetting.groupTime);                   //每组探测时间
     newSettings.endGroup();
 
     newSettings.beginGroup("Sample_Parameters");
-    newSettings.setValue("sampleFreq",fsetting.sampleFreq);                      //采样频率
-    newSettings.setValue("triggerLevel",fsetting.triggerLevel);                       //触发电平
-    newSettings.setValue("nPointsPreTrigger",fsetting.nPointsPreTrigger);              //预触发点数，保留，暂不提供设置
+    newSettings.setValue("sampleFreq",fsetting.sampleFreq);                 //采样频率
+    newSettings.setValue("triggerLevel",fsetting.triggerLevel);             //触发电平
+    newSettings.setValue("nPointsPreTrigger",fsetting.nPointsPreTrigger);   //预触发点数，保留，暂不提供设置
     newSettings.endGroup();
 
     newSettings.beginGroup("Realtime_Process");
-    newSettings.setValue("nPulsesAcc",fsetting.nPulsesAcc);              //单方向累加脉冲数
-    newSettings.setValue("nRangeBin",fsetting.nRangeBin);                       //距离门数
-    newSettings.setValue("nPointsPerBin",fsetting.nPointsPerBin);                     //距离门内点数
-    newSettings.setValue("overlapRatio",fsetting.overlapRatio);                       //距离门重叠率
-    newSettings.setValue("nPointsMirrorWidth",fsetting.nPointsMirrorWidth);           //径向风速范围
+    newSettings.setValue("nPulsesAcc",fsetting.nPulsesAcc);                 //单方向累加脉冲数
+    newSettings.setValue("nRangeBin",fsetting.nRangeBin);                   //距离门数
+    newSettings.setValue("nPointsPerBin",fsetting.nPointsPerBin);           //距离门内点数
+    newSettings.setValue("overlapRatio",fsetting.overlapRatio);             //距离门重叠率
+    newSettings.setValue("nPointsMirrorWidth",fsetting.nPointsMirrorWidth); //径向风速范围
     newSettings.endGroup();
 
     newSettings.beginGroup("Vector_Velocity_Inversion");
-    newSettings.setValue("nPointsObjFreq", fsetting.nPointsObjFreq);              //计算径向风速时目标带宽点数
-    newSettings.setValue("nDirsVectorCal", fsetting.nDirsVectorCal);  //计算矢量风速用到的径向风速个数
+    newSettings.setValue("nPointsObjFreq", fsetting.nPointsObjFreq);        //计算径向风速时目标带宽点数
+    newSettings.setValue("nDirsVectorCal", fsetting.nDirsVectorCal);        //计算矢量风速用到的径向风速个数
     newSettings.endGroup();
 
     newSettings.beginGroup("File_Store");
-    newSettings.setValue("dataFilePath",fsetting.dataFilePath);            //文件保存路径
-    newSettings.setValue("autoCreateDateDir",fsetting.autoCreateDateDir);  //自动创建日期文件夹
+    newSettings.setValue("dataFilePath",fsetting.dataFilePath);             //文件保存路径
+    newSettings.setValue("autoCreateDateDir",fsetting.autoCreateDateDir);   //自动创建日期文件夹
     newSettings.setValue("nDirsPerFile",fsetting.nDirsPerFile);
     newSettings.endGroup();
 }
@@ -105,17 +105,17 @@ SOFTWARESETTINGS SettingFile::readSettings()
     settings.endGroup();
 
     settings.beginGroup("Vector_Velocity_Inversion");
-    fsetting.nPointsObjFreq = settings.value("nPointsObjFreq",40).toUInt();           //目标风速大小点数
-    fsetting.nDirsVectorCal = settings.value("nDirsVectorCal",8).toUInt();           //合成矢量风速的径向风速个数
+    fsetting.nPointsObjFreq = settings.value("nPointsObjFreq",40).toUInt();         //目标风速大小点数
+    fsetting.nDirsVectorCal = settings.value("nDirsVectorCal",8).toUInt();          //合成矢量风速的径向风速个数
     settings.endGroup();
 
     QString docu_path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     QString dataStorePath = docu_path + "/KnapsackCDL_data/";
 
     settings.beginGroup("File_Store");
-    fsetting.dataFilePath = settings.value("dataFilePath",dataStorePath).toString();          //文件保存路径
-    fsetting.autoCreateDateDir = settings.value("autoCreateDateDir",true).toBool();           //自动创建最小文件夹
-    fsetting.nDirsPerFile = settings.value("nDirsPerFile",1000).toUInt();                     //单文件方向数
+    fsetting.dataFilePath = settings.value("dataFilePath",dataStorePath).toString();  //文件保存路径
+    fsetting.autoCreateDateDir = settings.value("autoCreateDateDir",true).toBool();   //自动创建最小文件夹
+    fsetting.nDirsPerFile = settings.value("nDirsPerFile",1000).toUInt();             //单文件方向数
     settings.endGroup();
 
     return fsetting;
@@ -140,7 +140,7 @@ void SettingFile::testSettings()
         settings.setValue("laserLocalPower",1.0);               //激光功率
         settings.setValue("laserRPF",10.0);                     //激光重频
         settings.setValue("laserPulseWidth",400.0);             //激光脉宽
-        settings.setValue("laserWaveLength",1.545);             //激光波长
+        settings.setValue("laserWaveLength",1.55);              //激光波长
         settings.setValue("laserAOMFreq",120.0);                //AOM移频量
         settings.endGroup();
 
@@ -154,7 +154,7 @@ void SettingFile::testSettings()
         settings.setValue("isAngleChecked",true);               //方向键
         settings.setValue("isCircleChecked",false);             //圆周键
         settings.setValue("motorSpeed",90.0);                   //扫描速度
-        settings.setValue("motorSpeed",15.0);                   //分组间隔
+        settings.setValue("intervalTime",15.0);                 //分组间隔
         settings.setValue("groupTime",3.0);                     //每组探测时间
         settings.endGroup();
 
@@ -199,39 +199,39 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
         return true;
     if(fsetting.laserLocalPower != dlgsetting.laserLocalPower)      //激光功率
         return true;
-    if(fsetting.laserRPF != dlgsetting.laserRPF)					//激光重频
+    if(fsetting.laserRPF != dlgsetting.laserRPF)                    //激光重频
         return true;
-    if(fsetting.laserPulseWidth != dlgsetting.laserPulseWidth)		//脉冲宽度
+    if(fsetting.laserPulseWidth != dlgsetting.laserPulseWidth)      //脉冲宽度
         return true;
-    if(fsetting.laserWaveLength != dlgsetting.laserWaveLength)		//激光波长
+    if(fsetting.laserWaveLength != dlgsetting.laserWaveLength)      //激光波长
         return true;
-    if(fsetting.laserAOMFreq != dlgsetting.laserAOMFreq)			//AOM移频量
+    if(fsetting.laserAOMFreq != dlgsetting.laserAOMFreq)            //AOM移频量
         return true;
 
-    if(fsetting.detectMode != dlgsetting.detectMode)
-        return true;                                                //探测方式
-    if(fsetting.elevationAngle != dlgsetting.elevationAngle)		//俯仰角
+    if(fsetting.detectMode != dlgsetting.detectMode)                //探测方式
         return true;
-    if(fsetting.azAngleStart != dlgsetting.azAngleStart)			//起始角
+    if(fsetting.elevationAngle != dlgsetting.elevationAngle)        //俯仰角
         return true;
-    if(fsetting.azAngleStep != dlgsetting.azAngleStep)		       	//步进角
+    if(fsetting.azAngleStart != dlgsetting.azAngleStart)            //起始角
         return true;
-    if(fsetting.angleNum != dlgsetting.angleNum)					//方向数
+    if(fsetting.azAngleStep != dlgsetting.azAngleStep)              //步进角
         return true;
-    if(fsetting.circleNum != dlgsetting.circleNum)					//圆周数
+    if(fsetting.angleNum != dlgsetting.angleNum)                    //方向数
+        return true;
+    if(fsetting.circleNum != dlgsetting.circleNum)                  //圆周数
         return true;
     if(fsetting.azAngleStep != dlgsetting.azAngleStep)
         return true;
     if(fsetting.isCircleChecked != dlgsetting.isCircleChecked)
         return true;
-    if(fsetting.motorSpeed != dlgsetting.motorSpeed)			    //电机速度
+    if(fsetting.motorSpeed != dlgsetting.motorSpeed)                //电机速度
         return true;
     if(fsetting.intervalTime != dlgsetting.intervalTime)
         return true;
     if(fsetting.groupTime != dlgsetting.groupTime)
         return true;
 
-    if(fsetting.sampleFreq != dlgsetting.sampleFreq)				//采样频率
+    if(fsetting.sampleFreq != dlgsetting.sampleFreq)                //采样频率
         return true;
     if(fsetting.triggerLevel != dlgsetting.triggerLevel)            //触发电平
         return true;
@@ -249,16 +249,16 @@ bool SettingFile::isSettingsChanged(const SOFTWARESETTINGS &setting)
     if(fsetting.overlapRatio != dlgsetting.overlapRatio)
         return true;
 
-    if(fsetting.nPointsObjFreq != dlgsetting.nPointsObjFreq)          //径向风速范围
+    if(fsetting.nPointsObjFreq != dlgsetting.nPointsObjFreq)         //径向风速范围
         return true;
     if(fsetting.nDirsVectorCal != dlgsetting.nDirsVectorCal)
         return true;
 
-    if(fsetting.dataFilePath != dlgsetting.dataFilePath)			  //文件保存路径
+    if(fsetting.dataFilePath != dlgsetting.dataFilePath)             //文件保存路径
         return true;
-    if(fsetting.autoCreateDateDir != dlgsetting.autoCreateDateDir)    //自动创建日期文件夹
+    if(fsetting.autoCreateDateDir != dlgsetting.autoCreateDateDir)   //自动创建日期文件夹
         return true;
-    if(fsetting.nDirsPerFile != dlgsetting.nDirsPerFile)              //单文件方向数
+    if(fsetting.nDirsPerFile != dlgsetting.nDirsPerFile)             //单文件方向数
         return true;
 
     return false;
@@ -269,7 +269,7 @@ void SettingFile::setUserIniFilePath(QString userIniFilePath)
     this->userIniFilePath = userIniFilePath;
     QSettings settings(defaultIniFilePath, QSettings::IniFormat);
     settings.beginGroup("Ini_File_Path");
-    settings.setValue("userIniFilePath",userIniFilePath);              //设置文件路径
+    settings.setValue("userIniFilePath",userIniFilePath);             //设置文件路径
     settings.endGroup();
 }
 

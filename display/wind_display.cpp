@@ -9,10 +9,10 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
     my_scale = new rt_scale;
     Vlayout->addWidget(my_title);
     Vlayout->setStretch(0, 1);
-    nLayers = 10;
-    for (int i = 0; i < 20; ++i)
+    nLayers = 2;
+    for (int i = 0; i < Max_nLayers; ++i)
     {
-        // 设置100~1000米的10个标签
+        // 设置100~1000米的nLayers个标签
         my_display[i] = new rt_display;
         my_display[i]->setHeight(0);
         my_display[i]->setHSpeed(0,1);
@@ -61,14 +61,12 @@ void wind_display::setHSpeed(const double *sp)
             HSpeed[i] = sp[nLayers - i - 1];
             my_display[i]->setHSpeed(HSpeed[i], New_HSpeedScale);
         }
-    //    qDebug()<<"ssssssp = "<<MaxHSpeed<<"   SSSSSSSCALE= "<<New_HSpeedScale;
     if(New_HSpeedScale != HSpeedScale)
     {
         HSpeedScale = New_HSpeedScale;
         my_scale->setH_speed_scale(HSpeedScale);
         my_title->setHSpeed_Scale(HSpeedScale);
     }
-    //    qDebug()<<"=============";
 }
 
 void wind_display::setHDirection(const double *dir)
@@ -105,7 +103,8 @@ void wind_display::setSubSize()
 {
     int h = height();
     h = int((h-99)/(nLayers+2));
-
+    if(h<0)
+        h = 10;
     my_title->setHSizeHint(h);
     for(int i=0;i<nLayers;i++)
     {

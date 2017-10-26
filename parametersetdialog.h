@@ -104,7 +104,7 @@ private:
     Ui::ParameterSetDialog *ui;
     void refreshDisp();
     SOFTWARESETTINGS paraSettings;
-    uint getObjFreqPoints();
+    uint getObjFreqPoints(double losVelocityRange);
     double getObjVelocity();
     double getVoltageTriggerLevel();
     double getPreTriggerTimeLength();

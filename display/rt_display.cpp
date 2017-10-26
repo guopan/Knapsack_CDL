@@ -47,10 +47,10 @@ void rt_display::paintEvent(QPaintEvent *event)
     // 确定缩放尺度
     int w = width();
     int h = height();
-    if(qAbs(h-HSizeHint)<3)
-        h = HSizeHint;         // 消除各个行高的微小差别
-    int baseSize = qMin(w/11, h);
 
+    h = HSizeHint;         // 消除各个行高的微小差别
+//        qDebug()<<"h = "<<h<<"HSizeHint == "<<HSizeHint;
+    int baseSize = qMin(w/11, h);
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 

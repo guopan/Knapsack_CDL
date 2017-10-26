@@ -108,7 +108,7 @@ static const unsigned short BitReverseIndex[] =
     480,224,352,96,416,160,288,32,448,192,320,64,384,128,256,0
 };
 
-const int Max_nLayers = 20;         //最大高度层数 = 20
+const int Max_nLayers = 30;         //最大高度层数 = 30
 const int nFFT = 1024;              //FFT点数数 = 1024
 const int nFFT_half = nFFT/2;       //FFT点数数的一半 = 512
 const int CheckPeriod = 40;         //采集过程中，状态转换定时器的查询间隔（ms）

@@ -10,7 +10,6 @@ ParameterSetDialog::ParameterSetDialog(QWidget *parent) :
     paraSettingFile = new SettingFile();
 }
 
-
 ParameterSetDialog::~ParameterSetDialog()
 {
     delete paraSettingFile;
@@ -47,7 +46,7 @@ SOFTWARESETTINGS ParameterSetDialog::getParaSettings()
     paraSettings.nPointsMirrorWidth = ui->nPointsMirrorWidthSpinBox->value();
     paraSettings.overlapRatio = ui->overlapRatioComboBox->currentText().toDouble();
 
-    paraSettings.nPointsObjFreq = getObjFreqPoints();
+    paraSettings.nPointsObjFreq = getObjFreqPoints(ui->nPointsObjFreqdoubleSpinBox->value());
     paraSettings.nDirsVectorCal = ui->nDirsVectorCalSpinBox->value();
 
     paraSettings.dataFilePath = ui->dataFilePathLineEdit->text();
@@ -195,16 +194,10 @@ void ParameterSetDialog::refreshDisp()
     ui->settingFilePathDispLineEdit->setToolTip(paraSettingFile->getUserIniFilePath());
 }
 
-uint ParameterSetDialog::getObjFreqPoints()
+uint ParameterSetDialog::getObjFreqPoints(double losVelocityRange)
 {
-    double losVelocityRange = ui->nPointsObjFreqdoubleSpinBox->value();
     double objFreqPoints = losVelocityRange/(paraSettings.sampleFreq/nFFT*paraSettings.laserWaveLength/2);
-    if (objFreqPoints - qFloor(objFreqPoints) < 0.5) {
-        objFreqPoints = qFloor(objFreqPoints);
-    }
-    else {
-        objFreqPoints = qCeil(objFreqPoints);
-    }
+    objFreqPoints = qRound(objFreqPoints);
     return objFreqPoints;
 }
 
@@ -485,21 +478,22 @@ void ParameterSetDialog::on_nRangeBinSpinBox_valueChanged(int arg1)
 void ParameterSetDialog::on_nPointsObjFreqdoubleSpinBox_valueChanged(double arg1)
 {
     qDebug() << "Changed Obj Freq";
-    paraSettings.nPointsObjFreq = getObjFreqPoints();
+    paraSettings.nPointsObjFreq = getObjFreqPoints(arg1);
     QString objFreqPointsDispStr = "m/s=" + QString::number(paraSettings.nPointsObjFreq) +
             QString::fromLocal8Bit("µã");
     ui->objFreqPointsDispLabel->setText(objFreqPointsDispStr);
+    ui->nPointsObjFreqdoubleSpinBox->setValue(getObjVelocity());
 }
 
 void ParameterSetDialog::on_nPointsObjFreqdoubleSpinBox_editingFinished()
 {
-    refreshDisp();
+//    refreshDisp();
 }
 
 void ParameterSetDialog::on_nDirsVectorCalSpinBox_valueChanged(int arg1)
 {
     paraSettings.nDirsVectorCal = arg1;
-    refreshDisp();
+//    refreshDisp();
 }
 
 

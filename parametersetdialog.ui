@@ -331,7 +331,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_1">
     <attribute name="title">
@@ -1325,7 +1325,7 @@
         <item>
          <widget class="QSpinBox" name="nRangeBinSpinBox">
           <property name="minimum">
-           <number>10</number>
+           <number>2</number>
           </property>
           <property name="maximum">
            <number>20</number>
@@ -1658,7 +1658,7 @@
        <rect>
         <x>20</x>
         <y>40</y>
-        <width>421</width>
+        <width>424</width>
         <height>108</height>
        </rect>
       </property>
@@ -2023,7 +2023,7 @@
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>479</width>
+        <width>498</width>
         <height>32</height>
        </rect>
       </property>
