@@ -111,7 +111,8 @@ static const unsigned short BitReverseIndex[] =
 const int Max_nLayers = 30;         //最大高度层数 = 30
 const int nFFT = 1024;              //FFT点数数 = 1024
 const int nFFT_half = nFFT/2;       //FFT点数数的一半 = 512
-const int CheckPeriod = 40;         //采集过程中，状态转换定时器的查询间隔（ms）
+const int stateCheckPeriod = 40;    //采集过程中，状态转换定时器的查询间隔（ms）
+const int motorCheckPeriod = 150;   //采集过程中，电机MS判断定时器的查询间隔（ms）
 const double lightSpeed = 299792458;
 enum Control_State{ waitMotor, Capture, Quit, Standby};     //探测过程控制状态值
 const QString SeedLaserComPort  = "COM1";   // 种子激光器串口号

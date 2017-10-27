@@ -70,7 +70,7 @@ private:
     laserPulse LaserPulse;
     ADQ214 adq;
 
-    QTimer *timeOclock;
+    QTimer *motorCheckTimer;
     QTimer *ControlTimer;           // 探测过程控制计时器
 
     bool moveNorth, checkReady;

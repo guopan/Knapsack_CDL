@@ -3,7 +3,7 @@
 
 DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
 {
-    timeOclock = new QTimer(this);
+    motorCheckTimer = new QTimer(this);
     ControlTimer = new QTimer(this);
     connect(&Compass, &compass::compassAngle, this, &DevicesControl::showCompassAngle);
     connect(&Motor, &motor::motorPrepareOk, this, &DevicesControl::readyToMove);
@@ -12,7 +12,7 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
     connect(&LaserPulse,&laserPulse::laserWorkRight,this,&DevicesControl::pulse_laser_opened_fcn);
     connect(ControlTimer,&QTimer::timeout, this,&DevicesControl::On_ControlTimer_TimeOut);
     connect(&Motor, &motor::beginMove, this, &DevicesControl::timeStart);
-    connect(timeOclock,&QTimer::timeout,this, &DevicesControl::checkMove);
+    connect(motorCheckTimer,&QTimer::timeout,this, &DevicesControl::checkMove);
     connect(&Motor, &motor::moveReady,this, &DevicesControl::getPosition);
     connect(&LaserPulse,&laserPulse::pulseCloseReady, &LaserSeed,&laserSeed::closeSeedLaser);
     connect(&Motor, &motor::motorError, this, &DevicesControl::errorSolve);
@@ -41,7 +41,7 @@ void DevicesControl::stopAction()
     //待完善
     qDebug() << "stop action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
     stop_now = true;
-    State = Quit;
+//    State = Quit;
 }
 
 
@@ -59,7 +59,7 @@ void DevicesControl::checkMotorAngle(const double &s)
         if(headAngle-s>=-0.5&&headAngle-s<=0.5)
         {
             moveNorth = false;
-            readyToCollect=true;
+            readyToCollect = true;
             checkReady = false;
             motorPX0 = s;
             if(motorPX0>360-mysetting.azAngleStep)
@@ -76,7 +76,7 @@ void DevicesControl::checkMotorAngle(const double &s)
     {
         if((s-motorPX0-mysetting.azAngleStep)<=0.01&&(s-motorPX0-mysetting.azAngleStep)>=-0.01)   //判断是否到达指定位置,误差暂设0.5°
         {
-            readyToCollect=true;
+            readyToCollect = true;
             LaserPulse.checkLaser();
             LaserSeed.checkLaser();
             checkReady = false;
@@ -95,9 +95,9 @@ void DevicesControl::checkMotorAngle(const double &s)
 void DevicesControl::getPosition()
 {
 
-    if(timeOclock->isActive())
+    if(motorCheckTimer->isActive())
     {
-        timeOclock->stop();
+        motorCheckTimer->stop();
     }
     Motor.position();
 }
@@ -105,7 +105,7 @@ void DevicesControl::getPosition()
 void DevicesControl::checkMotor()
 {
     QSerialPort my_serial;
-    my_serial.setPortName("COM8");
+    my_serial.setPortName(MotorComPort);
     if(!my_serial.open(QIODevice::ReadWrite))
     {
         qDebug()<<"motor not open";
@@ -138,7 +138,7 @@ void DevicesControl::checkMotor()
 
 void DevicesControl::errorSolve()
 {
-    timeOclock->stop();
+    motorCheckTimer->stop();
     if(moveNorth)
     {
         Compass.read();
@@ -199,7 +199,7 @@ void DevicesControl::pulse_laser_opened_fcn()
     Init_Buffers();
     azimuthAngle = VectorXd::Zero(mysetting.nDirsVectorCal);
     losVelocityMat = MatrixXd::Zero(nRB_ovlp, mysetting.nDirsVectorCal);
-    ControlTimer->start(CheckPeriod);
+    ControlTimer->start(stateCheckPeriod);
 }
 
 void DevicesControl::On_ControlTimer_TimeOut()
@@ -337,7 +337,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
 
 void DevicesControl::timeStart()
 {
-    timeOclock->start(1000);
+    motorCheckTimer->start(motorCheckPeriod);
 }
 
 void DevicesControl::Generate_freqAxis()
@@ -450,7 +450,7 @@ void DevicesControl::SaveVelo_FileHead()
 
         VeloFile << "elevationAngle:   " << QString::number(mysetting.elevationAngle) << endl;	//俯仰角
         VeloFile << "start_azAngle:    " << QString::number(mysetting.azAngleStart) << endl;	//起始角
-        VeloFile << "step_azAngle:     " << QString::number(mysetting.azAngleStep) << endl;	//步进角
+        VeloFile << "step_azAngle:     " << QString::number(mysetting.azAngleStep) << endl;	    //步进角
         VeloFile << "angleNum:         " << QString::number(mysetting.angleNum) << endl;		//方向数
         VeloFile << "IntervalTime:     " << QString::number(mysetting.intervalTime) << endl;	//定时探测间隔，单位：分钟
         VeloFile << "GroupTime:        " << QString::number(mysetting.groupTime) << endl;		//定时探测单组时间，单位：分钟
@@ -466,15 +466,11 @@ void DevicesControl::SaveVelo_FileHead()
         VeloFile << "nPointsPerBin:    " << QString::number(mysetting.nPointsPerBin) << endl;    //距离门内点数
 
         VeloFile << "Height Axis:      ";
-        QString str;
+        QString str= "";
         CalHeightsValues();
-        str = "";
         for(int i=0;i<nRB_ovlp;i++)
             str = str + QString::number(Height_values[i],'f', 2) + " ";
         VeloFile << str << endl;
-
-
-
         for(int i=0;i<60;i++)
             VeloFile << "=";                    // =分隔符
         VeloFile << endl;
@@ -510,17 +506,17 @@ void DevicesControl::SaveSpec_FileHead()
         if(1)
         {
             specFile << "Pulse" << endl;		//脉冲探测（true）or连续探测（false） bool
-            specFile << "laserPulseEnergy: " << QString::number(mysetting.laserPulseEnergy) << endl;	//激光能量，单位μJ，连续模式下为0
+            specFile << "laserPulseEnergy: " << QString::number(mysetting.laserPulseEnergy) << endl;    //激光能量，单位μJ，连续模式下为0
         }
         else
         {
             specFile << "Continuous" << endl;	//脉冲探测（true）or连续探测（false） bool
-            specFile << "laserPower:       " << QString::number(mysetting.laserLocalPower) << endl;		//激光功率，单位mW，脉冲模式下为0
+            specFile << "laserPower:       " << QString::number(mysetting.laserLocalPower) << endl;     //激光功率，单位mW，脉冲模式下为0
         }
-        specFile << "laserRPF:         " << QString::number(mysetting.laserRPF) << endl;			//激光频率
-        specFile << "laserPulseWidth:  " << QString::number(mysetting.laserPulseWidth) << endl;	//脉冲宽度
-        specFile << "laserWaveLength:  " << QString::number(mysetting.laserWaveLength) << endl;	//激光波长
-        specFile << "AOM_Freq:         " << QString::number(mysetting.laserAOMFreq) << endl;			//AOM移频量
+        specFile << "laserRPF:         " << QString::number(mysetting.laserRPF) << endl;                //激光频率
+        specFile << "laserPulseWidth:  " << QString::number(mysetting.laserPulseWidth) << endl;         //脉冲宽度
+        specFile << "laserWaveLength:  " << QString::number(mysetting.laserWaveLength) << endl;         //激光波长
+        specFile << "AOM_Freq:         " << QString::number(mysetting.laserAOMFreq) << endl;            //AOM移频量
 
         //扫描参数
         specFile << "detectMode:       " ;      //探测方式：0持续探测1单组探测2定时探测
@@ -606,6 +602,7 @@ void DevicesControl::SaveVelo_AddData()
         outputVelo.close();
     }
 }
+
 void DevicesControl::Create_DataFolder()
 {
     QDir mypath;
