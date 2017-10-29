@@ -75,7 +75,7 @@ bool ADQ214::Start_Capture()
     }
     qDebug() << "Collect finished!";
     ConvertData2Spec();
-    WriteSpecData2disk();
+//    WriteSpecData2disk();
     delete setupadq.data_stream_target;
 
     if(success == 0) {
