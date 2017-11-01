@@ -139,15 +139,7 @@ void DevicesControl::checkMotor()
 void DevicesControl::errorSolve()
 {
     motorCheckTimer->stop();
-    if(moveNorth)
-    {
-        Compass.read();
-        Motor.prepare();
-    }
-    else
-    {
-        Motor.prepare();
-    }
+    qDebug()<<"motor already stop";
 }
 
 void DevicesControl::laserErrorHint(const QString &s)

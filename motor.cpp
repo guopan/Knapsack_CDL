@@ -96,7 +96,7 @@ void motor::receive_response(const QString &s)
             if(s.left(4)=="MS;3")
             {
                 emit this->motorError();
-                qDebug()<<"电机启动异常";
+                qDebug()<<"motor already stop";
             }
             //            else
             //            {qDebug()<<"moveon";}
