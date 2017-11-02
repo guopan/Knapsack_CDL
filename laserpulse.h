@@ -35,8 +35,6 @@ signals:
 private:    
     QByteArray senddata;
     QString laserPort,errorCode;
-    char ConvertHexChar(char ch);
-    void StringToHex(QString str, QByteArray &senddata);
     bool powerSet,fire,close;
     laserpulsethread Laserpulsethread;
     double pulsePower;

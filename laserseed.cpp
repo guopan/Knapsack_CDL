@@ -19,7 +19,8 @@ void laserSeed::beginSeedLaser(const double &SeedPower,const double &PulsePower)
     qDebug() << "begin Seed laser";
     seedPower=SeedPower;
     pulsePower=PulsePower;
-    StringToHex("AA 55 C1 01 01 01 00",senddata);
+//    StringToHex("AA 55 C1 01 01 01 00",senddata);
+    senddata=QByteArray::fromHex("AA 55 C1 01 01 01 00");
     Laserseedthread.transaction(SeedLaserComPort,senddata);
     fire=true;
     openPulse=true;
@@ -32,7 +33,8 @@ void laserSeed::setSeedPower(const int &s)
     int aa=key.left(2).toInt(&ok,16)+key.right(2).toInt(&ok,16);
     QString key2 =QString("%1").arg(aa,4,16,QLatin1Char('0')).toUpper();
     QString power="AA 55 C3 02 "+key.right(2)+" "+key.left(2)+" "+key2.right(2)+" "+key2.left(2);
-    StringToHex(power,senddata);
+//    StringToHex(power,senddata);
+    senddata=QByteArray::fromHex(power.toLatin1());
     Laserseedthread.transaction(SeedLaserComPort,senddata);
     powerSet=false;
 }
@@ -40,7 +42,8 @@ void laserSeed::setSeedPower(const int &s)
 void laserSeed::closeSeedLaser()
 {
     close=true;
-    StringToHex("AA 55 C1 01 00 00 00",senddata);
+//    StringToHex("AA 55 C1 01 00 00 00",senddata);
+    senddata=QByteArray::fromHex("AA 55 C1 01 00 00 00");
     Laserseedthread.transaction(SeedLaserComPort,senddata);
 
 }
@@ -138,52 +141,9 @@ void laserSeed::receive_response(const QString &temp)
 
 void laserSeed::checkLaser()
 {
-    StringToHex("AA 55 D3 00 00 00",senddata);
+//    StringToHex("AA 55 D3 00 00 00",senddata);
+    senddata=QByteArray::fromHex("AA 55 D3 00 00 00");
     Laserseedthread.transaction(SeedLaserComPort,senddata);
-}
-
-char laserSeed::ConvertHexChar(char ch)
-{
-    if((ch >= '0') && (ch <= '9'))
-        return ch-0x30;
-    else if((ch >= 'A') && (ch <= 'F'))
-        return ch-'A'+10;
-    else if((ch >= 'a') && (ch <= 'f'))
-        return ch-'a'+10;
-    else return (-1);
-}
-
-void laserSeed::StringToHex(QString str, QByteArray &senddata)
-{
-    int hexdata,lowhexdata;
-    int hexdatalen = 0;
-    int len = str.length();
-    senddata.resize(len/2);
-    char lstr,hstr;
-    for(int i=0; i<len; )
-    {
-        //char lstr,
-        hstr=str[i].toLatin1();
-        if(hstr == ' ')
-        {
-            i++;
-            continue;
-        }
-        i++;
-        if(i >= len)
-            break;
-        lstr = str[i].toLatin1();
-        hexdata = ConvertHexChar(hstr);
-        lowhexdata = ConvertHexChar(lstr);
-        if((hexdata == 16) || (lowhexdata == 16))
-            break;
-        else
-            hexdata = hexdata*16+lowhexdata;
-        i++;
-        senddata[hexdatalen] = (char)hexdata;
-        hexdatalen++;
-    }
-    senddata.resize(hexdatalen);
 }
 
 void laserSeed::portError()

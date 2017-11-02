@@ -65,6 +65,11 @@ void compassThread::run()
                            .arg(portName).arg(serial.error()));
                 return;
             }
+            serial.setBaudRate(QSerialPort::Baud9600);			//波特率
+            serial.setDataBits(QSerialPort::Data8);				//数据位
+            serial.setParity(QSerialPort::NoParity);			//校验位
+            serial.setStopBits(QSerialPort::OneStop);			//停止位
+            serial.setFlowControl(QSerialPort::NoFlowControl);	//流控制
         }
         QByteArray requestData = currentRequest;
         serial.write(requestData);

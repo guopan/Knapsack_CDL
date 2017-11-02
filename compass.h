@@ -22,8 +22,6 @@ signals:
     void compassAngle(const double &s);
 public slots:
 private:
-    void StringToHex(QString str, QByteArray &senddata);   //转换为16进制
-    char ConvertHexChar(char ch);
     QByteArray senddata;                                   //需要发送的字节数组
     double toangle(const QString &c);                     //将接收的数据转为角度信息
     void showResponse(const QByteArray &s);

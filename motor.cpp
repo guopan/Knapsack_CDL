@@ -72,7 +72,7 @@ void motor::receive_response(const QString &s)
             //            qDebug()<<"电机打开";
         }
         else
-            qDebug()<<"电机关闭";
+            qDebug()<<"motor close";
     }
     if(s.left(2) == "AC")
     {
