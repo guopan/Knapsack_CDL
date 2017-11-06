@@ -69,10 +69,12 @@ void motor::receive_response(const QString &s)
         {
             Order_str = "AC=1e7;";
             thread_port.transaction(portname,Order_str);
-            //            qDebug()<<"电机打开";
         }
         else
+        {
+            emit this->motorClosed();
             qDebug()<<"motor close";
+        }
     }
     if(s.left(2) == "AC")
     {
@@ -89,17 +91,13 @@ void motor::receive_response(const QString &s)
         if(s.left(4)=="MS;0")
         {
             emit this->moveReady();
-            //qDebug()<<"moveready";
         }
         else
         {
             if(s.left(4)=="MS;3")
             {
                 emit this->motorError();
-                qDebug()<<"motor already stop";
             }
-            //            else
-            //            {qDebug()<<"moveon";}
         }
     }
     if(s.left(2) == "PA")

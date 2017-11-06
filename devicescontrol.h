@@ -101,6 +101,9 @@ private:
     QDateTime CaptureTime;          // 当前方向的采集时间
     QString SpecFileName;
     QString VeloFileName;
+
+    void quitControlTimer();
+    void quitLaser();
 };
 
 #endif // DEVICESCONTROL_H

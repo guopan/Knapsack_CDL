@@ -21,6 +21,7 @@ signals:
     void beginMove();
     void moveReady();
     void motorError();
+    void motorClosed();
 public slots:
 private slots:
     void timeout();

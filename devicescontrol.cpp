@@ -18,6 +18,8 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
     connect(&Motor, &motor::motorError, this, &DevicesControl::errorSolve);
     connect(&LaserSeed,&laserSeed::laserSeedError, this,&DevicesControl::laserErrorHint);
     connect(&LaserPulse,&laserPulse::laserPulseError, this,&DevicesControl::laserErrorHint);
+    connect(&LaserSeed,&laserSeed::laserColseRight, this,&DevicesControl::quitControlTimer);
+    connect(&Motor, &motor::motorClosed, this, &DevicesControl::quitLaser);
 
     stopped = true;
     readyToCollect = false;
@@ -298,10 +300,11 @@ void DevicesControl::On_ControlTimer_TimeOut()
     }
 
     case Quit:
-        ControlTimer->stop();
-        LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
+//        ControlTimer->stop();
+//        LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
         Motor.motorQuit();
         stopped = true;
+        State=Stop;
         break;
 
     case Standby:       //也许之前需要一个停止状态
@@ -320,6 +323,9 @@ void DevicesControl::On_ControlTimer_TimeOut()
             else
                 State = Capture;
         }
+        break;
+
+    case Stop:
         break;
 
     default:
@@ -469,6 +475,16 @@ void DevicesControl::SaveVelo_FileHead()
         outputVelo.close();
         //        qDebug() << "Velofile Header added!";
     }
+}
+
+void DevicesControl::quitControlTimer()
+{
+    ControlTimer->stop();
+}
+
+void DevicesControl::quitLaser()
+{
+    LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
 }
 
 void DevicesControl::SaveSpec_FileHead()

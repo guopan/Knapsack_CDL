@@ -114,7 +114,7 @@ const int nFFT_half = nFFT/2;       //FFT点数数的一半 = 512
 const int stateCheckPeriod = 40;    //采集过程中，状态转换定时器的查询间隔（ms）
 const int motorCheckPeriod = 150;   //采集过程中，电机MS判断定时器的查询间隔（ms）
 const double lightSpeed = 299792458;
-enum Control_State{ waitMotor, Capture, Quit, Standby};     //探测过程控制状态值
+enum Control_State{ waitMotor, Capture, Quit, Standby ,Stop};     //探测过程控制状态值
 const QString SeedLaserComPort  = "COM1";   // 种子激光器串口号
 const QString PulseLaserComPort = "COM2";   // 脉冲放大器串口号
 const QString CompassComPort    = "COM4";   // 电子罗盘串口号
