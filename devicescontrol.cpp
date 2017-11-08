@@ -18,8 +18,11 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
     connect(&Motor, &motor::motorError, this, &DevicesControl::errorSolve);
     connect(&LaserSeed,&laserSeed::laserSeedError, this,&DevicesControl::laserErrorHint);
     connect(&LaserPulse,&laserPulse::laserPulseError, this,&DevicesControl::laserErrorHint);
-    connect(&LaserSeed,&laserSeed::laserColseRight, this,&DevicesControl::quitControlTimer);
-    connect(&Motor, &motor::motorClosed, this, &DevicesControl::quitLaser);
+//    connect(&LaserSeed,&laserSeed::laserColseRight, this,&DevicesControl::quitControlTimer);
+    connect(&LaserSeed,&laserSeed::laserColseRight, ControlTimer,&QTimer::stop);
+
+//    connect(&Motor, &motor::motorClosed, this, &DevicesControl::quitLaser);
+    connect(&Motor, &motor::motorClosed, &LaserPulse, &laserPulse::closePulseLaser);
 
     stopped = true;
     readyToCollect = false;
@@ -43,7 +46,6 @@ void DevicesControl::stopAction()
     //待完善
     qDebug() << "stop action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
     stop_now = true;
-//    State = Quit;
 }
 
 
@@ -55,8 +57,8 @@ void DevicesControl::showCompassAngle(const double &s)
 
 void DevicesControl::checkMotorAngle(const double &s)
 {
-    currentMotorAngle=s;
-    if(moveNorth)
+    currentMotorAngle = s;
+    if(moveNorth)       // 采集之初，驱动电机指向正北时
     {
         if(headAngle-s>=-0.5&&headAngle-s<=0.5)
         {
@@ -74,7 +76,7 @@ void DevicesControl::checkMotorAngle(const double &s)
             Motor.moveRelative(headAngle-s);
         }
     }
-    else
+    else                // 每次采集结束，转到下一方向时
     {
         if((s-motorPX0-mysetting.azAngleStep)<=0.01&&(s-motorPX0-mysetting.azAngleStep)>=-0.01)   //判断是否到达指定位置,误差暂设0.5°
         {
@@ -174,6 +176,8 @@ void DevicesControl::checkMove()
     Motor.checkMove();      //检查电机转动状态
 }
 
+// 罗盘读好了，电机转到位了，激光器也都打开了
+// 在这里，完成所有的准备工作
 void DevicesControl::pulse_laser_opened_fcn()
 {
     qDebug() << "pulse laser open success!!";
@@ -184,7 +188,7 @@ void DevicesControl::pulse_laser_opened_fcn()
     if( mysetting.detectMode == 2) {
         Start_Time = QDateTime::currentDateTimeUtc();
     }
-    State = waitMotor;
+    State = WaitMotor;          //貌似可以直接开始采集了吧？？不用wait了吧？
     Generate_freqAxis();
     SaveSpec_FileHead();        //建立新文件，写入文件头
     SaveVelo_FileHead();        //建立新文件，写入文件头
@@ -201,11 +205,11 @@ void DevicesControl::On_ControlTimer_TimeOut()
     QDateTime currentTime;
     qint64 dt;
     if (stop_now) {
-        State = Quit;
+        State = Stop;
         stop_now = false;
     }
     switch (State) {
-    case waitMotor:    //****查询电机状态，没到位，则直接返回，等下次进入定时器
+    case WaitMotor:    //****查询电机状态，没到位，则直接返回，等下次进入定时器
         if (mysetting.azAngleStep != 0) {
             if(readyToCollect) {
                 State = Capture;
@@ -254,16 +258,14 @@ void DevicesControl::On_ControlTimer_TimeOut()
             hAngle = dswf.getHAngle();
             vVelocity = dswf.getVVelocity();
 
-            //存储风速到文件
-            SaveVelo_AddData();
+            SaveVelo_AddData();     // 存储矢量风速到文件
             //更新显示
             emit hVelocityReady(hVelocity);
             emit hAngleReady(hAngle);
             emit vVelocityReady(vVelocity);
         }
 
-        //存储功率谱到文件
-        SaveSpec_AddData();
+        SaveSpec_AddData();         //存储功率谱到文件
 
         capture_counter++;
         qDebug() << "capture_counter = " << capture_counter;
@@ -272,9 +274,9 @@ void DevicesControl::On_ControlTimer_TimeOut()
         case 0:                 //单组探测
             //判断探测方向数
             if(capture_counter == mysetting.angleNum)
-                State = Quit;
+                State = Stop;
             else
-                State = waitMotor;
+                State = WaitMotor;
             break;
         case 1:                 //持续探测
             //判断是否应该关闭文件，建立新文件
@@ -282,16 +284,16 @@ void DevicesControl::On_ControlTimer_TimeOut()
             {
                 SaveSpec_FileHead();        //建立新文件，写入文件头
             }
-            State = waitMotor;
+            State = WaitMotor;
             break;
 
         case 2:                 //定时探测
             // 判断否达到待机条件
             dt = currentTime.msecsTo(Start_Time);
-            if(dt > qint64(mysetting.groupTime*60*1000))  // *60s? *1000ms?// 如果达到待机时间
-            {
+            if(dt > qint64(mysetting.groupTime*60*1000))  // *60s*1000ms 如果达到待机时间
                 State = Standby;
-            }
+            else
+                State = WaitMotor;
             break;
         default:
             break;
@@ -299,12 +301,12 @@ void DevicesControl::On_ControlTimer_TimeOut()
         break;
     }
 
-    case Quit:
+    case Stop:
 //        ControlTimer->stop();
 //        LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
         Motor.motorQuit();
         stopped = true;
-        State=Stop;
+        State = Quit;
         break;
 
     case Standby:       //也许之前需要一个停止状态
@@ -318,14 +320,14 @@ void DevicesControl::On_ControlTimer_TimeOut()
                 moveNorth = true;
                 Motor.position();
                 //---------电机转到 mysetting.start_azAngle;
-                State = waitMotor;
+                State = WaitMotor;
             }
             else
                 State = Capture;
         }
         break;
 
-    case Stop:
+    case Quit:
         break;
 
     default:
@@ -338,6 +340,7 @@ void DevicesControl::timeStart()
     motorCheckTimer->start(motorCheckPeriod);
 }
 
+// 生成频率坐标轴，用于计算径向风速，并会被写入到功率谱的记录文件
 void DevicesControl::Generate_freqAxis()
 {
     for (int i = 0; i < nFFT_half; i++)  {
@@ -346,6 +349,7 @@ void DevicesControl::Generate_freqAxis()
     }
 }
 
+// 计算径向风速
 void DevicesControl::LOSVelocityCal(const int heightNum, const int totalSpecPoints, const int objSpecPoints, const double lambda, const double *freqAxis, const double *specData)
 {
     for (int k = 0; k < totalSpecPoints; k++) {
@@ -363,8 +367,8 @@ void DevicesControl::LOSVelocityCal(const int heightNum, const int totalSpecPoin
         }
     }
 
-    int startIndex = aomIndex - objSpecPoints;
-    int endIndex = aomIndex + objSpecPoints;
+    int startIndex = aomIndex - objSpecPoints;  // 目标风速区间起点
+    int endIndex = aomIndex + objSpecPoints;    // 目标风速区间终点
 
     int *losVelocityIndex = new int[heightNum - 2];
     temp = 0;
@@ -384,6 +388,7 @@ void DevicesControl::LOSVelocityCal(const int heightNum, const int totalSpecPoin
     }
 }
 
+// 初始化各个数据缓冲区，申请内存空间
 void DevicesControl::Init_Buffers()
 {
     losVelocity = new double[nRB_ovlp];
@@ -393,6 +398,7 @@ void DevicesControl::Init_Buffers()
     adq.Init_Buffers();
 }
 
+// 保存矢量风速反演结果——文件头
 void DevicesControl::SaveVelo_FileHead()
 {
     Create_DataFolder();
@@ -420,17 +426,17 @@ void DevicesControl::SaveVelo_FileHead()
         if(1)
         {
             VeloFile << "Pulse" << endl;		//脉冲探测（true）or连续探测（false） bool
-            VeloFile << "laserPulseEnergy: " << QString::number(mysetting.laserPulseEnergy) << endl;	//激光能量，单位μJ，连续模式下为0
+            VeloFile << "laserPulseEnergy: " << QString::number(mysetting.laserPulseEnergy) << endl;    //激光能量，单位μJ，连续模式下为0
         }
         else
         {
             VeloFile << "Continuous" << endl;	//脉冲探测（true）or连续探测（false） bool
-            VeloFile << "laserPower:       " << QString::number(mysetting.laserLocalPower) << endl;		//激光功率，单位mW，脉冲模式下为0
+            VeloFile << "laserPower:       " << QString::number(mysetting.laserLocalPower) << endl; //激光功率，单位mW，脉冲模式下为0
         }
         VeloFile << "laserRPF:         " << QString::number(mysetting.laserRPF) << endl;			//激光频率
-        VeloFile << "laserPulseWidth:  " << QString::number(mysetting.laserPulseWidth) << endl;	//脉冲宽度
-        VeloFile << "laserWaveLength:  " << QString::number(mysetting.laserWaveLength) << endl;	//激光波长
-        VeloFile << "AOM_Freq:         " << QString::number(mysetting.laserAOMFreq) << endl;			//AOM移频量
+        VeloFile << "laserPulseWidth:  " << QString::number(mysetting.laserPulseWidth) << endl;     //脉冲宽度
+        VeloFile << "laserWaveLength:  " << QString::number(mysetting.laserWaveLength) << endl;     //激光波长
+        VeloFile << "AOM_Freq:         " << QString::number(mysetting.laserAOMFreq) << endl;        //AOM移频量
 
         //扫描参数
         VeloFile << "detectMode:       " ;      //探测方式：0持续探测1单组探测2定时探测
@@ -454,14 +460,14 @@ void DevicesControl::SaveVelo_FileHead()
         VeloFile << "GroupTime:        " << QString::number(mysetting.groupTime) << endl;		//定时探测单组时间，单位：分钟
 
         //采样参数
-        VeloFile << "sampleFreq:       " << QString::number(mysetting.sampleFreq) << endl;		//采样频率
-        VeloFile << "Trigger_Level:    " << QString::number(mysetting.triggerLevel) << endl;    //触发电平
-        VeloFile << "PreTrigger:       " << QString::number(mysetting.nPointsPreTrigger) << endl;       //预触发点数，保留，暂不提供设置
+        VeloFile << "sampleFreq:       " << QString::number(mysetting.sampleFreq) << endl;          //采样频率
+        VeloFile << "Trigger_Level:    " << QString::number(mysetting.triggerLevel) << endl;        //触发电平
+        VeloFile << "PreTrigger:       " << QString::number(mysetting.nPointsPreTrigger) << endl;   //预触发点数，保留，暂不提供设置
 
         //实时处理参数
-        VeloFile << "plsAccNum:        " << QString::number(mysetting.nPulsesAcc) << endl;        //单方向累加脉冲数
-        VeloFile << "nRangeBin:        " << QString::number(nRB_ovlp) << endl;        //距离门数
-        VeloFile << "nPointsPerBin:    " << QString::number(mysetting.nPointsPerBin) << endl;    //距离门内点数
+        VeloFile << "plsAccNum:        " << QString::number(mysetting.nPulsesAcc) << endl;          //单方向累加脉冲数
+        VeloFile << "nRangeBin:        " << QString::number(nRB_ovlp) << endl;                      //距离门数
+        VeloFile << "nPointsPerBin:    " << QString::number(mysetting.nPointsPerBin) << endl;       //距离门内点数
 
         VeloFile << "Height Axis:      ";
         QString str= "";
@@ -477,16 +483,17 @@ void DevicesControl::SaveVelo_FileHead()
     }
 }
 
-void DevicesControl::quitControlTimer()
-{
-    ControlTimer->stop();
-}
+//void DevicesControl::quitControlTimer()
+//{
+//    ControlTimer->stop();
+//}
 
-void DevicesControl::quitLaser()
-{
-    LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
-}
+//void DevicesControl::quitLaser()
+//{
+//    LaserPulse.closePulseLaser();  // 关闭激光放大器，随后关闭激光器本振
+//}
 
+// 保存功率谱计算结果——文件头
 void DevicesControl::SaveSpec_FileHead()
 {
     Create_DataFolder();
@@ -618,13 +625,15 @@ void DevicesControl::Create_DataFolder()
         mypath.mkpath(mysetting.dataFilePath);
 }
 
+// 计算各个高度层的高度值，用于写入到结果文件
 void DevicesControl::CalHeightsValues()
 {
-    //垂直向 最小探测距离
+    //垂直向 最小探测距离 minDetectRange
     double resol = lightSpeed/mysetting.sampleFreq/1000000/2;        //单采样点的径向分辨率
     double minDetectRange = resol*(mysetting.nPointsMirrorWidth+mysetting.nPointsPerBin/2);
     minDetectRange = minDetectRange*qSin(qDegreesToRadians(mysetting.elevationAngle));
-    //垂直向 距离分辨率
+
+    //垂直向 距离分辨率 rangeResol
     double rangeResol = resol*(mysetting.nPointsPerBin*(1-mysetting.overlapRatio));
     rangeResol = rangeResol*qSin(qDegreesToRadians(mysetting.elevationAngle));
 

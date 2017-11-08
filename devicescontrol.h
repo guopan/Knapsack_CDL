@@ -102,8 +102,8 @@ private:
     QString SpecFileName;
     QString VeloFileName;
 
-    void quitControlTimer();
-    void quitLaser();
+//    void quitControlTimer();
+//    void quitLaser();
 };
 
 #endif // DEVICESCONTROL_H
