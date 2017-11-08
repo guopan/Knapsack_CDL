@@ -14,11 +14,11 @@ class laserPulse : public QObject
     Q_OBJECT
 public:
     explicit laserPulse(QObject *parent = nullptr);
-    void setPulsePower(const int &s);
-    void closePulseLaser();
-    void checkLaser();
 
 public slots:
+    void setPulsePower(const int &s);
+    void checkLaser();
+    void closePulseLaser();
     void beginPulseLaser(const double &s);
 
 private slots:
