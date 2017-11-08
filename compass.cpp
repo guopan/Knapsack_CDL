@@ -18,34 +18,33 @@ void compass::read()
     workthread.transaction(CompassComPort,senddata);
 }
 
-double compass::toangle(const QString &c)
+//SXXX.YYS 为符号位（0 正，1 负）XXX 为三位整数值，YY 为两位位小数值。如 10 26 87 表示-26.87o
+double compass::toangle(const QString &str_Angle)
 {
     double answer;
-    QString sign = c.mid(0,1);                    //截取符号位，整数位和小数位
-    QString round1 = c.mid(1,1);
-    QString round2 = c.mid(2,2);
-    QString decimal = c.mid(4,2);
-    answer = 100*round1.toDouble()+round2.toDouble()+0.01*decimal.toDouble(); //数据整合为实际角度
+    QString sign = str_Angle.mid(0,1);                    //截取符号位，整数位和小数位
+    QString integers = str_Angle.mid(1,3);
+    QString decimals = str_Angle.mid(4,2);
+    answer = integers.toDouble()+0.01*decimals.toDouble(); //数据整合为实际角度
     if(sign.toInt() == 1)
-    {
         answer = -1*answer;               //符号位为1时取负
-    }
     return answer;
 }
 
 void compass::showResponse(const QByteArray &s)
 {
-    double angle;
-    QString temp = s.toHex();             //接收信号转16进制
+    double headAngle;
+    QString temp = s.toHex();           //接收信号转16进制
 
-    QString a,b,c;
-    a = temp.mid(8,6);                     //截取接收信号 pitch roll head
-    b = temp.mid(14,6);
-    c = temp.mid(20,6);
+    QString str_pitch, str_roll, str_head;
+    //截取接收信号 pitch roll head
+    str_pitch = temp.mid(8,6);
+    str_roll = temp.mid(14,6);
+    str_head = temp.mid(20,6);
 
-    angle = toangle(c);
+    headAngle = toangle(str_head);
     //    qDebug()<<"result="<<result;
-    emit this->compassAngle(angle);
+    emit this->compassAngle(headAngle);
 }
 
 void compass::processError(const QString &s)
