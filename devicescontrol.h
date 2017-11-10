@@ -76,13 +76,13 @@ private:
     bool moveNorth, checkReady;
     double headAngle, motorPX0;
     double currentMotorAngle;       //电机的当前位置，是否就是motorPX0？
-    bool stopped;                   // 采集未启动状态
+
     bool stop_now;                  // 命令：GUI用来控制ControlTimer停止采集，待商榷
     uint capture_counter;           // 探测方向计数器
     QDateTime Start_Time;           // 开始时间，用于定时探测模式
     Control_State State;
     bool readyToCollect;            //----指示电机是否已经停止并达到指定位置
-    bool isPulseLaserOpened;
+
     SOFTWARESETTINGS mysetting;
 
     int nRB_ovlp;                   // 修正了overlap之后的距离门数，不包括噪声和镜面

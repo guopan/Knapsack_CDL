@@ -24,9 +24,7 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
 //    connect(&Motor, &motor::motorClosed, this, &DevicesControl::quitLaser);
     connect(&Motor, &motor::motorClosed, &LaserPulse, &laserPulse::closePulseLaser);
 
-    stopped = true;
     readyToCollect = false;
-    isPulseLaserOpened = false;
 }
 
 void DevicesControl::startAction(SOFTWARESETTINGS settings)
@@ -153,11 +151,9 @@ void DevicesControl::laserErrorHint(const QString &s)
 
 void DevicesControl::readyToMove()
 {
-    if(stopped) {
-        if(mysetting.azAngleStep != 0) {
-            moveNorth = true;
-            Motor.position();
-        }
+    if(mysetting.azAngleStep != 0) {
+        moveNorth = true;
+        Motor.position();
     }
 }
 
@@ -181,7 +177,6 @@ void DevicesControl::checkMove()
 void DevicesControl::pulse_laser_opened_fcn()
 {
     qDebug() << "pulse laser open success!!";
-    isPulseLaserOpened = true;
     capture_counter = 0;        // 探测方向计数器置零
 
     stop_now = false;
@@ -193,7 +188,6 @@ void DevicesControl::pulse_laser_opened_fcn()
     SaveSpec_FileHead();        //建立新文件，写入文件头
     SaveVelo_FileHead();        //建立新文件，写入文件头
 
-    stopped = false;
     Init_Buffers();
     azimuthAngle = VectorXd::Zero(mysetting.nDirsVectorCal);
     losVelocityMat = MatrixXd::Zero(nRB_ovlp, mysetting.nDirsVectorCal);
@@ -305,7 +299,6 @@ void DevicesControl::On_ControlTimer_TimeOut()
 //        ControlTimer->stop();
 //        LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
         Motor.motorQuit();
-        stopped = true;
         State = Quit;
         break;
 
