@@ -20,5 +20,8 @@ public:
 private:
     MatrixXd vectorVelocity;
     int heightNum;
+    double *HVelocity = NULL;
+    double *HAngle = NULL;
+    double *VVelocity = NULL;
 };
 #endif // DSWF_H

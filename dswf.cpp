@@ -11,10 +11,14 @@ DSWF::DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNu
     Eigen::Matrix3d SiSum;
     SiSum << 0,0,0,0,0,0,0,0,0;
     Eigen::Vector3d Si;
+    MatrixXd SiSi = MatrixXd::Zero(3,losNum);
     for(int i=0;i<losNum;i++){
         Si(0) = qSin(qDegreesToRadians(elevationAngle));
         Si(1) = qCos(qDegreesToRadians(elevationAngle))*qCos(qDegreesToRadians(azimuthAngle(i)));
         Si(2) = qCos(qDegreesToRadians(elevationAngle))*qSin(qDegreesToRadians(azimuthAngle(i)));
+        SiSi(0,i) = Si(0);
+        SiSi(1,i) = Si(1);
+        SiSi(2,i) = Si(2);
         SiSum = SiSum + Si*Si.transpose();
     }
 
@@ -23,7 +27,7 @@ DSWF::DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNu
         Eigen::Vector3d SiVri(0,0,0);
         Eigen::Vector3d temp(0,0,0);
         for(int n=0;n<losNum;n++) {
-            SiVri = SiVri + losVelocity(m,n)*Si;
+            SiVri = SiVri + losVelocity(m,n)*SiSi.col(n);
         }
         std::cout << "SiVri = " << SiVri << "\n";
         temp = SiSum.inverse()*SiVri;
@@ -32,7 +36,10 @@ DSWF::DSWF(double elevationAngle, VectorXd azimuthAngle, int losNum,int heightNu
 }
 double *DSWF::getHVelocity()
 {
-    double *HVelocity = new double[heightNum];
+    if (HVelocity != NULL) {
+        delete [] HVelocity;
+    }
+    HVelocity = new double[heightNum];
     for (int i = 0; i < heightNum; i++) {
         HVelocity[i] = qSqrt(vectorVelocity(i,1)*vectorVelocity(i,1) +
                              vectorVelocity(i,2)*vectorVelocity(i,2));
@@ -42,16 +49,26 @@ double *DSWF::getHVelocity()
 
 double *DSWF::getHAngle()
 {
-    double *HAngle = new double[heightNum];
-    for (int i = 0; i < heightNum; i++) {
-        HAngle[i] = 0.0-qRadiansToDegrees(qAtan2(vectorVelocity(i,2), vectorVelocity(i,1)));
+    if (HAngle != NULL) {
+        delete [] HAngle;
     }
+    HAngle = new double[heightNum];
+    for (int i = 0; i < heightNum; i++) {
+        HAngle[i] = 0.0-qRadiansToDegrees(qAtan2(vectorVelocity(i,2), vectorVelocity(i,1)));\
+        if(HAngle[i] < 0) {
+            HAngle[i] = HAngle[i] + 360.0;
+        }
+    }
+
     return HAngle;
 }
 
 double *DSWF::getVVelocity()
 {
-    double *VVelocity = new double[heightNum];
+    if (VVelocity != NULL) {
+        delete [] VVelocity;
+    }
+    VVelocity = new double[heightNum];
     for (int i = 0; i < heightNum; i++) {
         VVelocity[i] = vectorVelocity(i,0);
     }
