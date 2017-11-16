@@ -22,6 +22,8 @@
 #include <eigen/Eigen>
 #include <Eigen/Dense>
 #include <dswf.h>
+#include <fswf.h>
+
 using namespace Eigen;
 
 class DevicesControl : public QObject
@@ -69,9 +71,9 @@ private:
     laserSeed LaserSeed;
     laserPulse LaserPulse;
     ADQ214 adq;
-
-    QTimer *motorCheckTimer;
-    QTimer *ControlTimer;           // 探测过程控制计时器
+    FSWF fswf;
+    QTimer *motorCheckTimer = NULL;
+    QTimer *ControlTimer = NULL;           // 探测过程控制计时器
 
     bool moveNorth, checkReady;
     double headAngle, motorPX0;
@@ -87,15 +89,15 @@ private:
 
     int nRB_ovlp;                   // 修正了overlap之后的距离门数，不包括噪声和镜面
     double freqAxis [nFFT_half];    // 频率轴
-    double *losVelocity;            // 径向风速值
-    double *aomSpec;
-    double *specArray;
+    double *losVelocity = NULL;            // 径向风速值
+    double *aomSpec = NULL;
+    double *specArray = NULL;
 
     VectorXd azimuthAngle;
     MatrixXd losVelocityMat;
-    double *hVelocity;
-    double *hAngle;
-    double *vVelocity;
+    double *hVelocity = NULL;
+    double *hAngle = NULL;
+    double *vVelocity = NULL;
     double Height_values[Max_nLayers];
 
     QDateTime CaptureTime;          // 当前方向的采集时间

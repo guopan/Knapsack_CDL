@@ -1,6 +1,8 @@
 #include "devicescontrol.h"
 #include <QtMath>
 
+# define method 1
+
 DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
 {
     motorCheckTimer = new QTimer(this);
@@ -246,11 +248,57 @@ void DevicesControl::On_ControlTimer_TimeOut()
         }
 
         if (capture_counter > mysetting.nDirsVectorCal) {
-            std::cout << "azimuthAngle = " << azimuthAngle << std::endl;
-            DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,nRB_ovlp,losVelocityMat);
-            hVelocity = dswf.getHVelocity();
-            hAngle = dswf.getHAngle();
-            vVelocity = dswf.getVVelocity();
+            if(method==1){
+                //滤波正弦波拟合
+                double *azAngle = new double[azimuthAngle.rows()];
+                for (int i = 0; i < azimuthAngle.rows(); i++) {
+                    azAngle[i] = azimuthAngle(i);
+                }
+                double sigama2=4;
+
+                if (hVelocity != NULL) {
+                    delete [] hVelocity;
+                }
+                if (hAngle != NULL) {
+                    delete [] hAngle;
+                }
+                if (vVelocity != NULL) {
+                    delete [] vVelocity;
+                }
+                hVelocity = new double [nRB_ovlp];
+                hAngle = new double [nRB_ovlp];
+                vVelocity = new double [nRB_ovlp];
+
+                double *vectorVelocity;
+                for(int i=0;i<nRB_ovlp;i++)
+                {
+                    double *losVelocityPerHeight=new double [mysetting.nDirsVectorCal];
+                    for(int j=0;j<mysetting.nDirsVectorCal;j++)
+                    {
+                        losVelocityPerHeight[j]=losVelocityMat(i,j);
+                    }
+                    vectorVelocity=fswf.getVelocity(mysetting.nDirsVectorCal,sigama2,mysetting.elevationAngle,azAngle,losVelocityPerHeight);
+                    hVelocity[i]=qSqrt(*(vectorVelocity+1)**(vectorVelocity+1) +
+                                       *(vectorVelocity+2)**(vectorVelocity+2));
+                    hAngle[i] = 0.0-qRadiansToDegrees(qAtan2(*(vectorVelocity+2), *(vectorVelocity+1)));
+                    if(hAngle[i] < 0) {
+                        hAngle[i] = hAngle[i] + 360.0;
+                    }
+                    vVelocity[i] = *vectorVelocity;
+//                    delete []vectorVelocity;
+                    delete []losVelocityPerHeight;
+                }
+                delete []azAngle;
+            }
+            else{
+                std::cout << "azimuthAngle = " << azimuthAngle << std::endl;
+                DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,nRB_ovlp,losVelocityMat);
+                hVelocity = dswf.getHVelocity();
+                hAngle = dswf.getHAngle();
+                vVelocity = dswf.getVVelocity();
+            }
+
+
 
             SaveVelo_AddData();     // 存储矢量风速到文件
             //更新显示
@@ -258,6 +306,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
             emit hAngleReady(hAngle);
             emit vVelocityReady(vVelocity);
         }
+
 
         SaveSpec_AddData();         //存储功率谱到文件
 
@@ -299,7 +348,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
 //        ControlTimer->stop();
 //        LaserPulse.closePulseLaser();  //-------关闭激光放大器,关闭激光器本振
         Motor.motorQuit();
-        State = Quit;
+//        State = Quit;
         break;
 
     case Standby:       //也许之前需要一个停止状态
