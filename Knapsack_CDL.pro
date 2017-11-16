@@ -26,11 +26,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     mainwindow.cpp \
-    compass.cpp \
-    compassthread.cpp \
-    motor.cpp \
-    motorthread.cpp \
-    adq214.cpp \
+    devices\compass.cpp \
+    devices\compassthread.cpp \
+    devices\motor.cpp \
+    devices\motorthread.cpp \
+    devices\adq214.cpp \
     display\wind_display.cpp \
     display\rt_display.cpp \
     display\rt_title.cpp \
@@ -38,10 +38,10 @@ SOURCES += \
     admintoolbar.cpp \
     display\rt_scale.cpp \
     settingfile.cpp \
-    laserseed.cpp \
-    laserpulse.cpp \
-    laserseedthread.cpp \
-    laserpulsethread.cpp \
+    devices\laserseed.cpp \
+    devices\laserpulse.cpp \
+    devices\laserseedthread.cpp \
+    devices\laserpulsethread.cpp \
     dswf.cpp \
     parametersetdialog.cpp \
     dispsettings.cpp \
@@ -52,11 +52,11 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    compass.h \
-    compassthread.h \
-    motor.h \
-    motorthread.h \
-    adq214.h \
+    devices\compass.h \
+    devices\compassthread.h \
+    devices\motor.h \
+    devices\motorthread.h \
+    devices\adq214.h \
     display\wind_display.h \
     global_defines.h \
     display\rt_display.h \
@@ -65,10 +65,10 @@ HEADERS += \
     admintoolbar.h \
     display\rt_scale.h \
     settingfile.h \
-    laserseed.h \
-    laserpulse.h \
-    laserseedthread.h \
-    laserpulsethread.h \
+    devices\laserseed.h \
+    devices\laserpulse.h \
+    devices\laserseedthread.h \
+    devices\laserpulsethread.h \
     dswf.h \
     parametersetdialog.h \
     dispsettings.h \
