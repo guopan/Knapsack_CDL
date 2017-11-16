@@ -25,6 +25,7 @@
 #include <laserpulse.h>
 #include <laserseed.h>
 #include <devicescontrol.h>
+#include <stgraph.h>
 
 
 namespace Ui {
@@ -47,6 +48,8 @@ public:
     double V_speed[Max_nLayers];
     double Height_values[Max_nLayers];
 
+public slots:
+    void changeData();
 signals:
     void size_changed();                    // 用于调整实时风速显示的widget高度
 
@@ -85,6 +88,10 @@ private:
     // 数据显示
     wind_display *DisplaySpeed;
     void resizeEvent(QResizeEvent * event);
+    STGraph *stGraph_HSpeed;
+
+    double minDetectRange;      // 垂直向 最小探测距离
+    double rangeResol;          // 垂直向 距离分辨率
 
     //参数配置
     SOFTWARESETTINGS mysetting;

@@ -8,6 +8,7 @@
 #include <QFont>
 #include <QString>
 #include <QGridLayout>
+#include <QDockWidget>
 #include "display/wind_display.h"
 #include "display/rt_display.h"
 
@@ -45,21 +46,45 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "tool bar created";
 
     //显示部分
+    stGraph_HSpeed = new STGraph(this);
     DisplaySpeed = new wind_display(this);
     UpdateHeightsValue();
-    ui->gridLayout->addWidget(DisplaySpeed);
+    setCentralWidget(DisplaySpeed);
 
+    QDockWidget *dockWidget_1;
+    dockWidget_1 = new QDockWidget;
+    dockWidget_1->setWidget( stGraph_HSpeed);
+    dockWidget_1->setFeatures(QDockWidget::NoDockWidgetFeatures);
+
+    dockWidget_1->setWindowTitle(QString::fromLocal8Bit("水平风速时空分布"));
+    addDockWidget(Qt::LeftDockWidgetArea, dockWidget_1);
+    stGraph_HSpeed->initialShow(mysetting.nRangeBin, 132, 88);
+
+//    connect(devicesControl, &DevicesControl::hVelocityReady, stGraph_HSpeed, &STGraph::updateShow);
     connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
     devicesControl = new DevicesControl();
     connect(devicesControl, &DevicesControl::hVelocityReady, this, &MainWindow::updateHVelocityDisp);
     connect(devicesControl, &DevicesControl::hAngleReady, this, &MainWindow::updateHAngleDisp);
     connect(devicesControl, &DevicesControl::vVelocityReady, this, &MainWindow::updateVVelocityDisp);
 
+    // 控制部分
     workThread = new QThread;
     devicesControl->moveToThread(workThread);
     connect(workThread, &QThread::finished, devicesControl, &QObject::deleteLater);
     workThread->start();
     isWorking = false;
+
+    // 显示测试用
+    for (int i = 0; i < Max_nLayers; ++i)
+    {
+        H_speed[i] = 0;
+        V_speed[i] = 0;
+        H_direction[i] = 0;
+    }
+    // 构造定时器，设置超时为 1 秒
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(changeData()));
+//    timer->start(1000);
 }
 
 MainWindow::~MainWindow()
@@ -81,6 +106,8 @@ void MainWindow::setActionTriggered()
     if (parameterSetDialog->exec() == QDialog::Accepted) {
         mysetting =  parameterSetDialog->getParaSettings();
         UpdateHeightsValue();       //刷新显示
+        UpdateHeightsValue();       //刷新显示
+        stGraph_HSpeed->initialShow(mysetting.nRangeBin, 132, 88);
     }
     delete parameterSetDialog;
 }
@@ -190,6 +217,7 @@ void MainWindow::UpdateHeightsValue()
     for(int i=0;i<nRB_ovlp;i++)
     {
         Height_values[i] = minDetectRange + i*rangeResol;
+        qDebug()<<Height_values[i];
     }
     DisplaySpeed->set_nLayers(nRB_ovlp);
     DisplaySpeed->setHeights(Height_values);
@@ -199,6 +227,7 @@ void MainWindow::updateHVelocityDisp(double *hVelocity)
 {
     DisplaySpeed->setHSpeed(hVelocity);
     qDebug() << "HSpeed update show";
+    stGraph_HSpeed->updateShow(hVelocity);
 }
 
 void MainWindow::updateHAngleDisp(double *hAngle)
@@ -257,4 +286,30 @@ void MainWindow::checkDataFilePath()
         }
     }
     mysetting.dataFilePath = str;
+}
+
+void MainWindow::changeData()
+{
+    for (int i = 0; i < Max_nLayers; ++i)
+    {
+        H_speed[i] += (1.3 - H_speed[i]*0.01*i);
+        if(H_speed[i]>15)
+            H_speed[i] -= 14.3;
+
+        H_direction[i] += 1.3 + H_direction[i]*0.2 + i/18;
+        if(H_direction[i] >= 360)
+            H_direction[i] -= 360;
+
+        V_speed[i] += 0.7-0.2*i;
+        if(V_speed[i]>6)
+            V_speed[i] -= 12 + i/12;
+        if(V_speed[i]<-6)
+            V_speed[i] += 8 + i/7;
+    }
+    DisplaySpeed->setHSpeed(H_speed);
+    DisplaySpeed->setVSpeed(V_speed);
+    DisplaySpeed->setHDirection(H_direction);
+
+    stGraph_HSpeed->updateShow(H_speed);
+//    stGraph_VSpeed->updateShow(V_speed);
 }
