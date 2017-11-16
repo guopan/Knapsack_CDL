@@ -2,11 +2,11 @@
 #define DEVICESCONTROL_H
 
 #include <QObject>
-#include <adq214.h>
-#include <compass.h>
-#include <motor.h>
-#include <laserpulse.h>
-#include <laserseed.h>
+#include "devices/adq214.h"
+#include "devices/compass.h"
+#include "devices/motor.h"
+#include "devices/laserpulse.h"
+#include "devices/laserseed.h"
 #include <global_defines.h>
 #include <ADQAPI.h>
 #include <QDebug>
@@ -21,8 +21,8 @@
 #include <dispsettings.h>
 #include <eigen/Eigen>
 #include <Eigen/Dense>
-#include <dswf.h>
-#include <fswf.h>
+#include "calculate/dswf.h"
+#include "calculate/fswf.h"
 
 using namespace Eigen;
 

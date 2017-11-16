@@ -25,57 +25,57 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    mainwindow.cpp \
+    admintoolbar.cpp \
+    calculate\dswf.cpp \
+    calculate\fswf.cpp \
+    devices\adq214.cpp \
     devices\compass.cpp \
     devices\compassthread.cpp \
+    devices\laserpulse.cpp \
+    devices\laserpulsethread.cpp \
+    devices\laserseed.cpp \
+    devices\laserseedthread.cpp \
     devices\motor.cpp \
     devices\motorthread.cpp \
-    devices\adq214.cpp \
-    display\wind_display.cpp \
-    display\rt_display.cpp \
-    display\rt_title.cpp \
-    usertoolbar.cpp \
-    admintoolbar.cpp \
-    display\rt_scale.cpp \
-    settingfile.cpp \
-    devices\laserseed.cpp \
-    devices\laserpulse.cpp \
-    devices\laserseedthread.cpp \
-    devices\laserpulsethread.cpp \
-    dswf.cpp \
-    parametersetdialog.cpp \
-    dispsettings.cpp \
     devicescontrol.cpp \
-    fswf.cpp \
+    display\rt_display.cpp \
+    display\rt_scale.cpp \
+    display\rt_title.cpp \
     display\stdata.cpp \
-    display\stgraph.cpp
+    display\stgraph.cpp \
+    display\wind_display.cpp \
+    dispsettings.cpp \
+    mainwindow.cpp \
+    parametersetdialog.cpp \
+    settingfile.cpp \
+    usertoolbar.cpp
 
 HEADERS += \
         mainwindow.h \
+    admintoolbar.h \
+    calculate\dswf.h \
+    calculate\fswf.h \
+    devices\adq214.h \
     devices\compass.h \
     devices\compassthread.h \
+    devices\laserpulse.h \
+    devices\laserpulsethread.h \
+    devices\laserseed.h \
+    devices\laserseedthread.h \
     devices\motor.h \
     devices\motorthread.h \
-    devices\adq214.h \
-    display\wind_display.h \
-    global_defines.h \
-    display\rt_display.h \
-    display\rt_title.h \
-    usertoolbar.h \
-    admintoolbar.h \
-    display\rt_scale.h \
-    settingfile.h \
-    devices\laserseed.h \
-    devices\laserpulse.h \
-    devices\laserseedthread.h \
-    devices\laserpulsethread.h \
-    dswf.h \
-    parametersetdialog.h \
-    dispsettings.h \
     devicescontrol.h \
-    fswf.h \
+    display\rt_display.h \
+    display\rt_scale.h \
+    display\rt_title.h \
     display\stdata.h \
-    display\stgraph.h
+    display\stgraph.h \
+    display\wind_display.h \
+    dispsettings.h \
+    global_defines.h \
+    parametersetdialog.h \
+    settingfile.h \
+    usertoolbar.h
 
 FORMS += \
         mainwindow.ui \

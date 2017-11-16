@@ -9,7 +9,6 @@
 #include <QString>
 #include <QGridLayout>
 #include <QDockWidget>
-#include "display/wind_display.h"
 #include "display/rt_display.h"
 
 MainWindow::MainWindow(QWidget *parent) :

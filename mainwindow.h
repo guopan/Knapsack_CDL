@@ -2,30 +2,23 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "compass.h"
-#include "motor.h"
-#include "motorthread.h"
-#include "adq214.h"
 #include "global_defines.h"
 #include "settingfile.h"
-#include <parametersetdialog.h>
+#include "parametersetdialog.h"
 
 #include <QDebug>
-#include "display/wind_display.h"
 #include <QLabel>
 #include <QTimer>
 #include <QWidget>
-#include "mainwindow.h"
 #include <QToolBar>
 #include <QAction>
 #include <QMouseEvent>
 #include <QKeyEvent>
-#include <usertoolbar.h>
-#include <admintoolbar.h>
-#include <laserpulse.h>
-#include <laserseed.h>
-#include <devicescontrol.h>
-#include <stgraph.h>
+#include "usertoolbar.h"
+#include "admintoolbar.h"
+#include "devicescontrol.h"
+#include "display/wind_display.h"
+#include "display/stgraph.h"
 
 
 namespace Ui {
