@@ -45,7 +45,10 @@ SOURCES += \
     dswf.cpp \
     parametersetdialog.cpp \
     dispsettings.cpp \
-    devicescontrol.cpp
+    devicescontrol.cpp \
+    fswf.cpp \
+    stdata.cpp \
+    stgraph.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -69,7 +72,10 @@ HEADERS += \
     dswf.h \
     parametersetdialog.h \
     dispsettings.h \
-    devicescontrol.h
+    devicescontrol.h \
+    fswf.h \
+    stdata.h \
+    stgraph.h
 
 FORMS += \
         mainwindow.ui \
@@ -79,6 +85,9 @@ INCLUDEPATH += \
     $$quote(C:/Program Files/SP Devices/ADQAPI/)\
  C:\eigen\
 .\diplay\
-
+ C:/nlopt
 RESOURCES += \
     icons.qrc
+#INCLUDEPATH +=C:/nlopt
+LIBS += -LC:/nlopt -lnlopt
+CONFIG += qwt
