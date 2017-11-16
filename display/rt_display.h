@@ -10,7 +10,7 @@ class rt_display : public QWidget
 public:
     explicit rt_display(QWidget *parent = nullptr);
 public:
-    void setHeight(const int h);
+    void setHeight(const double h);
     void setHSpeed(const double sp, const int scale);
     void setVSpeed(const double sp);
     void setHdirection(const double dir);

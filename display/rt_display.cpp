@@ -241,7 +241,7 @@ void rt_display::paintEvent(QPaintEvent *event)
 }
 
 // 设置高度层数值
-void rt_display::setHeight(const int h)
+void rt_display::setHeight(const double h)
 {
     if(H != h)
     {
