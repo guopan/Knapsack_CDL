@@ -47,8 +47,8 @@ SOURCES += \
     dispsettings.cpp \
     devicescontrol.cpp \
     fswf.cpp \
-    stdata.cpp \
-    stgraph.cpp
+    display\stdata.cpp \
+    display\stgraph.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -74,8 +74,8 @@ HEADERS += \
     dispsettings.h \
     devicescontrol.h \
     fswf.h \
-    stdata.h \
-    stgraph.h
+    display\stdata.h \
+    display\stgraph.h
 
 FORMS += \
         mainwindow.ui \
