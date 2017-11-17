@@ -100,6 +100,8 @@ private:
     double *vVelocity = NULL;
     double Height_values[Max_nLayers];
 
+    double *vectorVelocity = NULL;
+
     QDateTime CaptureTime;          // 当前方向的采集时间
     QString SpecFileName;
     QString VeloFileName;

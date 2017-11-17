@@ -254,7 +254,7 @@ void DevicesControl::On_ControlTimer_TimeOut()
                 for (int i = 0; i < azimuthAngle.rows(); i++) {
                     azAngle[i] = azimuthAngle(i);
                 }
-                double sigama2=4;
+                double sigama2 = 4;
 
                 if (hVelocity != NULL) {
                     delete [] hVelocity;
@@ -269,7 +269,6 @@ void DevicesControl::On_ControlTimer_TimeOut()
                 hAngle = new double [nRB_ovlp];
                 vVelocity = new double [nRB_ovlp];
 
-                double *vectorVelocity;
                 for(int i=0;i<nRB_ovlp;i++)
                 {
                     double *losVelocityPerHeight=new double [mysetting.nDirsVectorCal];
@@ -277,8 +276,8 @@ void DevicesControl::On_ControlTimer_TimeOut()
                     {
                         losVelocityPerHeight[j]=losVelocityMat(i,j);
                     }
-                    vectorVelocity=fswf.getVelocity(mysetting.nDirsVectorCal,sigama2,mysetting.elevationAngle,azAngle,losVelocityPerHeight);
-                    hVelocity[i]=qSqrt(*(vectorVelocity+1)**(vectorVelocity+1) +
+                    vectorVelocity = fswf.getVelocity(mysetting.nDirsVectorCal,sigama2,mysetting.elevationAngle,azAngle,losVelocityPerHeight);
+                    hVelocity[i] = qSqrt(*(vectorVelocity+1)**(vectorVelocity+1) +
                                        *(vectorVelocity+2)**(vectorVelocity+2));
                     hAngle[i] = 0.0-qRadiansToDegrees(qAtan2(*(vectorVelocity+2), *(vectorVelocity+1)));
                     if(hAngle[i] < 0) {
@@ -297,8 +296,6 @@ void DevicesControl::On_ControlTimer_TimeOut()
                 hAngle = dswf.getHAngle();
                 vVelocity = dswf.getVVelocity();
             }
-
-
 
             SaveVelo_AddData();     // 存储矢量风速到文件
             //更新显示
@@ -426,7 +423,7 @@ void DevicesControl::LOSVelocityCal(const int heightNum, const int totalSpecPoin
     }
     memset(losVelocity, 0, sizeof(double)*(heightNum-2));
     for(int i=0; i<heightNum-2; i++) {
-        losVelocity[i] = (freqAxis[losVelocityIndex[i]] - freqAxis[aomIndex])*lambda/2;
+        losVelocity[i] = -(freqAxis[losVelocityIndex[i]] - freqAxis[aomIndex])*lambda/2;
     }
 }
 

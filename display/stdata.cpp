@@ -11,17 +11,16 @@ void STData::setSize(int nLayers)
     updatedata = new double[10*n_layer]{0};
 }
 
-//STData::~STData()
-//{
-//    delete updatedata;
-//}
+STData::~STData()
+{
+    delete updatedata;
+}
 
 void STData::setHeightsLabel(double minHeight, double maxHeight)
 {
     setInterval( Qt::XAxis, QwtInterval( -10, 0, QwtInterval::ExcludeMaximum ) );
-    setInterval( Qt::YAxis, QwtInterval( minHeight, maxHeight, QwtInterval::ExcludeMaximum ) );
-//    setInterval( Qt::YAxis, QwtInterval( 0, 1000, QwtInterval::ExcludeMaximum ) );
-//    setInterval( Qt::ZAxis, QwtInterval( 0, 15) );
+    setInterval( Qt::YAxis, QwtInterval( minHeight-44, maxHeight+44, QwtInterval::ExcludeMaximum ) );
+
 }
 
 void STData::setdata(const double *s)

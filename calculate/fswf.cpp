@@ -48,8 +48,8 @@ double *FSWF::getVelocity(const double &length, const double &sigama2, const dou
     myData->azimuthAngle=azimuthAngle;
     myData->losVelocity=losVelocity;
 
-    double lb[3] = {-5,-15,-15};
-    double ub[3] = {5,15,15};
+    double lb[3] = {-20,-50,-50};
+    double ub[3] = {20,50,50};
     nlopt_opt opt;
     opt = nlopt_create(NLOPT_LD_LBFGS, 3);
     nlopt_set_lower_bounds(opt,lb);

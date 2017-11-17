@@ -25,13 +25,20 @@ STGraph::STGraph( QWidget *parent ):
 
     setAxisScale( QwtPlot::xBottom, -10, 0 );
     setAxisMaxMinor( QwtPlot::xBottom, 0 );
-//    ColorMap *myColorMap = new ColorMap();
+    //    ColorMap *myColorMap = new ColorMap();
     d_spectrogram->setColorMap( new ColorMap());
 
-    QFont font("Î¢ÈíÑÅºÚ",12);
+    QFont font("Microsoft Yahei",12);
     font.setBold(true);
     setAxisFont(QwtPlot::yLeft,font);
     setAxisFont(QwtPlot::xBottom,font);
+
+    //    QList<double> ticks;
+    //    ticks << 132 << 220 << 308 << 396 << 484 << 572 << 660 << 748 << 836 << 924 << 1012 << 1100 << 1188 << 1276;
+    ////    ticks << 132 << 220 << 308 << 396 << 484 << 572 << 660 << 748 << 836 << 924 << 1012 << 1100;
+    //    QwtScaleDiv scaleDiv(88, 1320);
+    //    scaleDiv.setTicks(QwtScaleDiv::MajorTick, ticks);
+    //    setAxisScaleDiv(QwtPlot::yLeft, scaleDiv);
 
     stData = new STData;
 }
@@ -42,11 +49,21 @@ void STGraph::initialShow(int nLayers, double minHeight, double heightStep)
     stData->setdata(new double[nLayers]{0});
     stData->setHeightsLabel(minHeight, minHeight + (nLayers-1)*heightStep);
 
+    QList<double> ticks;
+    //    ticks << 132 << 220 << 308 << 396 << 484 << 572 << 660 << 748 << 836 << 924 << 1012 << 1100 << 1188 << 1276;
+    //    ticks << 132 << 220 << 308 << 396 << 484 << 572 << 660 << 748 << 836 << 924 << 1012 << 1100;
+    for(int i=0;i<nLayers;i++) {
+        ticks += minHeight + i*heightStep;
+    }
+    QwtScaleDiv scaleDiv(minHeight-heightStep/2, minHeight + (nLayers-1)*heightStep+heightStep/2);
+    scaleDiv.setTicks(QwtScaleDiv::MajorTick, ticks);
+    setAxisScaleDiv(QwtPlot::yLeft, scaleDiv);
+
     d_spectrogram->setData( stData );
     d_spectrogram->attach(this);
-    setAxisScale( QwtPlot::yLeft, minHeight, minHeight + (nLayers-1)*heightStep, heightStep );
+//    setAxisScale( QwtPlot::yLeft, minHeight, minHeight + (nLayers-1)*heightStep, heightStep );
 
-//    static_cast<STData *>( d_spectrogram->data() )->setResampleMode( static_cast<QwtMatrixRasterData::ResampleMode>( 0 ));
+    //    static_cast<STData *>( d_spectrogram->data() )->setResampleMode( static_cast<QwtMatrixRasterData::ResampleMode>( 0 ));
     stData->setResampleMode(QwtMatrixRasterData::NearestNeighbour);
 
     d_spectrogram->setDisplayMode(QwtPlotSpectrogram::ContourMode, false);       //ÉèÖÃÏÔÊ¾Ä£Ê½
@@ -55,12 +72,12 @@ void STGraph::initialShow(int nLayers, double minHeight, double heightStep)
     //zÖá
     zInterval.setInterval(0,15);
     // A color bar on the right axis
-//    QwtScaleWidget *rightAxis = axisWidget( QwtPlot::yRight );
+    //    QwtScaleWidget *rightAxis = axisWidget( QwtPlot::yRight );
     rightAxis = axisWidget( QwtPlot::yRight );
     rightAxis->setColorBarEnabled( true );
     rightAxis->setColorBarWidth( 40 );
     rightAxis->setColorMap( zInterval, new ColorMap());
-    QFont font("Î¢ÈíÑÅºÚ",12);
+    QFont font("Microsoft Yahei",12);
     font.setBold(true);
     rightAxis->setFont(font);
     setAxisScale( QwtPlot::yRight, zInterval.minValue(), zInterval.maxValue() );

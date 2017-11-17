@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     dockWidget_1->setWindowTitle(QString::fromLocal8Bit("水平风速时空分布"));
     addDockWidget(Qt::LeftDockWidgetArea, dockWidget_1);
-    stGraph_HSpeed->initialShow(mysetting.nRangeBin, 132, 88);
+    stGraph_HSpeed->initialShow(mysetting.nRangeBin, minDetectRange, rangeResol);
 
 //    connect(devicesControl, &DevicesControl::hVelocityReady, stGraph_HSpeed, &STGraph::updateShow);
     connect(this, &MainWindow::size_changed,DisplaySpeed, &wind_display::setSubSize);
@@ -83,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // 构造定时器，设置超时为 1 秒
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(changeData()));
-//    timer->start(1000);
+    timer->start(1000);
 }
 
 MainWindow::~MainWindow()
@@ -106,7 +106,7 @@ void MainWindow::setActionTriggered()
         mysetting =  parameterSetDialog->getParaSettings();
         UpdateHeightsValue();       //刷新显示
         UpdateHeightsValue();       //刷新显示
-        stGraph_HSpeed->initialShow(mysetting.nRangeBin, 132, 88);
+        stGraph_HSpeed->initialShow(mysetting.nRangeBin, minDetectRange, rangeResol);
     }
     delete parameterSetDialog;
 }
@@ -200,10 +200,10 @@ void MainWindow::UpdateHeightsValue()
 
     //垂直向 最小探测距离
     double resol = lightSpeed/mysetting.sampleFreq/1000000/2;        //单采样点的径向分辨率
-    double minDetectRange = resol*(mysetting.nPointsMirrorWidth+mysetting.nPointsPerBin/2);
+    minDetectRange = resol*(mysetting.nPointsMirrorWidth+mysetting.nPointsPerBin/2);
     minDetectRange = minDetectRange*qSin(qDegreesToRadians(mysetting.elevationAngle));
     //垂直向 距离分辨率
-    double rangeResol = resol*(mysetting.nPointsPerBin*(1-mysetting.overlapRatio));
+    rangeResol = resol*(mysetting.nPointsPerBin*(1-mysetting.overlapRatio));
     rangeResol = rangeResol*qSin(qDegreesToRadians(mysetting.elevationAngle));
 
     //重叠后距离门数（0或0.5）

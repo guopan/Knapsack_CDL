@@ -11,10 +11,10 @@ class STData : public QwtMatrixRasterData
 //    Q_OBJECT
 public:
     STData( );
-//    ~STData();
+    ~STData();
 
     void setdata(const double *s);
-    void setSize(int layer);
+    void setSize(int nLayers);
     void setHeightsLabel(double minHeight, double maxHeight);
 private:
     int n_layer;
