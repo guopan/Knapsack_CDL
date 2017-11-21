@@ -70,6 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     workThread = new QThread;
     devicesControl->moveToThread(workThread);
     connect(workThread, &QThread::finished, devicesControl, &QObject::deleteLater);
+    connect(devicesControl, &DevicesControl::detectionFinished, userToolBar, &UserToolBar::set_to_stopped);
     workThread->start();
     isWorking = false;
 

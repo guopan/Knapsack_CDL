@@ -39,7 +39,7 @@ signals:
     void hVelocityReady(double *hVelocity);
     void hAngleReady(double *hAngle);
     void vVelocityReady(double *vVelocity);
-
+    void detectionFinished();
 private slots:
     void showCompassAngle(const double &s);
     void checkMotorAngle(const double &s);

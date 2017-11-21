@@ -22,6 +22,7 @@ DevicesControl::DevicesControl(QObject *parent) : QObject(parent)
     connect(&LaserPulse,&laserPulse::laserPulseError, this,&DevicesControl::laserErrorHint);
 //    connect(&LaserSeed,&laserSeed::laserColseRight, this,&DevicesControl::quitControlTimer);
     connect(&LaserSeed,&laserSeed::laserColseRight, ControlTimer,&QTimer::stop);
+    connect(&LaserSeed,&laserSeed::laserColseRight, this,&DevicesControl::detectionFinished);
 
 //    connect(&Motor, &motor::motorClosed, this, &DevicesControl::quitLaser);
     connect(&Motor, &motor::motorClosed, &LaserPulse, &laserPulse::closePulseLaser);
