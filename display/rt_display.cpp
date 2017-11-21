@@ -198,7 +198,7 @@ void rt_display::paintEvent(QPaintEvent *event)
             painter.drawConvexPolygon(VS_Triangle_P, 3);
             painter.translate(80,0);
         }
-        VS_Triangle_P[1].setX(qRound(V_length*8/16*80/3));
+        VS_Triangle_P[1].setX(qRound(V_length*80/3));
         VS_Triangle_P[1].setY(qRound(V_length*80/1.5-80));
         VS_Triangle_P[2].setY(qRound(V_length*80/1.5-80));
         painter.drawConvexPolygon(VS_Triangle_P, 3);
@@ -213,7 +213,7 @@ void rt_display::paintEvent(QPaintEvent *event)
             painter.drawConvexPolygon(VS_Triangle_N, 3);
             painter.translate(80,0);
         }
-        VS_Triangle_N[1].setX(qRound(V_length*(-8)/16*80/3));
+        VS_Triangle_N[1].setX(qRound(V_length*(-80)/3));
         VS_Triangle_N[1].setY(qRound(V_length*80/1.5+80));
         VS_Triangle_N[2].setY(qRound(V_length*80/1.5+80));
         painter.drawConvexPolygon(VS_Triangle_N, 3);

@@ -29,6 +29,7 @@ wind_display::wind_display(QWidget *parent) : QWidget(parent)
 
     setLayout(Vlayout);    //整体布局
     HSpeedScale = 1;
+    setMinimumSize(240, 640);
 }
 
 wind_display::~wind_display()
@@ -103,7 +104,7 @@ void wind_display::setSubSize()
 {
     int h = height();
     h = int((h-99)/(nLayers+2));
-    if(h<0)
+    if(h<=0)
         h = 10;
     my_title->setHSizeHint(h);
     for(int i=0;i<nLayers;i++)
