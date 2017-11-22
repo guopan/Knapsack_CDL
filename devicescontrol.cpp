@@ -275,9 +275,10 @@ void DevicesControl::On_ControlTimer_TimeOut()
                     double *losVelocityPerHeight=new double [mysetting.nDirsVectorCal];
                     for(int j=0;j<mysetting.nDirsVectorCal;j++)
                     {
-                        losVelocityPerHeight[j]=losVelocityMat(i,j);
+                        losVelocityPerHeight[j]=losVelocityMat(i,j); //每个高度层各个方向的径向风速
                     }
                     vectorVelocity = fswf.getVelocity(mysetting.nDirsVectorCal,sigama2,mysetting.elevationAngle,azAngle,losVelocityPerHeight);
+                    //根据返回的径向风速依次得到水平风速、水平风向、垂直风速
                     hVelocity[i] = qSqrt(*(vectorVelocity+1)**(vectorVelocity+1) +
                                        *(vectorVelocity+2)**(vectorVelocity+2));
                     hAngle[i] = 0.0-qRadiansToDegrees(qAtan2(*(vectorVelocity+2), *(vectorVelocity+1)));
@@ -285,12 +286,12 @@ void DevicesControl::On_ControlTimer_TimeOut()
                         hAngle[i] = hAngle[i] + 360.0;
                     }
                     vVelocity[i] = *vectorVelocity;
-//                    delete []vectorVelocity;
                     delete []losVelocityPerHeight;
                 }
                 delete []azAngle;
             }
             else{
+                //直接正弦波拟合
                 std::cout << "azimuthAngle = " << azimuthAngle << std::endl;
                 DSWF dswf(mysetting.elevationAngle,azimuthAngle,mysetting.nDirsVectorCal,nRB_ovlp,losVelocityMat);
                 hVelocity = dswf.getHVelocity();
