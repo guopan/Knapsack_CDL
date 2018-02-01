@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
-#include<QTimer>
+#include <QTimer>
 #include <QByteArray>
-#include "laserseedthread.h"
+#include "serialportthread.h"
 #include "laserpulse.h"
 
 class laserSeed : public QObject
@@ -19,7 +19,7 @@ public:
     void closeSeedLaser();
     void checkLaser();
 private slots:
-    void receive_response(const QString &temp);
+    void receive_response(const QByteArray &s);
     void portError();
     void timeout();
 
@@ -33,8 +33,10 @@ private:
     QByteArray senddata;
     QString laserPort,errorCode;
     bool powerSet, fire, close, openPulse;
-    laserseedthread Laserseedthread;
+    serialportThread laserseedThread;
     double seedPower,pulsePower;
+
+    int baud,waittimeout,waitForReadyReadTime;
 };
 
 #endif // LASERSEED_H

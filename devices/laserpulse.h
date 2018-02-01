@@ -4,9 +4,9 @@
 #include <QObject>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
-#include<QTimer>
+#include <QTimer>
 #include <QByteArray>
-#include "laserpulsethread.h"
+#include "serialportthread.h"
 #include "laserseed.h"
 
 class laserPulse : public QObject
@@ -22,7 +22,7 @@ public slots:
     void beginPulseLaser(const double &s);
 
 private slots:
-    void receive_response(const QString &temp);
+    void receive_response(const QByteArray &s);
     void portError();
     void timeout();
 
@@ -32,12 +32,13 @@ signals:
     void laserPulseError(QString &s);
     void pulseCloseReady();
     void laserWorkRight();
-private:    
+private:
     QByteArray senddata;
     QString laserPort,errorCode;
     bool powerSet,fire,close;
-    laserpulsethread Laserpulsethread;
+    serialportThread laserpulseThread;
     double pulsePower;
+    int baud,waittimeout,waitForReadyReadTime;
 };
 
 #endif // laserPulse_H

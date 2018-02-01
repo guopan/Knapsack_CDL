@@ -5,9 +5,13 @@
 
 compass::compass(QObject *parent) : QObject(parent)
 {
-    connect(&workthread, &compassThread::response, this, &compass::showResponse);
-    connect(&workthread, &compassThread::error, this, &compass::processError);
-    connect(&workthread, &compassThread::timeout, this, &compass::processError);
+    connect(&compassThread, &serialportThread::response, this, &compass::showResponse);
+    connect(&compassThread, &serialportThread::PortNotOpen, this, &compass::processError);
+    connect(&compassThread, &serialportThread::timeout, this, &compass::processError);
+
+    baud = 9600;
+    waittimeout = 3000;
+    waitForReadyReadTime = 30;
 }
 
 void compass::read()
@@ -15,7 +19,8 @@ void compass::read()
     //要发送的命令
     QByteArray str = "6804000408";
     senddata=QByteArray::fromHex(str);
-    workthread.transaction(CompassComPort,senddata);
+
+    compassThread.transaction(CompassComPort,senddata,baud,waittimeout,waitForReadyReadTime);
 }
 
 //SXXX.YYS 为符号位（0 正，1 负）XXX 为三位整数值，YY 为两位位小数值。如 10 26 87 表示-26.87o
@@ -43,11 +48,11 @@ void compass::showResponse(const QByteArray &s)
     str_head = temp.mid(20,6);
 
     headAngle = toangle(str_head);
-    //    qDebug()<<"result="<<result;
+
     emit this->compassAngle(headAngle);
 }
 
-void compass::processError(const QString &s)
+void compass::processError()
 {
-    qDebug()<<"compass error:"<<s;
+    qDebug()<<"compass error:";
 }

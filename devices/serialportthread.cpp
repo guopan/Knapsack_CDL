@@ -1,18 +1,16 @@
-#include "compassthread.h"
+#include "serialportthread.h"
+#include "serialportthread.h"
 #include <QtSerialPort/QSerialPort>
-
 #include <QTime>
-
 #include <QDebug>
 
 QT_USE_NAMESPACE
-
-compassThread::compassThread(QObject *parent)
+serialportThread::serialportThread(QObject *parent)
     : QThread(parent), waitTimeout(0), quit(false)
 {
-}
 
-compassThread::~compassThread()
+}
+serialportThread::~serialportThread()
 {
     mutex.lock();
     quit = true;
@@ -21,24 +19,28 @@ compassThread::~compassThread()
     wait();
 }
 
-void compassThread::transaction(const QString &portName, const QByteArray &request)
+void serialportThread::transaction(const QString &portName, const QByteArray &request,
+                                   const int baud, const int waitTimeout, const int waitForReadyReadTime)
 {
-    qDebug() << "Compass port name: " << portName;
+    //qDebug() << "Compass port name: " << portName;
     QMutexLocker locker(&mutex);
     this->portName = portName;
+    this->waitTimeout = waitTimeout;
     this->request = request;
-    //! [3]
+    this->baud = baud;
+    this->waitForReadyReadTime = waitForReadyReadTime;
+
     if (!isRunning())
     {
-         start();
+        start();
     }
     else
     {
-       cond.wakeOne();
+        cond.wakeOne();
     }
 }
 
-void compassThread::run()
+void serialportThread::run()
 {
     bool currentPortNameChanged = false;
     mutex.lock();
@@ -48,8 +50,7 @@ void compassThread::run()
         currentPortName = portName;
         currentPortNameChanged = true;
     }
-    int currentWaitTimeout = 1000;
-    waitTimeout=3000;
+    int currentWaitTimeout = waitTimeout;
     QByteArray currentRequest = request;
     mutex.unlock();
     QSerialPort serial;
@@ -61,56 +62,74 @@ void compassThread::run()
             serial.setPortName(currentPortName);
             if (!serial.open(QIODevice::ReadWrite))
             {
-                emit error(tr("Can't open %1, error code %2")
-                           .arg(portName).arg(serial.error()));
+                emit PortNotOpen();
+
                 return;
             }
-            serial.setBaudRate(QSerialPort::Baud9600);			//波特率
+            switch (baud)
+            {
+            case 4800:
+                serial.setBaudRate(QSerialPort::Baud4800);
+                break;
+            case 9600:
+                serial.setBaudRate(QSerialPort::Baud9600);
+                break;
+            case 19200:
+                serial.setBaudRate(QSerialPort::Baud19200);
+                break;
+            case 115200:
+                serial.setBaudRate(QSerialPort::Baud115200);    //波特率
+                break;
+            default:
+                break;
+            }
             serial.setDataBits(QSerialPort::Data8);				//数据位
             serial.setParity(QSerialPort::NoParity);			//校验位
             serial.setStopBits(QSerialPort::OneStop);			//停止位
             serial.setFlowControl(QSerialPort::NoFlowControl);	//流控制
         }
+
         QByteArray requestData = currentRequest;
         serial.write(requestData);
 
+
         if (serial.waitForBytesWritten(waitTimeout))                        //有字节写入时就开启，时间终止后跳出
         {
-             if (serial.waitForReadyRead(currentWaitTimeout))                //有信号可读时就开启，时间终止后跳出
-             {
+            if (serial.waitForReadyRead(currentWaitTimeout))                //有信号可读时就开启，时间终止后跳出
+            {
                 QByteArray responseData = serial.readAll();                  //先读取一次
-                while (serial.waitForReadyRead(30))                          // 如果在20s内还有可读数据就继续读取
+                while (serial.waitForReadyRead(waitForReadyReadTime))        // 如果在waitForReadyReadTime内还有可读数据就继续读取
                 {
                     responseData += serial.readAll();                        //将读取信号拼接为完整的接收信号
                 }
-                 emit this->response(responseData);
+
+                emit this->response(responseData);                           //返回命令统一以QByteArray类发送，具体器件各自再做处理
             }
-             else
-             {
-                emit timeout(tr("Wait read response timeout %1")
-                    .arg(QTime::currentTime().toString()));
-             }
+            else
+            {
+                emit this->timeout();
+               return;
+            }
 
         }
         else
         {
-            emit timeout(tr("Wait write request timeout %1")
-                         .arg(QTime::currentTime().toString()));
+            emit this->timeout();
+         return;
         }
-
         mutex.lock();
         cond.wait(&mutex);
-       if (currentPortName != portName)
-       {
+        if(currentPortName != portName)
+        {
             currentPortName = portName;
             currentPortNameChanged = true;
-       }
-       else
-       {
+        }
+        else
             currentPortNameChanged = false;
-       }
+
         currentWaitTimeout = waitTimeout;
         currentRequest = request;
         mutex.unlock();
     }
 }
+

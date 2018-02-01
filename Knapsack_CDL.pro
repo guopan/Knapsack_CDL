@@ -30,13 +30,9 @@ SOURCES += \
     calculate\fswf.cpp \
     devices\adq214.cpp \
     devices\compass.cpp \
-    devices\compassthread.cpp \
     devices\laserpulse.cpp \
-    devices\laserpulsethread.cpp \
     devices\laserseed.cpp \
-    devices\laserseedthread.cpp \
     devices\motor.cpp \
-    devices\motorthread.cpp \
     devicescontrol.cpp \
     display\rt_display.cpp \
     display\rt_scale.cpp \
@@ -48,7 +44,8 @@ SOURCES += \
     mainwindow.cpp \
     parametersetdialog.cpp \
     settingfile.cpp \
-    usertoolbar.cpp
+    usertoolbar.cpp \
+    devices/serialportthread.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -57,13 +54,9 @@ HEADERS += \
     calculate\fswf.h \
     devices\adq214.h \
     devices\compass.h \
-    devices\compassthread.h \
     devices\laserpulse.h \
-    devices\laserpulsethread.h \
     devices\laserseed.h \
-    devices\laserseedthread.h \
     devices\motor.h \
-    devices\motorthread.h \
     devicescontrol.h \
     display\rt_display.h \
     display\rt_scale.h \
@@ -75,19 +68,22 @@ HEADERS += \
     global_defines.h \
     parametersetdialog.h \
     settingfile.h \
-    usertoolbar.h
+    usertoolbar.h \
+    devices/serialportthread.h
 
 FORMS += \
         mainwindow.ui \
     parametersetdialog.ui
+
 win32: LIBS += -L$$quote(C:/Program Files/SP Devices/ADQAPI/) -lADQAPI
+LIBS += -LC:/nlopt -lnlopt
+
 INCLUDEPATH += \
     $$quote(C:/Program Files/SP Devices/ADQAPI/)\
- C:\eigen\
-.\diplay\
- C:/nlopt
+    C:/eigen/\
+    C:/nlopt/
+
 RESOURCES += \
     icons.qrc
-#INCLUDEPATH +=C:/nlopt
-LIBS += -LC:/nlopt -lnlopt
+
 CONFIG += qwt
